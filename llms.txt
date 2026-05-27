@@ -1,0 +1,57 @@
+# Fast Track School Supplies
+
+> Fast Track School Supplies is an online service that takes the work out of back-to-school shopping. Parents upload their child's school supply list, the AI matches every item to the right product, and a packed kit ships to the door before the first bell. Pre-built grade-level kits and gift options for grandparents are also available.
+
+## What we do
+
+Fast Track School Supplies replaces the annual scramble of running from store to store for school supplies. We offer three ways to shop:
+
+1. **Upload a supply list** — Parents drop a photo or PDF of the teacher's supply list. An AI assistant reads every line, matches each item to a SKU in our catalog, and builds a cart in seconds.
+2. **Pre-built grade kits** — Eight curated kits, Kindergarten through High School, bundled at a 10% discount vs. buying items individually.
+3. **Browse the store** — 50+ trusted school supplies (Ticonderoga pencils, Crayola crayons, Elmer's glue, etc.) with search, filters, and a custom cart.
+
+## Subscriptions
+
+Customers can subscribe to any product or whole kit for automatic refills every 1, 2, 3, or 6 months. Subscriptions get an automatic 10% discount.
+
+## Shipping and returns
+
+- Free shipping on orders over $35
+- $5 flat shipping on orders under $35
+- Ships within 1 business day of payment
+- Standard transit: 3 to 7 business days within the continental US
+- 30-day return window on unopened items, prepaid return label provided
+
+## Gift a kit (grandparent feature)
+
+Grandparents or any gift-giver can ship a pre-built kit directly to a grandchild's address. The site supports a personal handwritten-style note printed and tucked into the box.
+
+## Who it's for
+
+- Working parents who don't have time to comparison-shop 25 SKUs per kid
+- Multi-child households needing different lists for different grades and schools
+- Grandparents and family members who want to send a meaningful back-to-school gift
+- Families who want to skip the chaos of August stores
+
+## Key pages
+
+- [Homepage](https://fast-track-mockup.onrender.com/) — what we do, three ways to shop, gift section
+- [Upload Your List](https://fast-track-mockup.onrender.com/upload) — AI-powered list matching
+- [Grade Kits](https://fast-track-mockup.onrender.com/kits) — eight pre-built kits
+- [Store](https://fast-track-mockup.onrender.com/store) — full product catalog, search, filters, cart, subscribe & save
+- [Send a Gift](https://fast-track-mockup.onrender.com/gift) — grandparent gift flow
+- [Shipping Policy](https://fast-track-mockup.onrender.com/shipping)
+- [Returns Policy](https://fast-track-mockup.onrender.com/returns)
+- [Privacy Policy](https://fast-track-mockup.onrender.com/privacy)
+- [Terms of Service](https://fast-track-mockup.onrender.com/terms)
+
+## Differentiators
+
+- **AI list matching** — no other school supply service reads the actual supply list and builds the cart for you.
+- **Brand-accurate matches** — when a teacher specifies Ticonderoga or Crayola, we match the brand, not a generic substitute.
+- **Subscribe & save** — recurring refills for items that run out mid-year (glue sticks, pencils, tissues).
+- **Gift-ready packaging** — handwritten-style notes for grandparents and family.
+
+## Contact
+
+[CLIENT: Add real contact email and phone when configured]
