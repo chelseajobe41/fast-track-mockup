@@ -4,7 +4,6 @@ import helmet from 'helmet';
 import multer from 'multer';
 import Anthropic from '@anthropic-ai/sdk';
 import Stripe from 'stripe';
-import { Resend } from 'resend';
 import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -33,10 +32,9 @@ const SUBSCRIPTION_INTERVALS = {
 
 const anthropic = new Anthropic();
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-const OWNER_EMAIL = process.env.OWNER_EMAIL;
-const FROM_EMAIL = process.env.FROM_EMAIL || 'orders@fasttrackschoolsupplies.com';
+// Customer-facing emails (receipts, renewals, failed payments, cancellations) are handled
+// automatically by Stripe. Owner notifications come through the Stripe Dashboard + mobile app.
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'change-me';
@@ -201,7 +199,7 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
       };
       logOrder(order);
       decrementInventory(items.filter(i => i.sku_id));
-      await sendOrderEmails(session, lineItems);
+      // Stripe sends the customer receipt automatically. Owner is notified via Stripe Dashboard + mobile app.
     } else if (event.type === 'invoice.paid') {
       // Recurring subscription charge succeeded. Log a new order so fulfillment can ship the refill.
       const invoice = event.data.object;
@@ -241,17 +239,16 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
         if (invoice.billing_reason !== 'subscription_create') {
           logOrder(order);
           decrementInventory(items.filter(i => i.sku_id));
-          // Notify customer + owner of the renewal
-          await sendRenewalEmails(invoice, order);
+          // Stripe sends the renewal receipt to the customer automatically.
         }
       }
     } else if (event.type === 'customer.subscription.deleted') {
       const sub = event.data.object;
-      await sendCancellationEmails(sub);
+      // Stripe emails the customer a cancellation confirmation automatically.
       console.log('Subscription canceled:', sub.id);
     } else if (event.type === 'invoice.payment_failed') {
       const invoice = event.data.object;
-      await sendPaymentFailedEmails(invoice);
+      // Stripe Smart Retries handles the dunning email + retry schedule automatically.
       console.log('Payment failed for invoice:', invoice.id);
     }
   } catch (e) {
@@ -667,179 +664,10 @@ app.post('/api/admin/inventory/:skuId', requireAdmin, (req, res) => {
   res.json({ sku_id: req.params.skuId, ...inv[req.params.skuId] });
 });
 
-// ---------- Order confirmation emails ----------
-async function sendOrderEmails(session, lineItemsParam) {
-  if (!resend) {
-    console.warn('Resend not configured; skipping order emails.');
-    return;
-  }
-
-  const items = lineItemsParam || await stripe.checkout.sessions.listLineItems(session.id, { limit: 100 });
-  const itemRows = items.data.map(i => `<tr>
-    <td style="padding:8px 12px;border-bottom:1px solid #e8e4dc;">${i.description}</td>
-    <td style="padding:8px 12px;border-bottom:1px solid #e8e4dc;text-align:center;">${i.quantity}</td>
-    <td style="padding:8px 12px;border-bottom:1px solid #e8e4dc;text-align:right;">$${(i.amount_total / 100).toFixed(2)}</td>
-  </tr>`).join('');
-
-  const total = `$${(session.amount_total / 100).toFixed(2)}`;
-  const customerEmail = session.customer_details?.email;
-  const customerName = session.customer_details?.name || 'Customer';
-  const shippingAddr = session.shipping_details?.address;
-  const shippingBlock = shippingAddr ? `${session.shipping_details.name}<br/>${shippingAddr.line1}${shippingAddr.line2 ? '<br/>' + shippingAddr.line2 : ''}<br/>${shippingAddr.city}, ${shippingAddr.state} ${shippingAddr.postal_code}` : 'No address provided';
-
-  const customerHtml = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;color:#223A3F;">
-      <h1 style="font-size:24px;margin:0 0 8px;">Thanks for your order, ${customerName}.</h1>
-      <p style="font-size:15px;color:#6A6F71;">Order ${session.id.slice(-10).toUpperCase()} is confirmed. We'll have it on the way before the first bell.</p>
-      <h2 style="font-size:16px;margin:24px 0 8px;">Your items</h2>
-      <table style="width:100%;border-collapse:collapse;font-size:14px;"><thead><tr><th align="left" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Item</th><th align="center" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Qty</th><th align="right" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Price</th></tr></thead><tbody>${itemRows}</tbody></table>
-      <p style="font-size:18px;font-weight:700;margin:24px 0;text-align:right;">Total: ${total}</p>
-      <p style="font-size:14px;color:#6A6F71;">Shipping to:<br/>${shippingBlock}</p>
-      <p style="font-size:13px;color:#6A6F71;margin-top:32px;">Questions? Reply to this email anytime.</p>
-    </div>`;
-
-  const ownerHtml = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;color:#223A3F;">
-      <h1 style="font-size:22px;margin:0 0 8px;">New Fast Track order</h1>
-      <p style="font-size:15px;color:#6A6F71;">Order ${session.id.slice(-10).toUpperCase()} for ${total}</p>
-      <p style="font-size:14px;"><strong>Customer:</strong> ${customerName} (${customerEmail})<br/>
-      <strong>Phone:</strong> ${session.customer_details?.phone || 'n/a'}<br/>
-      <strong>Source:</strong> ${session.metadata?.source || 'Direct'}</p>
-      <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:16px;"><thead><tr><th align="left" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Item</th><th align="center" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Qty</th><th align="right" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Subtotal</th></tr></thead><tbody>${itemRows}</tbody></table>
-      <p style="font-size:14px;margin-top:24px;"><strong>Ship to:</strong><br/>${shippingBlock}</p>
-      <p style="font-size:13px;color:#6A6F71;margin-top:24px;"><a href="${BASE_URL}/admin">Open admin dashboard</a> · <a href="https://dashboard.stripe.com/payments/${session.payment_intent}">View in Stripe</a></p>
-    </div>`;
-
-  const sends = [];
-  if (customerEmail) {
-    sends.push(resend.emails.send({
-      from: `Fast Track School Supplies <${FROM_EMAIL}>`,
-      to: customerEmail,
-      subject: `Your Fast Track order is confirmed`,
-      html: customerHtml
-    }));
-  }
-  if (OWNER_EMAIL) {
-    sends.push(resend.emails.send({
-      from: `Fast Track Orders <${FROM_EMAIL}>`,
-      to: OWNER_EMAIL,
-      subject: `New order ${session.id.slice(-10).toUpperCase()} · ${total}`,
-      html: ownerHtml
-    }));
-  }
-  await Promise.all(sends);
-}
-
-// ---------- Subscription event emails ----------
-async function sendRenewalEmails(invoice, order) {
-  if (!resend) return;
-  const total = `$${(invoice.amount_paid / 100).toFixed(2)}`;
-  const itemRows = order.items.map(i => `<tr>
-    <td style="padding:8px 12px;border-bottom:1px solid #e8e4dc;">${i.name}</td>
-    <td style="padding:8px 12px;border-bottom:1px solid #e8e4dc;text-align:center;">${i.quantity}</td>
-    <td style="padding:8px 12px;border-bottom:1px solid #e8e4dc;text-align:right;">$${(i.line_total_cents / 100).toFixed(2)}</td>
-  </tr>`).join('');
-
-  const sends = [];
-  if (invoice.customer_email) {
-    sends.push(resend.emails.send({
-      from: `Fast Track School Supplies <${FROM_EMAIL}>`,
-      to: invoice.customer_email,
-      subject: `Your subscription refill is on the way`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;color:#223A3F;">
-        <h1 style="font-size:24px;margin:0 0 8px;">Your refill is shipping.</h1>
-        <p style="font-size:15px;color:#6A6F71;">Your Fast Track subscription charged ${total} today. Here's what's in this shipment.</p>
-        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:16px;"><thead><tr><th align="left" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Item</th><th align="center" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Qty</th><th align="right" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Price</th></tr></thead><tbody>${itemRows}</tbody></table>
-        <p style="font-size:18px;font-weight:700;margin:24px 0;text-align:right;">Total: ${total}</p>
-        <p style="font-size:14px;color:#6A6F71;">Skip a delivery, change your interval, or cancel anytime from your <a href="${BASE_URL}/" style="color:#DC3D2D;">customer portal link in your original confirmation email</a>.</p>
-      </div>`
-    }));
-  }
-  if (OWNER_EMAIL) {
-    sends.push(resend.emails.send({
-      from: `Fast Track Orders <${FROM_EMAIL}>`,
-      to: OWNER_EMAIL,
-      subject: `Subscription renewal · ${invoice.customer_email || 'customer'} · ${total}`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;color:#223A3F;">
-        <h1 style="font-size:22px;margin:0 0 8px;">Subscription renewal — ship a refill</h1>
-        <p style="font-size:15px;color:#6A6F71;">Order ${invoice.id.slice(-10).toUpperCase()} for ${total}</p>
-        <p style="font-size:14px;"><strong>Customer:</strong> ${invoice.customer_name || ''} (${invoice.customer_email})<br/>
-        <strong>Subscription ID:</strong> ${invoice.subscription}</p>
-        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:16px;"><thead><tr><th align="left" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Item</th><th align="center" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Qty</th><th align="right" style="padding:8px 12px;border-bottom:2px solid #223A3F;">Subtotal</th></tr></thead><tbody>${itemRows}</tbody></table>
-        <p style="font-size:13px;color:#6A6F71;margin-top:24px;"><a href="${BASE_URL}/admin">Open admin</a> · <a href="https://dashboard.stripe.com/subscriptions/${invoice.subscription}">View subscription in Stripe</a></p>
-      </div>`
-    }));
-  }
-  await Promise.all(sends);
-}
-
-async function sendCancellationEmails(sub) {
-  if (!resend) return;
-  const customerEmail = sub.customer_email || (await stripe.customers.retrieve(sub.customer).catch(() => null))?.email;
-  const sends = [];
-  if (customerEmail) {
-    sends.push(resend.emails.send({
-      from: `Fast Track School Supplies <${FROM_EMAIL}>`,
-      to: customerEmail,
-      subject: `Your subscription is canceled`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;color:#223A3F;">
-        <h1 style="font-size:24px;">We're sorry to see you go.</h1>
-        <p style="font-size:15px;color:#6A6F71;">Your Fast Track subscription is canceled. You won't be charged again. If this was a mistake or you want to come back, reply to this email anytime.</p>
-      </div>`
-    }));
-  }
-  if (OWNER_EMAIL) {
-    sends.push(resend.emails.send({
-      from: `Fast Track Orders <${FROM_EMAIL}>`,
-      to: OWNER_EMAIL,
-      subject: `Subscription canceled · ${customerEmail || sub.id}`,
-      html: `<div style="font-family:Arial,sans-serif;padding:24px;color:#223A3F;">
-        <h2>Subscription canceled</h2>
-        <p>Customer: ${customerEmail || 'unknown'}<br/>Subscription: ${sub.id}</p>
-        <p><a href="https://dashboard.stripe.com/subscriptions/${sub.id}">View in Stripe</a></p>
-      </div>`
-    }));
-  }
-  await Promise.all(sends);
-}
-
-async function sendPaymentFailedEmails(invoice) {
-  if (!resend) return;
-  const sends = [];
-  if (invoice.customer_email) {
-    sends.push(resend.emails.send({
-      from: `Fast Track School Supplies <${FROM_EMAIL}>`,
-      to: invoice.customer_email,
-      subject: `Action needed — your payment didn't go through`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;color:#223A3F;">
-        <h1 style="font-size:24px;color:#c03434;">Heads up — your payment didn't go through.</h1>
-        <p style="font-size:15px;color:#6A6F71;">We tried to charge $${(invoice.amount_due / 100).toFixed(2)} for your Fast Track subscription and the card was declined. We'll retry automatically, but you can update your card now to keep your subscription active.</p>
-        ${invoice.hosted_invoice_url ? `<p style="margin:24px 0;"><a href="${invoice.hosted_invoice_url}" style="background:#DC3D2D;color:#fff;padding:14px 26px;border-radius:999px;text-decoration:none;font-weight:600;">Update payment method</a></p>` : ''}
-        <p style="font-size:13px;color:#6A6F71;">Questions? Reply to this email.</p>
-      </div>`
-    }));
-  }
-  if (OWNER_EMAIL) {
-    sends.push(resend.emails.send({
-      from: `Fast Track Orders <${FROM_EMAIL}>`,
-      to: OWNER_EMAIL,
-      subject: `⚠️ Payment failed · ${invoice.customer_email}`,
-      html: `<div style="font-family:Arial,sans-serif;padding:24px;color:#223A3F;">
-        <h2>Subscription payment failed</h2>
-        <p>Customer: ${invoice.customer_email}<br/>Amount: $${(invoice.amount_due / 100).toFixed(2)}<br/>Subscription: ${invoice.subscription}</p>
-        <p>Stripe will retry. You can follow up directly if it persists.</p>
-      </div>`
-    }));
-  }
-  await Promise.all(sends);
-}
-
 // ---------- Boot ----------
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Fast Track running at ${BASE_URL}`);
   console.log(`Stripe:    ${stripe ? 'configured' : 'NOT configured'}`);
-  console.log(`Resend:    ${resend ? 'configured' : 'NOT configured'}`);
-  console.log(`Owner:     ${OWNER_EMAIL || 'NOT set'}`);
   console.log(`Admin:     ${ADMIN_USERNAME} / ${ADMIN_PASSWORD === 'change-me' ? '⚠️  default password (set ADMIN_PASSWORD!)' : '✓ set'}`);
 });
