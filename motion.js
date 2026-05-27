@@ -101,6 +101,38 @@
     });
   });
 
+  // ---------- Cookie consent banner ----------
+  document.addEventListener('DOMContentLoaded', () => {
+    // Skip if user already chose
+    try {
+      if (localStorage.getItem('ft_cookie_choice')) return;
+    } catch (e) { return; }
+
+    const banner = document.createElement('div');
+    banner.className = 'cookie-banner';
+    banner.setAttribute('role', 'dialog');
+    banner.setAttribute('aria-live', 'polite');
+    banner.setAttribute('aria-label', 'Cookie notice');
+    banner.innerHTML = `
+      <p>We use essential cookies to keep your cart working and your order moving. We do not sell your data. See our <a href="/privacy">privacy notice</a>.</p>
+      <div class="cookie-actions">
+        <button class="cookie-decline" type="button">Essential only</button>
+        <button class="cookie-accept" type="button">Got it</button>
+      </div>
+    `;
+    document.body.appendChild(banner);
+    // Animate in next tick
+    requestAnimationFrame(() => banner.classList.add('visible'));
+
+    const dismiss = (choice) => {
+      try { localStorage.setItem('ft_cookie_choice', choice); } catch (e) {}
+      banner.classList.remove('visible');
+      setTimeout(() => banner.remove(), 350);
+    };
+    banner.querySelector('.cookie-accept').addEventListener('click', () => dismiss('accepted'));
+    banner.querySelector('.cookie-decline').addEventListener('click', () => dismiss('essential'));
+  });
+
   // ---------- Mobile menu (hamburger) ----------
   document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelector('header .nav-links');

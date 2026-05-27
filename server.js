@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import helmet from 'helmet';
 import multer from 'multer';
 import Anthropic from '@anthropic-ai/sdk';
 import Stripe from 'stripe';
@@ -133,6 +134,26 @@ function requireAdmin(req, res, next) {
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
+// Security headers (Helmet) — sane defaults with CSP relaxed for our specific needs
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      // Inline styles + scripts used in HTML pages. unsafe-inline is a tradeoff for static HTML simplicity.
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https://images.pexels.com", "https://images.unsplash.com", "https://irp.cdn-website.com"],
+      connectSrc: ["'self'", "https://api.stripe.com"],
+      frameSrc: ["https://js.stripe.com", "https://hooks.stripe.com", "https://checkout.stripe.com"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"]
+    }
+  },
+  crossOriginEmbedderPolicy: false,  // allow external images (Pexels CDN)
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }  // allow Stripe popup
+}));
+
 // Stripe webhook needs raw body BEFORE express.json
 app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   if (!stripe || !process.env.STRIPE_WEBHOOK_SECRET) return res.status(500).send('Stripe not configured');
@@ -254,6 +275,8 @@ app.get('/terms', (_req, res) => res.sendFile(join(__dirname, 'terms.html')));
 app.get('/privacy', (_req, res) => res.sendFile(join(__dirname, 'privacy.html')));
 app.get('/shipping', (_req, res) => res.sendFile(join(__dirname, 'shipping.html')));
 app.get('/returns', (_req, res) => res.sendFile(join(__dirname, 'returns.html')));
+app.get('/faq', (_req, res) => res.sendFile(join(__dirname, 'faq.html')));
+app.get('/help', (_req, res) => res.redirect(301, '/faq'));
 app.get('/admin', requireAdmin, (_req, res) => res.sendFile(join(__dirname, 'admin.html')));
 
 // ---------- Rate limiter for the AI endpoint ----------
@@ -496,11 +519,11 @@ app.post('/api/checkout', async (req, res) => {
       success_url: `${BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${BASE_URL}/cancel`,
       metadata: {
-        source: req.body.source || 'cart',
-        subscription_interval: intervalKey || '',
-        kit_id: req.body.kit_id || '',
-        gift_note: (req.body.gift_note || '').slice(0, 500),
-        sender_name: (req.body.sender_name || '').slice(0, 100)
+        source: sanitizeText(req.body.source, 50) || 'cart',
+        subscription_interval: sanitizeText(intervalKey, 50) || '',
+        kit_id: sanitizeText(req.body.kit_id, 50) || '',
+        gift_note: sanitizeText(req.body.gift_note, 500),
+        sender_name: sanitizeText(req.body.sender_name, 100)
       }
     };
 
@@ -543,20 +566,34 @@ app.post('/api/customer-portal', async (req, res) => {
   }
 });
 
+const MAX_QTY_PER_ITEM = 50;
+const MAX_ITEMS_IN_CART = 100;
+
 function normalizeCart(body) {
-  if (Array.isArray(body.items) && body.items.length) {
-    const isKit = !!body.kit_id && !!KITS[body.kit_id];
-    return body.items
-      .map(item => {
-        const p = item.sku_id ? PRODUCT_BY_ID[item.sku_id] : null;
-        if (!p) return null;
-        // Apply kit discount if this came from a pre-built kit
-        const price = isKit ? +(p.price * (1 - KIT_DISCOUNT)).toFixed(2) : p.price;
-        return { name: p.name, unit: p.unit, price, image: p.image, quantity: Math.max(1, item.quantity || 1) };
-      })
-      .filter(Boolean);
-  }
-  return [];
+  if (!Array.isArray(body.items) || body.items.length === 0) return [];
+  if (body.items.length > MAX_ITEMS_IN_CART) return [];  // reject absurdly long carts
+
+  const isKit = !!body.kit_id && !!KITS[body.kit_id];
+  return body.items
+    .map(item => {
+      // Look up the product server-side — never trust prices/names from the client
+      const p = item.sku_id ? PRODUCT_BY_ID[item.sku_id] : null;
+      if (!p) return null;
+      // Clamp quantity to a sane range
+      let qty = parseInt(item.quantity, 10);
+      if (!Number.isFinite(qty) || qty < 1) qty = 1;
+      if (qty > MAX_QTY_PER_ITEM) qty = MAX_QTY_PER_ITEM;
+      const price = isKit ? +(p.price * (1 - KIT_DISCOUNT)).toFixed(2) : p.price;
+      return { name: p.name, unit: p.unit, price, image: p.image, quantity: qty };
+    })
+    .filter(Boolean);
+}
+
+// Sanitize free-text input: strip control characters, cap length
+function sanitizeText(s, maxLen = 500) {
+  if (typeof s !== 'string') return '';
+  // eslint-disable-next-line no-control-regex
+  return s.replace(/[\x00-\x1f\x7f]/g, "").trim().slice(0, maxLen);
 }
 
 // ---------- Admin APIs ----------

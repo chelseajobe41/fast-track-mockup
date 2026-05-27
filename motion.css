@@ -298,6 +298,73 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .upload-visual { transform: none !important; }
 }
 
+/* ============================================== */
+/* COOKIE CONSENT BANNER                           */
+/* ============================================== */
+.cookie-banner {
+  position: fixed;
+  left: 16px; right: 16px; bottom: 16px;
+  background: var(--teal, #223A3F);
+  color: #fff;
+  border-radius: 14px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  z-index: 500;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+  font-family: 'Parkinsans', sans-serif;
+  transform: translateY(140%);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.25s;
+  max-width: 880px;
+  margin: 0 auto;
+}
+.cookie-banner.visible { transform: translateY(0); opacity: 1; }
+.cookie-banner p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  flex: 1 1 280px;
+  color: rgba(255, 255, 255, 0.92);
+}
+.cookie-banner a {
+  color: var(--yellow, #FDCA06);
+  text-decoration: underline;
+  font-weight: 600;
+}
+.cookie-banner .cookie-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.cookie-banner button {
+  font-family: 'Parkinsans', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+.cookie-banner .cookie-accept {
+  background: var(--yellow, #FDCA06);
+  color: var(--teal, #223A3F);
+}
+.cookie-banner .cookie-accept:hover { transform: translateY(-1px); background: #ffd633; }
+.cookie-banner .cookie-decline {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.cookie-banner .cookie-decline:hover { background: rgba(255, 255, 255, 0.22); }
+@media (max-width: 480px) {
+  .cookie-banner { padding: 14px 16px; gap: 12px; }
+  .cookie-banner .cookie-actions { width: 100%; }
+  .cookie-banner button { flex: 1; }
+}
+
 /* ---------- Respect reduced motion preference ---------- */
 @media (prefers-reduced-motion: reduce) {
   .wordmark .dot, .float-icon, .ft-anim-1, .ft-anim-2, .ft-anim-3, .ft-anim-4, .ft-fade-in, .cart-count.bump, .reveal {

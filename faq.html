@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FAQ & Help Center | Fast Track School Supplies</title>
+<meta name="description" content="Answers about ordering, shipping, returns, subscriptions, grade-level kits, gift orders, and the AI list upload. Find help fast." />
+<link rel="canonical" href="https://fast-track-mockup.onrender.com/faq" />
+<meta name="robots" content="index, follow" />
+
+<!-- OpenGraph -->
+<meta property="og:title" content="FAQ & Help Center | Fast Track School Supplies" />
+<meta property="og:description" content="Answers about ordering, shipping, returns, subscriptions, grade-level kits, gift orders, and the AI list upload." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://fast-track-mockup.onrender.com/faq" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- FAQPage JSON-LD for AEO/GEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How does the AI list upload work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Upload a photo or PDF of your child's school supply list. Our AI reads every item, matches it to our catalog, and builds a ready-to-buy cart. You review, adjust quantities, and check out. The whole flow takes under a minute."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a grade-level kit?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A grade-level kit is a curated set of supplies matched to the typical list for that grade (Kindergarten through High School). Kits ship at a 10% discount versus buying each item individually."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do subscriptions work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Subscribe & Save delivers your kit on a recurring schedule (monthly, every 2 months, every 3 months, or every 6 months) at 10% off. Manage or cancel any time through your customer portal."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I send supplies to a grandchild as a gift?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Choose Gift on any kit or product, add a personal note, and ship directly to your grandchild's address. We include your note on a printed card in the box."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does shipping cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Orders $35 and up ship free. Orders under $35 are a $5 flat rate. Standard delivery is 3 to 7 business days within the continental US."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is your return policy?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Unopened items in original packaging can be returned within 30 days for a full refund. Opened or used supplies are not returnable for hygiene reasons."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you ship internationally?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not yet. We ship to all 50 US states. International shipping is on our roadmap."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my payment information secure?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. We process every payment through Stripe and never see or store your card data. The whole checkout runs over HTTPS with strict security headers."
+      }
+    }
+  ]
+}
+</script>
+
+<style>
+  :root { --teal:#223A3F; --orange:#DC3D2D; --yellow:#FDCA06; --cream:#FAF6EF; --line:#E8E4DC; --muted:#6A6F71; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', system-ui, sans-serif; background: #fff; color: var(--teal); line-height: 1.7; }
+  .container { max-width: 820px; margin: 0 auto; padding: 0 32px; }
+  header { background: #fff; border-bottom: 1px solid var(--line); padding: 20px 0; }
+  .nav { display: flex; align-items: center; justify-content: space-between; }
+  .wordmark { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 22px; color: var(--teal); }
+  .back { font-family: 'Parkinsans', sans-serif; font-size: 14px; color: var(--muted); text-decoration: none; }
+  main { padding: 72px 0 96px; }
+  h1 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 48px; letter-spacing: -0.025em; margin-bottom: 12px; }
+  .lead { font-size: 18px; color: var(--muted); margin-bottom: 48px; font-family: 'Parkinsans', sans-serif; max-width: 620px; }
+  .category { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--orange); margin: 56px 0 18px; }
+  .category:first-of-type { margin-top: 0; }
+  details {
+    border-top: 1px solid var(--line);
+    padding: 22px 0;
+    cursor: pointer;
+  }
+  details:last-child { border-bottom: 1px solid var(--line); }
+  details summary {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--teal);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after {
+    content: '+';
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+    color: var(--orange);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+    line-height: 1;
+  }
+  details[open] summary::after { content: '–'; }
+  details p { font-size: 16px; margin: 14px 0 4px; color: var(--teal); }
+  details ul { margin: 10px 0 0 22px; }
+  details li { font-size: 16px; margin-bottom: 6px; }
+  .help-cta {
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 56px;
+    text-align: center;
+  }
+  .help-cta h3 { font-family: 'Parkinsans', sans-serif; font-size: 22px; margin-bottom: 8px; }
+  .help-cta p { font-size: 15px; color: var(--muted); margin-bottom: 18px; }
+  .help-cta a {
+    display: inline-block;
+    background: var(--teal);
+    color: #fff;
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .help-cta a:hover { transform: translateY(-1px); background: #1a2e32; }
+  .placeholder { background: #fff8e6; border-left: 3px solid var(--orange); padding: 12px 16px; font-size: 14px; color: var(--muted); font-style: italic; margin-bottom: 14px; border-radius: 0 6px 6px 0; }
+  footer { background: var(--cream); border-top: 1px solid var(--line); padding: 32px 0; text-align: center; font-size: 13px; color: var(--muted); }
+  footer a { color: var(--muted); margin: 0 12px; text-decoration: none; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 36px; }
+    .lead { font-size: 16px; margin-bottom: 36px; }
+    main { padding: 48px 0 72px; }
+    details summary { font-size: 16px; }
+    .help-cta { padding: 24px; }
+  }
+</style>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<link rel="stylesheet" href="/motion.css" />
+<script defer src="/motion.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a href="/" class="wordmark">Fast Track</a>
+    <a href="/" class="back">← Back to home</a>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <h1>Help Center.</h1>
+    <p class="lead">Quick answers to the questions parents and grandparents ask us most. If you don't see what you need, send us a note and we'll get back inside one business day.</p>
+
+    <div class="category">Ordering</div>
+    <details>
+      <summary>How does the AI list upload work?</summary>
+      <p>Upload a photo or PDF of your child's school supply list on the <a href="/upload">upload page</a>. Our AI reads every item, matches it to our catalog, and builds a ready-to-buy cart in seconds. You review, adjust quantities, swap brands, and check out. Most lists take under a minute.</p>
+    </details>
+    <details>
+      <summary>What if a list item isn't in your catalog?</summary>
+      <p>We flag any item we couldn't match. You can skip it, swap in a similar product from our catalog, or contact us and we'll source it.</p>
+    </details>
+    <details>
+      <summary>Can I save my cart and come back later?</summary>
+      <p>Yes. Your cart lives in your browser, so you can close the tab and pick up where you left off as long as you return on the same device and browser.</p>
+    </details>
+
+    <div class="category">Grade-level kits</div>
+    <details>
+      <summary>What is a grade-level kit?</summary>
+      <p>A grade-level kit is a curated bundle of supplies that covers the typical school list for that grade, from Kindergarten through High School. Every kit includes the basics most teachers ask for plus the extras that make the year smoother.</p>
+    </details>
+    <details>
+      <summary>Why are kits cheaper?</summary>
+      <p>Kits ship at a 10% discount versus buying each item individually. You also save the time of cross-checking your list against the catalog.</p>
+    </details>
+    <details>
+      <summary>Can I customize a kit?</summary>
+      <p>Add the kit to your cart, then add or remove individual products from the cart before checkout. The kit discount stays on the base bundle.</p>
+    </details>
+
+    <div class="category">Subscribe &amp; Save</div>
+    <details>
+      <summary>How do subscriptions work?</summary>
+      <p>Pick any kit or product, toggle <strong>Subscribe &amp; Save</strong>, and choose how often you want it delivered: monthly, every 2 months, every 3 months, or every 6 months. Every recurring shipment is 10% off.</p>
+    </details>
+    <details>
+      <summary>Can I cancel or change my subscription?</summary>
+      <p>Any time. Use the customer portal link we email you after your first order to skip a shipment, change the interval, update your address, or cancel. No phone tree, no friction.</p>
+    </details>
+    <details>
+      <summary>When am I billed?</summary>
+      <p>You're billed on the date of each recurring shipment. We email a receipt every time and notify you 3 days before the next charge.</p>
+    </details>
+
+    <div class="category">Gift orders</div>
+    <details>
+      <summary>Can I send supplies to my grandchild?</summary>
+      <p>Yes. On the <a href="/gift">gift page</a>, choose a kit, write a personal note, and ship directly to your grandchild's address. We include your note on a printed card tucked into the box.</p>
+    </details>
+    <details>
+      <summary>Will the price show up on the package?</summary>
+      <p>No. We never include a receipt or pricing inside gift orders. The packing slip shows only the items and the personal note.</p>
+    </details>
+    <details>
+      <summary>Can I gift a subscription?</summary>
+      <p>Subscriptions are billed to the buyer, so you can absolutely set one up and have it delivered to your grandchild's address every month or every quarter. You manage the billing; they get the supplies.</p>
+    </details>
+
+    <div class="category">Shipping</div>
+    <details>
+      <summary>What does shipping cost?</summary>
+      <p>Orders $35 and up ship free. Orders under $35 are a flat $5. Full details on the <a href="/shipping">shipping page</a>.</p>
+    </details>
+    <details>
+      <summary>How long does delivery take?</summary>
+      <p>Standard delivery is 3 to 7 business days within the continental US. Orders ship within 1 business day of payment. You'll get a tracking email when your box leaves our warehouse.</p>
+    </details>
+    <details>
+      <summary>Do you ship internationally?</summary>
+      <p>Not yet. We ship to all 50 US states. International shipping is on the roadmap.</p>
+    </details>
+
+    <div class="category">Returns &amp; refunds</div>
+    <details>
+      <summary>What is your return policy?</summary>
+      <p>Unopened items in their original packaging can be returned within 30 days for a full refund. Opened or used supplies are not returnable for hygiene reasons. See the <a href="/returns">returns page</a> for the full policy.</p>
+    </details>
+    <details>
+      <summary>My package arrived damaged. What do I do?</summary>
+      <p>Send us a photo of the damage within 14 days of delivery and we'll replace the items at no charge.</p>
+    </details>
+
+    <div class="category">Payment &amp; security</div>
+    <details>
+      <summary>Is my payment information secure?</summary>
+      <p>Yes. Every payment runs through Stripe and we never see or store your card data. Our site uses HTTPS with strict security headers (HSTS, CSP, X-Frame-Options) end-to-end.</p>
+    </details>
+    <details>
+      <summary>What payment methods do you accept?</summary>
+      <p>All major credit and debit cards (Visa, Mastercard, AmEx, Discover), Apple Pay, and Google Pay through Stripe Checkout.</p>
+    </details>
+    <details>
+      <summary>How do you use my data?</summary>
+      <p>We use your name, address, and email to fulfill your order and send shipment updates. We don't sell your data and we don't share it with anyone outside our shipping carrier and Stripe. See our <a href="/privacy">privacy notice</a> for the full list.</p>
+    </details>
+
+    <div class="help-cta">
+      <h3>Still need help?</h3>
+      <p>Reach out and we'll get back inside one business day.</p>
+      <div class="placeholder">[CLIENT: Add support email, e.g. help@fasttrackschoolsupplies.com]</div>
+      <a href="mailto:help@fasttrackschoolsupplies.com">Email support</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <a href="/terms">Terms</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/shipping">Shipping</a>
+    <a href="/returns">Returns</a>
+    <a href="/faq">FAQ</a>
+    <div style="margin-top: 12px;">© 2026 Fast Track School Supplies. All rights reserved.</div>
+  </div>
+</footer>
+
+</body>
+</html>
