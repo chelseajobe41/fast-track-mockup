@@ -179,8 +179,24 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .nav-links { display: none !important; }
 
   /* Collapse the homepage 3-up grids */
-  .three-ways-grid { grid-template-columns: 1fr; gap: 16px; }
-  .gift-grid { grid-template-columns: 1fr; gap: 40px; }
+  .three-ways-grid { grid-template-columns: 1fr !important; gap: 16px; }
+  .gift-grid { grid-template-columns: 1fr !important; gap: 40px; }
+
+  /* Collapse 2/3/4-col grids that get squished on phones */
+  .steps,
+  .promise-grid,
+  .product-grid,
+  .grid,
+  .kits-grid,
+  .schools-grid,
+  .why-grid,
+  .pick-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Footer can stay 2-col for compactness, but tighten gap */
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
 
   /* Generic containers — tighten padding */
   .container { padding: 0 20px !important; }
