@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin | Fast Track School Supplies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:#223A3F; --teal-soft:rgba(34,58,63,0.75); --orange:#DC3D2D; --yellow:#FDCA06;
+    --cream:#FAF6EF; --line:#E8E4DC; --muted:#6A6F71; --green:#2d8659; --red:#c03434;
+    --bg:#f7f5f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', system-ui, sans-serif; background: var(--bg); color: var(--teal); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .container { max-width: 1320px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; }
+
+  /* Header */
+  header { background: var(--teal); color: var(--cream); padding: 18px 0; }
+  .nav { display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 16px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 20px; }
+  .brand .badge { background: var(--orange); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .nav-actions { display: flex; align-items: center; gap: 16px; font-size: 13px; }
+  .nav-actions a { opacity: 0.7; }
+  .nav-actions a:hover { opacity: 1; color: var(--yellow); }
+
+  /* Tabs */
+  .tabs { background: #fff; border-bottom: 1px solid var(--line); }
+  .tabs-row { display: flex; gap: 4px; }
+  .tab { background: none; border: none; padding: 18px 24px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; transition: color 0.15s, border-color 0.15s; }
+  .tab:hover { color: var(--teal); }
+  .tab.active { color: var(--teal); border-bottom-color: var(--orange); }
+
+  /* Main */
+  main { padding: 32px 0 80px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  h2 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.01em; color: var(--teal); margin-bottom: 20px; }
+  h3 { font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 16px; color: var(--teal); }
+
+  /* Stats grid */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .stat .label { font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .stat .value { font-family: 'Parkinsans', sans-serif; font-size: 32px; font-weight: 700; color: var(--teal); letter-spacing: -0.02em; }
+  .stat .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .stat.warning .value { color: var(--orange); }
+  .stat.success .value { color: var(--green); }
+
+  /* Cards */
+  .cards-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .card-head { padding: 18px 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .card-body { padding: 12px 24px 18px; }
+
+  /* Lists */
+  .list { display: flex; flex-direction: column; }
+  .list-item { padding: 12px 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 14px; }
+  .list-item:first-child { border-top: none; }
+  .list-item .name { font-family: 'Parkinsans', sans-serif; font-weight: 500; }
+  .list-item .meta { font-size: 12px; color: var(--muted); }
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+  .pill.danger { background: rgba(192,52,52,0.1); color: var(--red); }
+  .pill.warn { background: rgba(220,61,45,0.1); color: var(--orange); }
+  .pill.ok { background: rgba(45,134,89,0.1); color: var(--green); }
+  .pill.gray { background: var(--cream); color: var(--muted); }
+  .pill.teal { background: rgba(34,58,63,0.08); color: var(--teal); }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: var(--cream); padding: 12px 16px; text-align: left; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1px solid var(--line); }
+  tbody td { padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tbody tr:hover { background: var(--cream); cursor: default; }
+  .table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+
+  /* Buttons */
+  .btn { background: var(--teal); color: #fff; padding: 8px 16px; border-radius: 999px; border: none; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { background: var(--orange); }
+  .btn.secondary { background: #fff; color: var(--teal); border: 1px solid var(--line); }
+  .btn.secondary:hover { background: var(--cream); border-color: var(--teal); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* Stock input */
+  .stock-input { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; width: 70px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; color: var(--teal); text-align: center; }
+  .stock-input.danger { background: rgba(192,52,52,0.06); border-color: rgba(192,52,52,0.3); color: var(--red); }
+  .stock-input.warn { background: rgba(220,61,45,0.06); border-color: rgba(220,61,45,0.3); color: var(--orange); }
+  .stock-cell { display: flex; align-items: center; gap: 6px; }
+  .adj-btn { background: #fff; border: 1px solid var(--line); border-radius: 6px; width: 26px; height: 26px; cursor: pointer; font-weight: 700; color: var(--teal); font-size: 14px; }
+  .adj-btn:hover { background: var(--teal); color: #fff; }
+
+  /* Order details */
+  .order-expand { background: var(--cream); padding: 16px 24px; border-top: 1px solid var(--line); font-size: 13px; display: none; }
+  .order-expand.open { display: block; }
+  .order-expand h4 { font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .order-items { display: grid; gap: 4px; margin-bottom: 12px; }
+  .order-item { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; font-size: 13px; padding: 4px 0; }
+
+  /* Empty state */
+  .empty { padding: 64px 32px; text-align: center; color: var(--muted); font-size: 14px; }
+  .empty h3 { color: var(--teal); margin-bottom: 8px; font-size: 18px; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--teal); color: #fff; padding: 14px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(120px); opacity: 0; transition: transform 0.2s, opacity 0.2s; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 900px) {
+    .stats { grid-template-columns: 1fr 1fr; }
+    .cards-2 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .stats { grid-template-columns: 1fr; }
+  }
+</style>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<link rel="stylesheet" href="/motion.css" />
+<script defer src="/motion.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <div class="brand">
+      <img src="/assets/logo.png" alt="Fast Track" style="height: 44px; width: auto; background: rgba(255,255,255,0.96); padding: 6px 10px; border-radius: 10px;" />
+      <span class="badge">Admin</span>
+    </div>
+    <div class="nav-actions">
+      <a href="/" target="_blank">View public site ↗</a>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="container tabs-row">
+    <button class="tab active" data-panel="overview">Overview</button>
+    <button class="tab" data-panel="orders">Orders</button>
+    <button class="tab" data-panel="inventory">Inventory</button>
+  </div>
+</div>
+
+<main>
+  <div class="container">
+
+    <!-- OVERVIEW -->
+    <section class="panel active" id="panel-overview">
+      <h2>Overview</h2>
+      <div class="stats" id="stats">
+        <div class="stat"><div class="label">Orders this week</div><div class="value" id="stat-orders-week">—</div></div>
+        <div class="stat success"><div class="label">Revenue this week</div><div class="value" id="stat-revenue-week">—</div></div>
+        <div class="stat warning"><div class="label">Pending fulfillment</div><div class="value" id="stat-pending">—</div></div>
+        <div class="stat"><div class="label">Lifetime orders</div><div class="value" id="stat-all-orders">—</div></div>
+      </div>
+
+      <div class="cards-2">
+        <div class="card">
+          <div class="card-head">
+            <h3>Low stock alerts</h3>
+            <span class="pill warn" id="low-stock-count">0</span>
+          </div>
+          <div class="card-body" id="low-stock-body">
+            <div class="empty"><h3>Nothing low</h3>Stock levels are healthy.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Top selling products</h3>
+            <span class="pill gray">All time</span>
+          </div>
+          <div class="card-body" id="top-products-body">
+            <div class="empty"><h3>No orders yet</h3>Top products will show once you have sales.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="panel" id="panel-orders">
+      <h2>Orders</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="orders-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- INVENTORY -->
+    <section class="panel" id="panel-inventory">
+      <h2>Inventory</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Low-stock threshold</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="inventory-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === t));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${t.dataset.panel}`));
+    if (t.dataset.panel === 'orders') loadOrders();
+    if (t.dataset.panel === 'inventory') loadInventory();
+  }));
+
+  function dollars(cents) { return `$${((cents || 0) / 100).toFixed(2)}`; }
+  function fmt(date) {
+    const d = new Date(date);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  // --- Overview ---
+  async function loadOverview() {
+    const res = await fetch('/api/admin/overview');
+    const data = await res.json();
+    document.getElementById('stat-orders-week').textContent = data.totals.orders_this_week;
+    document.getElementById('stat-revenue-week').textContent = dollars(data.totals.revenue_this_week_cents);
+    document.getElementById('stat-pending').textContent = data.totals.pending_fulfillment;
+    document.getElementById('stat-all-orders').textContent = data.totals.orders_all_time;
+
+    document.getElementById('low-stock-count').textContent = data.low_stock.length;
+    const lowBody = document.getElementById('low-stock-body');
+    if (data.low_stock.length === 0) {
+      lowBody.innerHTML = `<div class="empty"><h3>Nothing low</h3>Stock levels are healthy.</div>`;
+    } else {
+      lowBody.innerHTML = `<div class="list">${data.low_stock.map(item => `
+        <div class="list-item">
+          <div>
+            <div class="name">${escapeHtml(item.name)}</div>
+            <div class="meta">Threshold: ${item.threshold}</div>
+          </div>
+          <span class="pill ${item.stock === 0 ? 'danger' : 'warn'}">${item.stock === 0 ? 'OUT' : item.stock + ' left'}</span>
+        </div>`).join('')}</div>`;
+    }
+
+    const topBody = document.getElementById('top-products-body');
+    if (data.top_products.length === 0) {
+      topBody.innerHTML = `<div class="empty"><h3>No orders yet</h3>Top products will show once you have sales.</div>`;
+    } else {
+      topBody.innerHTML = `<div class="list">${data.top_products.map(item => `
+        <div class="list-item">
+          <div class="name">${escapeHtml(item.name)}</div>
+          <span class="pill teal">${item.units_sold} sold</span>
+        </div>`).join('')}</div>`;
+    }
+  }
+
+  // --- Orders ---
+  let cachedOrders = [];
+  async function loadOrders() {
+    const res = await fetch('/api/admin/orders');
+    const data = await res.json();
+    cachedOrders = data.orders;
+    const tbody = document.getElementById('orders-table');
+    if (!cachedOrders.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty"><h3>No orders yet</h3>Orders will appear here once customers check out.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = cachedOrders.map((o, idx) => {
+      const fStatus = o.fulfillment || 'pending';
+      const fPill = fStatus === 'shipped' ? 'ok' : fStatus === 'fulfilled' ? 'teal' : 'warn';
+      return `
+        <tr data-order-id="${o.id}">
+          <td><strong>${o.short_id}</strong></td>
+          <td>${escapeHtml(o.customer_name || '—')}<br/><span class="meta" style="color:var(--muted);font-size:12px;">${escapeHtml(o.customer_email || '')}</span></td>
+          <td><strong>${dollars(o.amount_total_cents)}</strong></td>
+          <td><span class="pill ${fPill}">${fStatus}</span></td>
+          <td><span style="color:var(--muted);font-size:13px;">${fmt(o.created_at)}</span></td>
+          <td><button class="btn btn-sm secondary" data-action="toggle-details" data-idx="${idx}">Details</button></td>
+        </tr>
+        <tr><td colspan="6" style="padding:0;"><div class="order-expand" id="order-expand-${idx}"></div></td></tr>
+      `;
+    }).join('');
+
+    document.querySelectorAll('[data-action="toggle-details"]').forEach(btn => {
+      btn.addEventListener('click', () => toggleOrderDetails(+btn.dataset.idx));
+    });
+  }
+
+  function toggleOrderDetails(idx) {
+    const o = cachedOrders[idx];
+    const el = document.getElementById(`order-expand-${idx}`);
+    el.classList.toggle('open');
+    if (!el.classList.contains('open')) return;
+    const addr = o.shipping_address;
+    el.innerHTML = `
+      <h4>Items</h4>
+      <div class="order-items">
+        ${o.items.map(i => `<div class="order-item">
+          <span>${escapeHtml(i.name)}</span>
+          <span>×${i.quantity}</span>
+          <span><strong>${dollars(i.line_total_cents)}</strong></span>
+        </div>`).join('')}
+      </div>
+      <h4>Shipping</h4>
+      <p style="font-size:13px;color:var(--teal);">${escapeHtml(o.customer_name || '')}${o.customer_phone ? ' · ' + escapeHtml(o.customer_phone) : ''}<br/>
+      ${addr ? `${escapeHtml(addr.line1 || '')}${addr.line2 ? ', ' + escapeHtml(addr.line2) : ''}, ${escapeHtml(addr.city || '')}, ${escapeHtml(addr.state || '')} ${escapeHtml(addr.postal_code || '')}` : 'No address'}</p>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+        ${o.fulfillment !== 'fulfilled' ? `<button class="btn btn-sm" data-mark="${o.id}" data-status="fulfilled">Mark fulfilled</button>` : ''}
+        ${o.fulfillment !== 'shipped' ? `<button class="btn btn-sm" data-mark="${o.id}" data-status="shipped">Mark shipped</button>` : ''}
+        <a class="btn btn-sm secondary" target="_blank" href="https://dashboard.stripe.com/payments/${o.id}">Open in Stripe ↗</a>
+      </div>
+    `;
+    el.querySelectorAll('[data-mark]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.mark;
+        const status = btn.dataset.status;
+        const res = await fetch(`/api/admin/orders/${id}/fulfillment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        if (res.ok) {
+          toast(`Order marked ${status}`);
+          loadOrders();
+          loadOverview();
+        }
+      });
+    });
+  }
+
+  // --- Inventory ---
+  async function loadInventory() {
+    const res = await fetch('/api/admin/inventory');
+    const data = await res.json();
+    const tbody = document.getElementById('inventory-table');
+    tbody.innerHTML = data.inventory.map(row => {
+      const stockClass = row.stock === 0 ? 'danger' : row.stock <= row.low_stock_threshold ? 'warn' : '';
+      const status = row.stock === 0 ? `<span class="pill danger">Out of stock</span>` :
+                     row.stock <= row.low_stock_threshold ? `<span class="pill warn">Low</span>` :
+                     `<span class="pill ok">In stock</span>`;
+      return `
+        <tr>
+          <td><strong>${escapeHtml(row.name)}</strong><br/><span style="color:var(--muted);font-size:12px;">${escapeHtml(row.unit)}</span></td>
+          <td>$${row.price.toFixed(2)}</td>
+          <td>
+            <div class="stock-cell">
+              <button class="adj-btn" data-adj="-1" data-sku="${row.sku_id}">−</button>
+              <input class="stock-input ${stockClass}" type="number" min="0" value="${row.stock}" data-stock="${row.sku_id}" />
+              <button class="adj-btn" data-adj="1" data-sku="${row.sku_id}">+</button>
+            </div>
+          </td>
+          <td>
+            <input class="stock-input" type="number" min="0" value="${row.low_stock_threshold}" data-threshold="${row.sku_id}" />
+          </td>
+          <td>${status}</td>
+          <td><button class="btn btn-sm" data-save="${row.sku_id}">Save</button></td>
+        </tr>`;
+    }).join('');
+
+    document.querySelectorAll('[data-adj]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const adjust = +btn.dataset.adj;
+        const sku = btn.dataset.sku;
+        const res = await fetch(`/api/admin/inventory/${sku}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adjust })
+        });
+        const updated = await res.json();
+        const input = document.querySelector(`[data-stock="${sku}"]`);
+        input.value = updated.stock;
+        toast(`${adjust > 0 ? 'Added' : 'Removed'} 1 ${sku}`);
+        loadOverview();
+      });
+    });
+
+    document.querySelectorAll('[data-save]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const sku = btn.dataset.save;
+        const stock = +document.querySelector(`[data-stock="${sku}"]`).value;
+        const low_stock_threshold = +document.querySelector(`[data-threshold="${sku}"]`).value;
+        const res = await fetch(`/api/admin/inventory/${sku}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stock, low_stock_threshold })
+        });
+        if (res.ok) {
+          toast('Saved');
+          loadInventory();
+          loadOverview();
+        }
+      });
+    });
+  }
+
+  loadOverview();
+</script>
+
+</body>
+</html>

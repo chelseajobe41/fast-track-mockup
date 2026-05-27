@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Send a Kit | Fast Track School Supplies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&family=Caveat:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<link rel="stylesheet" href="/motion.css" />
+<script defer src="/motion.js"></script>
+<style>
+  :root {
+    --teal:#223A3F; --teal-soft:rgba(34,58,63,0.75); --orange:#DC3D2D; --yellow:#FDCA06;
+    --white:#ffffff; --cream:#FAF6EF; --line:#E8E4DC; --muted:#6A6F71; --green:#2d8659;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', system-ui, sans-serif; background: var(--white); color: var(--teal); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .container { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.96); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+  .wordmark { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 22px; color: var(--teal); display: inline-block; }
+  .nav-links { display: flex; gap: 38px; font-family: 'Parkinsans', sans-serif; font-size: 15px; font-weight: 500; }
+  .nav-links a { color: var(--teal); transition: color 0.15s; position: relative; }
+  .nav-links a:hover, .nav-links a.active { color: var(--orange); }
+  .nav-links a.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -22px; height: 3px; background: var(--orange); }
+  .cart-btn { background: var(--teal); color: var(--white); padding: 11px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; border: none; }
+  .cart-count { background: var(--yellow); color: var(--teal); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; min-width: 22px; text-align: center; }
+
+  /* Hero */
+  .hero { background: linear-gradient(180deg, #FFE9B8 0%, #FFD8C2 100%); padding: 96px 0 80px; position: relative; overflow: hidden; }
+  .hero-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 56px; align-items: center; }
+  .hero h1 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(44px, 5.8vw, 72px); line-height: 1.0; letter-spacing: -0.025em; color: var(--teal); margin-bottom: 20px; }
+  .hero .accent { font-family: 'Caveat', cursive; font-weight: 700; font-style: normal; color: var(--orange); font-size: 1.05em; }
+  .hero p.lead { font-size: 19px; color: var(--teal); max-width: 520px; margin-bottom: 32px; line-height: 1.55; }
+  .hero-cta { display: inline-flex; align-items: center; gap: 10px; background: var(--teal); color: #fff; padding: 17px 30px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 16px; transition: background 0.15s, transform 0.15s; cursor: pointer; border: none; }
+  .hero-cta:hover { background: var(--orange); transform: translateY(-2px); }
+  .hero-photo { position: relative; aspect-ratio: 4/5; max-width: 460px; margin-left: auto; }
+  .hero-photo-frame { width: 100%; height: 100%; border-radius: 32px; overflow: hidden; box-shadow: 0 28px 60px rgba(34,58,63,0.22); }
+  .hero-photo-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+  .hero-tag { position: absolute; bottom: -24px; right: -24px; background: #fff; padding: 14px 22px 14px 32px; border-radius: 8px 14px 14px 8px; font-family: 'Caveat', cursive; font-size: 22px; color: var(--teal); transform: rotate(-5deg); box-shadow: 0 12px 28px rgba(34,58,63,0.18); z-index: 2; }
+  .hero-tag::before { content: ''; position: absolute; left: 10px; top: 50%; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); transform: translateY(-50%); }
+  .hero-tag::after { content: ''; position: absolute; left: 0; top: 50%; width: 10px; height: 1px; background: var(--teal); transform: translateY(-50%); }
+
+  /* How it works */
+  .how { padding: 96px 0 64px; }
+  .how-head { text-align: center; max-width: 640px; margin: 0 auto 56px; }
+  .how-head h2 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(34px, 4vw, 48px); color: var(--teal); letter-spacing: -0.025em; line-height: 1.1; margin-bottom: 14px; }
+  .how-head p { font-size: 17px; color: var(--teal-soft); }
+  .how-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .how-step { text-align: center; padding: 0 16px; }
+  .how-step-emoji { width: 80px; height: 80px; background: var(--cream); border: 2px solid var(--line); border-radius: 24px; display: grid; place-items: center; margin: 0 auto 20px; transition: transform 0.3s; color: var(--orange); }
+  .how-step-emoji svg { width: 36px; height: 36px; }
+  .how-step:hover .how-step-emoji { transform: rotate(-4deg) scale(1.05); border-color: var(--orange); }
+  .how-step h4 { font-family: 'Parkinsans', sans-serif; font-size: 20px; font-weight: 700; color: var(--teal); margin-bottom: 8px; letter-spacing: -0.01em; }
+  .how-step p { font-size: 15px; color: var(--teal-soft); line-height: 1.55; }
+
+  /* Pick a kit */
+  .pick { background: var(--cream); padding: 96px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .pick-head { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 24px; margin-bottom: 40px; }
+  .pick-head h2 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(28px, 3.4vw, 40px); color: var(--teal); letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 6px; }
+  .pick-head p { font-size: 16px; color: var(--teal-soft); }
+  .pick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .pick-card { background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 24px; cursor: pointer; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+  .pick-card:hover { border-color: var(--teal); transform: translateY(-3px); box-shadow: 0 18px 40px rgba(34,58,63,0.08); }
+  .pick-card.selected { border-color: var(--orange); border-width: 2px; padding: 23px; box-shadow: 0 16px 36px rgba(220,61,45,0.18); }
+  .pick-card-grade { font-family: 'Parkinsans', sans-serif; font-size: 12px; font-weight: 700; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .pick-card h4 { font-family: 'Parkinsans', sans-serif; font-size: 18px; font-weight: 700; color: var(--teal); margin-bottom: 6px; }
+  .pick-card .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); }
+  .pick-card .price { font-family: 'Parkinsans', sans-serif; font-size: 22px; font-weight: 700; color: var(--teal); }
+  .pick-card .item-count { font-size: 12px; color: var(--muted); font-family: 'Parkinsans', sans-serif; }
+  .pick-card .ages { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+
+  /* Gift form */
+  .gift-form { padding: 96px 0; }
+  .gift-form-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 56px; align-items: start; }
+  .gift-form-grid h2 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(30px, 3.6vw, 44px); color: var(--teal); letter-spacing: -0.025em; line-height: 1.1; margin-bottom: 16px; }
+  .gift-form-grid > div:first-child > p { font-size: 16px; color: var(--teal-soft); margin-bottom: 32px; max-width: 480px; line-height: 1.6; }
+  .form-field { margin-bottom: 20px; }
+  .form-field label { display: block; font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal); margin-bottom: 8px; }
+  .form-field input, .form-field textarea { width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--teal); outline: none; transition: border-color 0.15s; background: var(--cream); }
+  .form-field input:focus, .form-field textarea:focus { border-color: var(--teal); background: #fff; }
+  .form-field textarea { resize: vertical; min-height: 120px; font-family: 'Caveat', cursive; font-size: 18px; line-height: 1.4; }
+  .form-field .hint { font-size: 12px; color: var(--muted); margin-top: 6px; font-family: 'Parkinsans', sans-serif; }
+  .form-field .char-count { float: right; font-size: 12px; color: var(--muted); margin-top: 6px; font-family: 'Parkinsans', sans-serif; }
+
+  /* Gift summary */
+  .gift-summary { background: var(--cream); border: 1px solid var(--line); border-radius: 18px; padding: 28px; position: sticky; top: 100px; }
+  .gift-summary h3 { font-family: 'Parkinsans', sans-serif; font-size: 18px; font-weight: 700; color: var(--teal); margin-bottom: 16px; }
+  .gift-summary .kit-summary { padding: 16px; background: var(--white); border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--line); }
+  .gift-summary .kit-summary-name { font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+  .gift-summary .kit-summary-meta { font-size: 13px; color: var(--muted); }
+  .gift-summary .empty-state { text-align: center; padding: 24px 16px; color: var(--muted); font-size: 14px; }
+  .gift-summary .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: var(--teal-soft); }
+  .gift-summary .row.bold { font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); font-size: 17px; padding-top: 12px; margin-top: 6px; border-top: 1px solid var(--line); }
+  .gift-summary .free { color: var(--green); font-weight: 700; }
+  .gift-summary .checkout-btn { width: 100%; background: var(--orange); color: #fff; padding: 16px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 16px; border: none; cursor: pointer; margin-top: 20px; transition: background 0.15s, transform 0.15s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .gift-summary .checkout-btn:hover:not(:disabled) { background: #b22e21; transform: translateY(-1px); }
+  .gift-summary .checkout-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+  .gift-summary .secure { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+  /* Footer */
+  footer { background: var(--teal); color: rgba(255,255,255,0.85); padding: 80px 0 32px; }
+  .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
+  .footer-brand .wordmark { color: var(--white); }
+  .footer-brand p { font-size: 14px; opacity: 0.7; margin-top: 18px; max-width: 300px; line-height: 1.6; }
+  .footer-col h5 { font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 20px; color: var(--yellow); letter-spacing: 0.05em; text-transform: uppercase; }
+  .footer-col a { display: block; font-family: 'Parkinsans', sans-serif; font-size: 14px; opacity: 0.85; margin-bottom: 12px; }
+  .footer-col a:hover { color: var(--orange); opacity: 1; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 24px; display: flex; justify-content: space-between; font-size: 13px; opacity: 0.6; flex-wrap: wrap; gap: 16px; }
+
+  @media (max-width: 900px) {
+    .hero-grid, .gift-form-grid { grid-template-columns: 1fr; gap: 48px; }
+    .hero-photo { max-width: 320px; margin: 0 auto; }
+    .pick-grid { grid-template-columns: 1fr 1fr; }
+    .how-steps { grid-template-columns: 1fr; gap: 40px; }
+    .gift-summary { position: static; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 500px) { .pick-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a href="/" class="wordmark">Fast Track</a>
+    <nav class="nav-links">
+      <a href="/#how">How It Works</a>
+      <a href="/kits">Kits</a>
+      <a href="/upload">Upload List</a>
+      <a href="/store">Store</a>
+      <a href="/gift" class="active">Gift</a>
+    </nav>
+    <button class="cart-btn" onclick="window.location.href='/store'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6z"/></svg>
+      Cart <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>Send a kit to your <span class="accent">grandkid</span>.</h1>
+      <p class="lead">Pick the grade. Pick the address. Add a note. We pack it up and ship it straight to them, ready for the first bell.</p>
+      <button class="hero-cta" onclick="document.getElementById('pick').scrollIntoView({behavior:'smooth'})">
+        Pick a kit
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </button>
+    </div>
+    <div class="hero-photo">
+      <div class="hero-photo-frame">
+        <img src="https://images.pexels.com/photos/13198519/pexels-photo-13198519.jpeg?auto=compress&w=1200" alt="Happy elementary-age child with a backpack" />
+      </div>
+      <div class="hero-tag">From: Grandma</div>
+    </div>
+  </div>
+</section>
+
+<section class="how">
+  <div class="container">
+    <div class="how-head">
+      <h2>Three steps. One very happy kid.</h2>
+      <p>Skip the supply list run. Skip the wrapping paper. Send something that actually gets used.</p>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-emoji">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h4>Pick a kit</h4>
+        <p>Eight grade levels, K through high school. Every kit curated for what kids actually need.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-emoji">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <h4>Ship to them</h4>
+        <p>You pay, we ship to your grandchild's address. They don't see the bill, they just see the box.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-emoji">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        </div>
+        <h4>Add a note</h4>
+        <p>We tuck a handwritten-style card in the box. "Have a great first day, love Grandma." It hits.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pick" id="pick">
+  <div class="container">
+    <div class="pick-head">
+      <div>
+        <h2>Pick a kit</h2>
+        <p>You know their grade. We know what they need.</p>
+      </div>
+      <a href="/kits" style="font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; color: var(--orange);">See all kits →</a>
+    </div>
+    <div class="pick-grid" id="pick-grid">Loading kits...</div>
+  </div>
+</section>
+
+<section class="gift-form" id="gift-form">
+  <div class="container gift-form-grid">
+    <div>
+      <h2>Make it personal</h2>
+      <p>Tell us who it's from and where it's going. We'll print your note on a card and tuck it inside the box.</p>
+      <div class="form-field">
+        <label>Your name <span style="color:var(--muted);font-weight:500;">(this appears on the gift note)</span></label>
+        <input type="text" id="sender-name" placeholder="Grandma Jane" maxlength="100" />
+      </div>
+      <div class="form-field">
+        <label>Gift note</label>
+        <textarea id="gift-note" placeholder="Have an awesome school year, sweetheart. I love you. — Grandma" maxlength="500"></textarea>
+        <span class="char-count" id="char-count">0 / 500</span>
+        <div class="hint">We'll print this on a card and ship it inside the box. You can leave it blank if you'd prefer no note.</div>
+      </div>
+      <div class="form-field">
+        <label>Note to us (optional)</label>
+        <input type="text" id="internal-note" placeholder="Birthday delivery, please don't ship before Aug 15" maxlength="200" />
+        <div class="hint">For us, not the recipient. Special instructions, delivery timing, etc.</div>
+      </div>
+      <div style="margin-top: 28px; padding: 20px 24px; background: var(--cream); border-radius: 12px; font-size: 14px; color: var(--teal-soft); line-height: 1.6;">
+        Shipping address comes next, on the Stripe checkout page. You'll enter your grandchild's mailing address there. Your billing email is just for the order receipt.
+      </div>
+    </div>
+
+    <aside class="gift-summary">
+      <h3>Your gift</h3>
+      <div id="kit-summary-box">
+        <div class="empty-state">Pick a kit above to get started.</div>
+      </div>
+      <div class="row"><span>Subtotal</span><span id="sum-subtotal">$0.00</span></div>
+      <div class="row"><span>Shipping</span><span id="sum-shipping">—</span></div>
+      <div class="row bold"><span>Total</span><span id="sum-total">$0.00</span></div>
+      <button class="checkout-btn" id="checkout-btn" disabled>
+        Send the gift
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+      <div class="secure">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Secure checkout via Stripe
+      </div>
+    </aside>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="wordmark">Fast Track</a>
+        <p>Back-to-school supplies, ordered, packed, and delivered.</p>
+      </div>
+      <div class="footer-col"><h5>Shop</h5><a href="/kits">Grade Kits</a><a href="/store">All Products</a><a href="/upload">Upload a List</a><a href="/gift">Gift a Kit</a></div>
+      <div class="footer-col"><h5>About</h5><a href="/#how">How It Works</a></div>
+      <div class="footer-col"><h5>Help</h5><a href="/shipping">Shipping</a><a href="/returns">Returns</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Fast Track School Supplies.</span>
+      <span><a href="/privacy" style="color: inherit;">Privacy</a> · <a href="/terms" style="color: inherit;">Terms</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const FREE_SHIPPING = 35;
+  const SHIPPING_FLAT = 5;
+  let selectedKit = null;
+  let allKits = [];
+
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  async function loadKits() {
+    try {
+      const res = await fetch('/api/kits');
+      const data = await res.json();
+      allKits = data.kits;
+      renderKits();
+
+      // Pre-select if ?kit=... in URL
+      const presel = new URLSearchParams(window.location.search).get('kit');
+      if (presel && allKits.find(k => k.kit_id === presel)) {
+        selectKit(presel);
+      }
+    } catch (err) {
+      document.getElementById('pick-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);">Could not load kits. Refresh to try again.</div>';
+    }
+  }
+
+  function renderKits() {
+    document.getElementById('pick-grid').innerHTML = allKits.map(k => `
+      <div class="pick-card ${selectedKit === k.kit_id ? 'selected' : ''}" data-kit="${k.kit_id}">
+        <div class="pick-card-grade">${escapeHtml(k.grade_label)}</div>
+        <h4>${escapeHtml(k.name)}</h4>
+        <div class="ages">${escapeHtml(k.age_range)}</div>
+        <div class="price-row">
+          <span class="price">$${k.price.toFixed(2)}</span>
+          <span class="item-count">${k.item_count} items</span>
+        </div>
+      </div>
+    `).join('');
+    document.querySelectorAll('.pick-card').forEach(card => {
+      card.addEventListener('click', () => selectKit(card.dataset.kit));
+    });
+  }
+
+  function selectKit(kitId) {
+    selectedKit = kitId;
+    renderKits();
+    updateSummary();
+    document.getElementById('gift-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function updateSummary() {
+    const box = document.getElementById('kit-summary-box');
+    if (!selectedKit) {
+      box.innerHTML = '<div class="empty-state">Pick a kit above to get started.</div>';
+      document.getElementById('sum-subtotal').textContent = '$0.00';
+      document.getElementById('sum-shipping').textContent = '—';
+      document.getElementById('sum-total').textContent = '$0.00';
+      document.getElementById('checkout-btn').disabled = true;
+      return;
+    }
+    const k = allKits.find(x => x.kit_id === selectedKit);
+    if (!k) return;
+    const shipping = k.price >= FREE_SHIPPING ? 0 : SHIPPING_FLAT;
+    const total = k.price + shipping;
+    box.innerHTML = `
+      <div class="kit-summary">
+        <div class="kit-summary-name">${escapeHtml(k.name)}</div>
+        <div class="kit-summary-meta">${k.item_count} items · ${escapeHtml(k.age_range)}</div>
+      </div>
+    `;
+    document.getElementById('sum-subtotal').textContent = `$${k.price.toFixed(2)}`;
+    document.getElementById('sum-shipping').innerHTML = shipping === 0 ? '<span class="free">Free</span>' : `$${shipping.toFixed(2)}`;
+    document.getElementById('sum-total').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('checkout-btn').disabled = false;
+  }
+
+  // Char counter
+  const noteEl = document.getElementById('gift-note');
+  const counter = document.getElementById('char-count');
+  noteEl.addEventListener('input', () => { counter.textContent = `${noteEl.value.length} / 500`; });
+
+  // Checkout
+  document.getElementById('checkout-btn').addEventListener('click', async () => {
+    if (!selectedKit) return;
+    const btn = document.getElementById('checkout-btn');
+    btn.disabled = true; const original = btn.innerHTML; btn.textContent = 'Redirecting...';
+    try {
+      // Fetch the kit's items
+      const kitRes = await fetch(`/api/kits/${selectedKit}`);
+      const kitData = await kitRes.json();
+      const items = kitData.items.map(i => ({ sku_id: i.sku_id, quantity: i.quantity }));
+      const res = await fetch('/api/checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'gift',
+          kit_id: selectedKit,
+          items,
+          gift_note: document.getElementById('gift-note').value || '',
+          sender_name: document.getElementById('sender-name').value || ''
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Checkout failed.');
+      window.location.href = data.url;
+    } catch (err) {
+      alert(err.message); btn.disabled = false; btn.innerHTML = original;
+    }
+  });
+
+  try {
+    const stored = JSON.parse(localStorage.getItem('fastTrackCart') || '{}');
+    document.getElementById('cart-count').textContent = Object.values(stored).reduce((s, q) => s + q, 0);
+  } catch {}
+
+  loadKits();
+</script>
+
+</body>
+</html>

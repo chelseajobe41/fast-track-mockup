@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Order Confirmed | Fast Track School Supplies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --teal:#223A3F; --orange:#DC3D2D; --yellow:#FDCA06; --cream:#FAF6EF; --line:#E8E4DC; --muted:#6A6F71; --green:#2d8659; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', system-ui, sans-serif; background: var(--cream); color: var(--teal); line-height: 1.55; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+  .card { background: #fff; border-radius: 24px; padding: 56px 48px; max-width: 560px; width: 100%; text-align: center; box-shadow: 0 30px 80px rgba(34,58,63,0.1); }
+  .check { width: 80px; height: 80px; background: rgba(45,134,89,0.1); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 28px; color: var(--green); }
+  .check svg { width: 36px; height: 36px; }
+  h1 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 36px; letter-spacing: -0.02em; margin-bottom: 12px; }
+  h1 .dot { color: var(--orange); }
+  p.lead { font-size: 17px; color: var(--muted); margin-bottom: 32px; }
+  .order-id { background: var(--cream); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; font-family: 'Parkinsans', sans-serif; font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+  .order-id strong { color: var(--teal); font-weight: 700; }
+  .btn { background: var(--teal); color: #fff; padding: 16px 28px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 15px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+  .btn:hover { background: var(--orange); }
+  .next { background: var(--cream); border-radius: 16px; padding: 24px; margin-top: 32px; text-align: left; font-size: 14px; color: var(--muted); }
+  .next h3 { font-family: 'Parkinsans', sans-serif; font-size: 15px; font-weight: 600; color: var(--teal); margin-bottom: 8px; }
+  .next ul { margin: 0; padding-left: 18px; }
+  .next li { margin-bottom: 4px; }
+</style>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<link rel="stylesheet" href="/motion.css" />
+<script defer src="/motion.js"></script>
+</head>
+<body>
+  <div class="card">
+    <div class="check">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </div>
+    <h1>Order confirmed<span class="dot">.</span></h1>
+    <p class="lead">Thanks for your order. We've sent a confirmation email with the details.</p>
+    <div class="order-id">Order ID: <strong id="order-id">Loading...</strong></div>
+    <a href="/" class="btn">
+      Back to home
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+    <div class="next">
+      <h3>What happens next</h3>
+      <ul>
+        <li>You'll get an order confirmation email within a few minutes.</li>
+        <li>We pack your kit within 1 business day.</li>
+        <li>Standard shipping arrives in 3-7 business days.</li>
+        <li>Questions? Reply to the confirmation email.</li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get('session_id') || '';
+    document.getElementById('order-id').textContent = sid ? sid.slice(-10).toUpperCase() : 'PENDING';
+  </script>
+</body>
+</html>

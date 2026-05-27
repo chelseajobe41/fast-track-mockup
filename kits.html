@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pre-Built Kits | Fast Track School Supplies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<link rel="stylesheet" href="/motion.css" />
+<script defer src="/motion.js"></script>
+<style>
+  :root {
+    --teal:#223A3F; --teal-soft:rgba(34,58,63,0.75); --orange:#DC3D2D; --yellow:#FDCA06;
+    --white:#ffffff; --cream:#FAF6EF; --line:#E8E4DC; --muted:#6A6F71; --green:#2d8659;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', system-ui, sans-serif; background: var(--white); color: var(--teal); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.96); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+  .wordmark { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 22px; color: var(--teal); display: inline-block; }
+  .nav-links { display: flex; gap: 38px; font-family: 'Parkinsans', sans-serif; font-size: 15px; font-weight: 500; }
+  .nav-links a { color: var(--teal); transition: color 0.15s; position: relative; }
+  .nav-links a:hover, .nav-links a.active { color: var(--orange); }
+  .nav-links a.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -22px; height: 3px; background: var(--orange); }
+  .cart-btn { background: var(--teal); color: var(--white); padding: 11px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; border: none; }
+  .cart-count { background: var(--yellow); color: var(--teal); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; min-width: 22px; text-align: center; }
+
+  /* Hero */
+  .hero { background: var(--cream); padding: 80px 0 56px; border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
+  .hero h1 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(40px, 5vw, 64px); line-height: 1.05; letter-spacing: -0.025em; color: var(--teal); margin-bottom: 16px; max-width: 760px; }
+  .hero p.lead { font-size: 19px; color: var(--teal-soft); max-width: 580px; }
+  .hero .badge-row { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .hero-badge { background: var(--white); border: 1px solid var(--line); padding: 8px 16px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 500; color: var(--teal); display: inline-flex; align-items: center; gap: 6px; }
+  .hero-badge.discount { background: var(--orange); color: #fff; border-color: var(--orange); font-weight: 700; }
+
+  /* Kit grid */
+  .kits-section { padding: 80px 0 120px; }
+  .kits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .kit-card { background: var(--white); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; transition: transform 0.25s, box-shadow 0.25s, border-color 0.2s; cursor: pointer; display: flex; flex-direction: column; }
+  .kit-card:hover { transform: translateY(-4px); border-color: var(--teal); box-shadow: 0 24px 56px rgba(34,58,63,0.1); }
+  .kit-card-hero { aspect-ratio: 5/3; display: grid; place-items: center; position: relative; overflow: hidden; padding: 24px; }
+  .kit-card-hero .preview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 70%; aspect-ratio: 1/1; }
+  .kit-card-hero .preview-grid img { width: 100%; height: 100%; object-fit: contain; background: #fff; border-radius: 10px; padding: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+  .kit-card-hero .grade-chip { position: absolute; top: 16px; left: 16px; background: var(--teal); color: var(--cream); font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 13px; padding: 6px 14px; border-radius: 999px; letter-spacing: 0.02em; }
+  .kit-card-hero .save-chip { position: absolute; top: 16px; right: 16px; background: var(--orange); color: #fff; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 12px; padding: 6px 12px; border-radius: 999px; }
+  .kit-card-body { padding: 24px 28px 28px; flex: 1; display: flex; flex-direction: column; }
+  .kit-card h3 { font-family: 'Parkinsans', sans-serif; font-size: 22px; font-weight: 700; color: var(--teal); letter-spacing: -0.01em; margin-bottom: 4px; }
+  .kit-card .age { font-family: 'Parkinsans', sans-serif; font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
+  .kit-card .tagline { font-size: 15px; color: var(--teal-soft); line-height: 1.5; margin-bottom: 20px; flex: 1; }
+  .kit-card-foot { display: flex; justify-content: space-between; align-items: center; padding-top: 18px; border-top: 1px solid var(--line); }
+  .kit-card-price { font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); }
+  .kit-card-price .strike { color: var(--muted); font-weight: 500; text-decoration: line-through; font-size: 14px; margin-right: 8px; }
+  .kit-card-price .now { font-size: 24px; letter-spacing: -0.01em; }
+  .kit-card-meta { font-size: 13px; color: var(--muted); font-family: 'Parkinsans', sans-serif; }
+  .kit-card-cta { background: var(--teal); color: var(--white); padding: 10px 18px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border: none; transition: background 0.15s; }
+  .kit-card:hover .kit-card-cta { background: var(--orange); }
+
+  /* Why kits / how it works */
+  .why { background: var(--cream); padding: 80px 0; }
+  .why-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 32px; align-items: start; }
+  .why h2 { font-family: 'Parkinsans', sans-serif; font-size: clamp(28px, 3.4vw, 40px); font-weight: 700; color: var(--teal); letter-spacing: -0.02em; line-height: 1.1; }
+  .why-item h4 { font-family: 'Parkinsans', sans-serif; font-size: 17px; font-weight: 700; color: var(--teal); margin-bottom: 8px; }
+  .why-item p { font-size: 14px; color: var(--teal-soft); line-height: 1.55; }
+  .why-icon { width: 44px; height: 44px; background: var(--white); border-radius: 12px; display: grid; place-items: center; color: var(--orange); margin-bottom: 16px; border: 1px solid var(--line); }
+  .why-icon svg { width: 22px; height: 22px; }
+
+  /* Loading */
+  .loading { padding: 96px 32px; text-align: center; color: var(--muted); font-family: 'Parkinsans', sans-serif; }
+
+  /* Footer */
+  footer { background: var(--teal); color: rgba(255,255,255,0.85); padding: 80px 0 32px; }
+  .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
+  .footer-brand .wordmark { color: var(--white); }
+  .footer-brand p { font-size: 14px; opacity: 0.7; margin-top: 18px; max-width: 300px; line-height: 1.6; }
+  .footer-col h5 { font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 20px; color: var(--yellow); letter-spacing: 0.05em; text-transform: uppercase; }
+  .footer-col a { display: block; font-family: 'Parkinsans', sans-serif; font-size: 14px; opacity: 0.85; margin-bottom: 12px; }
+  .footer-col a:hover { color: var(--orange); opacity: 1; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 24px; display: flex; justify-content: space-between; font-size: 13px; opacity: 0.6; flex-wrap: wrap; gap: 16px; }
+
+  @media (max-width: 1000px) { .kits-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: 1fr 1fr; gap: 24px; } }
+  @media (max-width: 700px) { .kits-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .footer-grid { grid-template-columns: 1fr 1fr; } .nav-links { display: none; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a href="/" class="wordmark">Fast Track</a>
+    <nav class="nav-links">
+      <a href="/#how">How It Works</a>
+      <a href="/kits" class="active">Kits</a>
+      <a href="/upload">Upload List</a>
+      <a href="/store">Store</a>
+      <a href="/gift">Gift</a>
+    </nav>
+    <button class="cart-btn" onclick="window.location.href='/store'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6zM9 22a1 1 0 100-2 1 1 0 000 2zM15 22a1 1 0 100-2 1 1 0 000 2z"/></svg>
+      Cart <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Pre-built kits, grade by grade.</h1>
+    <p class="lead">Every kit is curated to match what teachers actually ask for. Pick your child's grade, we ship it. No supply list required.</p>
+    <div class="badge-row">
+      <span class="hero-badge discount">Save 10% vs buying individually</span>
+      <span class="hero-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        Ships in 1 business day
+      </span>
+      <span class="hero-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        Free shipping over $35
+      </span>
+    </div>
+  </div>
+</section>
+
+<section class="kits-section">
+  <div class="container">
+    <div class="loading" id="loading">Loading kits...</div>
+    <div class="kits-grid" id="kits-grid" style="display:none;"></div>
+  </div>
+</section>
+
+<section class="why">
+  <div class="container why-grid">
+    <div>
+      <h2>Built by parents.<br>Approved by teachers.</h2>
+    </div>
+    <div class="why-item">
+      <div class="why-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <h4>Right brands, right counts</h4>
+      <p>Ticonderoga pencils. Elmer's glue. Crayola crayons. The actual brands schools ask for.</p>
+    </div>
+    <div class="why-item">
+      <div class="why-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      </div>
+      <h4>Customize before you pay</h4>
+      <p>Add, remove, or adjust quantities on the kit page. The kit is a starting point.</p>
+    </div>
+    <div class="why-item">
+      <div class="why-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      <h4>Subscribe & save</h4>
+      <p>Set any kit to refill every 1, 2, 3, or 6 months. An extra 10% off recurring.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="wordmark">Fast Track</a>
+        <p>Back-to-school supplies, ordered, packed, and delivered. Built for families who want it done right.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Shop</h5>
+        <a href="/kits">Grade Kits</a>
+        <a href="/store">All Products</a>
+        <a href="/upload">Upload a List</a>
+        <a href="/gift">Gift a Kit</a>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <a href="/#how">How It Works</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5>Help</h5>
+        <a href="/shipping">Shipping</a>
+        <a href="/returns">Returns</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Fast Track School Supplies. All rights reserved.</span>
+      <span><a href="/privacy" style="color: inherit;">Privacy</a> · <a href="/terms" style="color: inherit;">Terms</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  async function loadKits() {
+    try {
+      const res = await fetch('/api/kits');
+      const data = await res.json();
+      const grid = document.getElementById('kits-grid');
+      document.getElementById('loading').style.display = 'none';
+      grid.style.display = '';
+      grid.innerHTML = data.kits.map(k => `
+        <a href="/kit?id=${k.kit_id}" class="kit-card">
+          <div class="kit-card-hero" style="background: ${k.hero_color};">
+            <span class="grade-chip">${escapeHtml(k.grade_label)}</span>
+            <span class="save-chip">Save ${data.discount_percent}%</span>
+            <div class="preview-grid">
+              ${k.preview_images.map(img => `<img src="${img}" alt="" loading="lazy" />`).join('')}
+            </div>
+          </div>
+          <div class="kit-card-body">
+            <h3>${escapeHtml(k.name)}</h3>
+            <div class="age">${escapeHtml(k.age_range)}</div>
+            <p class="tagline">${escapeHtml(k.tagline)}</p>
+            <div class="kit-card-foot">
+              <div class="kit-card-price">
+                <span class="strike">$${k.raw_subtotal.toFixed(2)}</span>
+                <span class="now">$${k.price.toFixed(2)}</span>
+                <div class="kit-card-meta">${k.item_count} items</div>
+              </div>
+              <button class="kit-card-cta">
+                View kit
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </a>
+      `).join('');
+      if (window.ftObserveReveals) window.ftObserveReveals();
+    } catch (err) {
+      document.getElementById('loading').textContent = 'Could not load kits. Please refresh.';
+      console.error(err);
+    }
+  }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  // Sync cart count
+  try {
+    const stored = JSON.parse(localStorage.getItem('fastTrackCart') || '{}');
+    const count = Object.values(stored).reduce((s, q) => s + q, 0);
+    document.getElementById('cart-count').textContent = count;
+  } catch {}
+
+  loadKits();
+</script>
+
+</body>
+</html>

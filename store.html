@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Store | Fast Track School Supplies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:#223A3F; --teal-soft:rgba(34,58,63,0.75); --teal-faint:rgba(34,58,63,0.06);
+    --orange:#DC3D2D; --yellow:#FDCA06; --white:#ffffff; --cream:#FAF6EF;
+    --line:#E8E4DC; --muted:#6A6F71; --green:#2d8659; --red:#c03434;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', system-ui, sans-serif; background: var(--white); color: var(--teal); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .container { max-width: 1340px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; }
+
+  /* Header */
+  header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.96); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+  .wordmark { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -0.02em; color: var(--teal); display: flex; align-items: baseline; gap: 6px; }
+  .wordmark .dot { color: var(--orange); }
+  .wordmark .sub { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .nav-links { display: flex; gap: 38px; font-family: 'Parkinsans', sans-serif; font-size: 15px; font-weight: 500; }
+  .nav-links a { color: var(--teal); transition: color 0.15s; position: relative; }
+  .nav-links a:hover, .nav-links a.active { color: var(--orange); }
+  .nav-links a.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -22px; height: 3px; background: var(--orange); }
+  .cart-btn { background: var(--teal); color: var(--white); padding: 11px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; border: none; transition: background 0.15s; }
+  .cart-btn:hover { background: var(--orange); }
+  .cart-count { background: var(--yellow); color: var(--teal); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; min-width: 22px; text-align: center; }
+
+  /* Hero */
+  .store-hero { background: var(--cream); padding: 64px 0 40px; border-bottom: 1px solid var(--line); }
+  .store-hero h1 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(40px, 5vw, 64px); line-height: 1.05; letter-spacing: -0.025em; color: var(--teal); margin-bottom: 12px; }
+  .store-hero h1 .dot { color: var(--orange); }
+  .store-hero p { font-size: 18px; color: var(--teal-soft); max-width: 540px; margin-bottom: 28px; }
+
+  /* Search & filters */
+  .controls { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 72px; z-index: 40; padding: 20px 0; }
+  .controls-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .search { flex: 1; min-width: 280px; position: relative; max-width: 480px; }
+  .search input { width: 100%; background: var(--cream); border: 1px solid var(--line); border-radius: 999px; padding: 13px 18px 13px 46px; font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--teal); outline: none; transition: border-color 0.15s, background 0.15s; }
+  .search input:focus { border-color: var(--teal); background: #fff; }
+  .search svg { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); width: 18px; height: 18px; }
+  .sort-select { background: var(--cream); border: 1px solid var(--line); border-radius: 999px; padding: 13px 36px 13px 18px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 500; color: var(--teal); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%236A6F71' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-position: right 16px center; background-repeat: no-repeat; }
+  .result-count { font-family: 'Parkinsans', sans-serif; font-size: 13px; color: var(--muted); margin-left: auto; }
+
+  .filter-chips { display: flex; gap: 8px; overflow-x: auto; padding: 14px 0 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .filter-chips::-webkit-scrollbar { display: none; }
+  .chip { background: #fff; border: 1px solid var(--line); padding: 8px 16px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 500; color: var(--teal-soft); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .chip:hover { color: var(--teal); border-color: var(--teal); }
+  .chip.active { background: var(--teal); color: var(--white); border-color: var(--teal); }
+
+  /* Grid */
+  .store-grid-section { padding: 36px 0 80px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .product-card { position: relative; background: var(--white); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+  .product-card:hover { transform: translateY(-3px); border-color: var(--teal); box-shadow: 0 16px 36px rgba(34,58,63,0.08); }
+  .product-img { position: relative; width: 100%; aspect-ratio: 1/1; background: var(--cream); overflow: hidden; border-bottom: 1px solid var(--line); }
+  .product-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 24px; }
+  .stock-badge { position: absolute; top: 12px; right: 12px; padding: 4px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .stock-badge.low { background: rgba(220,61,45,0.12); color: var(--orange); }
+  .subscribe-link { display: block; width: 100%; margin-top: 10px; padding: 8px 12px; background: var(--cream); border: 1px dashed var(--line); border-radius: 999px; color: var(--teal); font-family: 'Parkinsans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: border-color 0.15s, background 0.15s; text-align: center; }
+  .subscribe-link:hover { border-color: var(--orange); background: #fff; color: var(--orange); }
+  .cart-mode-bar { padding: 14px 28px; background: var(--cream); border-bottom: 1px solid var(--line); }
+  .mode-toggle { display: flex; gap: 4px; background: #fff; border-radius: 999px; padding: 3px; border: 1px solid var(--line); }
+  .mode-btn { flex: 1; background: transparent; border: none; padding: 8px 12px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; transition: background 0.15s, color 0.15s; }
+  .mode-btn.active { background: var(--teal); color: #fff; }
+  .interval-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-family: 'Parkinsans', sans-serif; font-size: 12px; color: var(--teal); }
+  .interval-select { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 28px 6px 10px; font-family: 'Parkinsans', sans-serif; font-size: 12px; font-weight: 600; color: var(--teal); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='%23223A3F' stroke-width='1.6'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); background-position: right 10px center; background-repeat: no-repeat; }
+  .cancel-note { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .stock-badge.out { background: rgba(192,52,52,0.12); color: var(--red); }
+  .product-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
+  .product-cat { font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+  .product-name { font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 15px; color: var(--teal); margin-bottom: 4px; line-height: 1.25; }
+  .product-meta { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .product-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; gap: 8px; }
+  .product-price { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 19px; color: var(--teal); letter-spacing: -0.01em; }
+  .add-btn { background: var(--teal); color: var(--white); padding: 8px 16px; height: 36px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; border: none; cursor: pointer; font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; transition: background 0.15s, transform 0.15s; }
+  .add-btn:hover:not(:disabled) { background: var(--orange); transform: translateY(-1px); }
+  .add-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .add-btn .plus { font-size: 16px; font-weight: 400; line-height: 1; }
+
+  /* Inline qty control on product card */
+  .qty-control-card { display: flex; align-items: center; gap: 4px; background: var(--cream); border: 1px solid var(--teal); border-radius: 999px; padding: 3px; }
+  .qty-btn-card { width: 28px; height: 28px; border: none; background: var(--white); border-radius: 50%; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--teal); display: grid; place-items: center; transition: background 0.15s, color 0.15s; }
+  .qty-btn-card:hover { background: var(--teal); color: var(--white); }
+  .qty-val-card { font-family: 'Parkinsans', sans-serif; font-weight: 700; min-width: 24px; text-align: center; font-size: 14px; color: var(--teal); }
+
+  .product-card.in-cart { border-color: var(--teal); }
+  .product-card .cart-indicator { position: absolute; top: 12px; left: 12px; background: var(--teal); color: var(--white); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 13px; box-shadow: 0 4px 12px rgba(34,58,63,0.25); z-index: 2; }
+  .empty-results { padding: 96px 32px; text-align: center; grid-column: 1 / -1; }
+  .empty-results h3 { font-family: 'Parkinsans', sans-serif; font-size: 22px; color: var(--teal); margin-bottom: 8px; }
+  .empty-results p { color: var(--muted); font-size: 15px; }
+
+  /* Cart drawer */
+  .cart-overlay { position: fixed; inset: 0; background: rgba(34,58,63,0.5); opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 90; }
+  .cart-overlay.open { opacity: 1; pointer-events: auto; }
+  .cart-drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 100vw; background: var(--white); transform: translateX(100%); transition: transform 0.25s ease-out; z-index: 100; display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(34,58,63,0.18); }
+  .cart-drawer.open { transform: translateX(0); }
+  .cart-head { padding: 24px 28px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .cart-head h2 { font-family: 'Parkinsans', sans-serif; font-size: 22px; font-weight: 700; color: var(--teal); letter-spacing: -0.01em; }
+  .close-btn { background: var(--cream); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; color: var(--teal); }
+  .close-btn:hover { background: var(--line); }
+  .cart-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .cart-empty { padding: 64px 32px; text-align: center; color: var(--muted); }
+  .cart-empty .icon { width: 56px; height: 56px; background: var(--cream); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 16px; color: var(--muted); }
+  .cart-item { padding: 14px 28px; display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; border-bottom: 1px solid var(--line); align-items: center; }
+  .cart-item-img { width: 56px; height: 56px; background: var(--cream); border-radius: 10px; padding: 6px; }
+  .cart-item-img img { width: 100%; height: 100%; object-fit: contain; }
+  .cart-item-info .name { font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; color: var(--teal); margin-bottom: 2px; line-height: 1.2; }
+  .cart-item-info .meta { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .cart-item-controls { display: flex; gap: 8px; align-items: center; }
+  .qty-control-small { display: flex; align-items: center; gap: 6px; background: var(--cream); border-radius: 999px; padding: 3px; }
+  .qty-btn-small { width: 22px; height: 22px; border: none; background: #fff; border-radius: 50%; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--teal); display: grid; place-items: center; }
+  .qty-btn-small:hover { background: var(--teal); color: #fff; }
+  .qty-val-small { font-family: 'Parkinsans', sans-serif; font-weight: 700; min-width: 18px; text-align: center; font-size: 13px; }
+  .cart-item-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px 8px; }
+  .cart-item-remove:hover { color: var(--red); }
+  .cart-item-price { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 14px; color: var(--teal); text-align: right; min-width: 56px; }
+
+  .cart-foot { border-top: 1px solid var(--line); padding: 24px 28px; }
+  .cart-summary { margin-bottom: 18px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; color: var(--teal-soft); }
+  .summary-row.bold { font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); font-size: 18px; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .free-tag { color: var(--green); font-weight: 700; }
+  .shipping-note { font-size: 12px; color: var(--muted); margin-top: 6px; padding: 8px 12px; background: var(--cream); border-radius: 8px; }
+  .shipping-note.close { color: var(--orange); }
+  .checkout-btn { width: 100%; background: var(--orange); color: #fff; padding: 16px 24px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 16px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.15s, transform 0.15s; }
+  .checkout-btn:hover:not(:disabled) { background: #b22e21; transform: translateY(-1px); }
+  .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .secure-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--teal); color: #fff; padding: 14px 24px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; box-shadow: 0 20px 50px rgba(0,0,0,0.2); opacity: 0; transition: transform 0.25s, opacity 0.2s; pointer-events: none; z-index: 110; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 800px) { .grid { grid-template-columns: repeat(2, 1fr); } .nav-links { display: none; } }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } .cart-drawer { width: 100vw; } }
+</style>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<link rel="stylesheet" href="/motion.css" />
+<script defer src="/motion.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a href="/" class="wordmark">
+      Fast Track<span class="dot">.</span>
+      <span class="sub">School Supplies</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/#how">How It Works</a>
+      <a href="/kits">Kits</a>
+      <a href="/upload">Upload List</a>
+      <a href="/store" class="active">Store</a>
+      <a href="/gift">Gift</a>
+    </nav>
+    <button class="cart-btn" id="cart-toggle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6zM9 22a1 1 0 100-2 1 1 0 000 2zM15 22a1 1 0 100-2 1 1 0 000 2z"/></svg>
+      Cart
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</header>
+
+<section class="store-hero">
+  <div class="container">
+    <h1>Shop the store<span class="dot">.</span></h1>
+    <p>Build your own kit or pick up something for next semester. Free shipping on orders over $35.</p>
+  </div>
+</section>
+
+<div class="controls">
+  <div class="container">
+    <div class="controls-row">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="search-input" placeholder="Search pencils, glue, backpacks..." autocomplete="off" />
+      </div>
+      <select class="sort-select" id="sort-select">
+        <option value="featured">Featured</option>
+        <option value="price-asc">Price, low to high</option>
+        <option value="price-desc">Price, high to low</option>
+        <option value="name">Name A-Z</option>
+      </select>
+      <span class="result-count" id="result-count">Loading...</span>
+    </div>
+    <div class="filter-chips" id="filter-chips"></div>
+  </div>
+</div>
+
+<section class="store-grid-section">
+  <div class="container">
+    <div class="grid" id="product-grid"></div>
+  </div>
+</section>
+
+<!-- Cart drawer -->
+<div class="cart-overlay" id="cart-overlay"></div>
+<aside class="cart-drawer" id="cart-drawer">
+  <div class="cart-head">
+    <h2>Your cart</h2>
+    <button class="close-btn" id="cart-close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="cart-mode-bar" id="cart-mode-bar" style="display:none;"></div>
+  <div class="cart-body" id="cart-body"></div>
+  <div class="cart-foot" id="cart-foot" style="display:none;">
+    <div class="cart-summary">
+      <div class="summary-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+      <div class="summary-row" id="cart-savings-row" style="display:none;"><span>Subscription savings</span><span id="cart-savings" class="free-tag">−$0.00</span></div>
+      <div class="summary-row"><span>Shipping</span><span id="cart-shipping">Calculated at checkout</span></div>
+      <div class="summary-row bold"><span>Total</span><span id="cart-total">$0.00</span></div>
+    </div>
+    <div class="shipping-note" id="shipping-note"></div>
+    <button class="checkout-btn" id="checkout-btn" style="margin-top: 14px;">
+      Continue to checkout
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+    <div class="secure-note">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      Secure checkout via Stripe
+    </div>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const FREE_SHIPPING = 35;
+  const SHIPPING_FLAT = 5;
+
+  // ---------- Category rules (keyword-based) ----------
+  const CATEGORIES = [
+    { id: 'all', label: 'All', match: () => true },
+    { id: 'writing', label: 'Writing', match: p => /pencil|pen|sharpie|dry erase marker|marker/i.test(p.name) && !/colored|crayola|color/i.test(p.name) },
+    { id: 'paper', label: 'Paper', match: p => /notebook|paper|cardstock|index cards|sticky notes/i.test(p.name) },
+    { id: 'binders', label: 'Binders & Folders', match: p => /binder|folder|divider|sheet protector|pouch|pencil box/i.test(p.name) },
+    { id: 'adhesives', label: 'Glue & Tape', match: p => /glue|tape/i.test(p.name) },
+    { id: 'art', label: 'Art Supplies', match: p => /crayon|colored pencil|crayola/i.test(p.name) || /markers/i.test(p.name) },
+    { id: 'tools', label: 'Tools', match: p => /scissors|ruler|calculator|sharpener/i.test(p.name) },
+    { id: 'erasers', label: 'Erasers', match: p => /eraser/i.test(p.name) },
+    { id: 'classroom', label: 'Classroom', match: p => /tissue|paper towel|disinfectant|wipes/i.test(p.name) },
+    { id: 'bags', label: 'Ziploc Bags', match: p => /bags|ziploc/i.test(p.name) },
+    { id: 'personal', label: 'Personal', match: p => /backpack|water bottle/i.test(p.name) }
+  ];
+
+  const SUBSCRIPTION_INTERVALS = [
+    { key: 'monthly',    label: 'Every month' },
+    { key: 'bimonthly',  label: 'Every 2 months' },
+    { key: 'quarterly',  label: 'Every 3 months' },
+    { key: 'semiannual', label: 'Every 6 months' }
+  ];
+  const SUB_DISCOUNT = 0.10;
+
+  let PRODUCTS = [];
+  let INVENTORY = {};
+  let activeCategory = 'all';
+  let searchQuery = '';
+  let sortMode = 'featured';
+  let cart = loadCart();
+  let cartMode = localStorage.getItem('fastTrackCartMode') || 'one-time';
+  let cartInterval = localStorage.getItem('fastTrackCartInterval') || 'monthly';
+
+  // ---------- Cart (localStorage) ----------
+  function loadCart() {
+    try { return JSON.parse(localStorage.getItem('fastTrackCart') || '{}'); }
+    catch { return {}; }
+  }
+  function saveCart() {
+    localStorage.setItem('fastTrackCart', JSON.stringify(cart));
+    localStorage.setItem('fastTrackCartMode', cartMode);
+    localStorage.setItem('fastTrackCartInterval', cartInterval);
+  }
+  function cartCount() { return Object.values(cart).reduce((s, q) => s + q, 0); }
+  function cartRawSubtotal() {
+    return Object.entries(cart).reduce((s, [id, qty]) => {
+      const p = PRODUCTS.find(x => x.id === id);
+      return s + (p ? p.price * qty : 0);
+    }, 0);
+  }
+  function cartSubtotal() {
+    const raw = cartRawSubtotal();
+    return cartMode === 'subscription' ? raw * (1 - SUB_DISCOUNT) : raw;
+  }
+  function intervalLabel() {
+    return SUBSCRIPTION_INTERVALS.find(i => i.key === cartInterval)?.label || 'Every month';
+  }
+
+  // ---------- Bootstrap ----------
+  async function init() {
+    const [productsRes, inventoryRes] = await Promise.all([
+      fetch('/products.json'),
+      fetch('/api/inventory-public').catch(() => null)
+    ]);
+    PRODUCTS = await productsRes.json();
+    if (inventoryRes && inventoryRes.ok) INVENTORY = await inventoryRes.json();
+    renderFilters();
+    render();
+    updateCartUI();
+  }
+
+  function renderFilters() {
+    const chips = document.getElementById('filter-chips');
+    chips.innerHTML = CATEGORIES.map(c => {
+      const count = c.id === 'all' ? PRODUCTS.length : PRODUCTS.filter(c.match).length;
+      return `<button class="chip ${activeCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.label} <span style="opacity:0.6;font-weight:400;">${count}</span></button>`;
+    }).join('');
+    chips.querySelectorAll('.chip').forEach(btn => btn.addEventListener('click', () => {
+      activeCategory = btn.dataset.cat;
+      renderFilters();
+      render();
+    }));
+  }
+
+  function render() {
+    const cat = CATEGORIES.find(c => c.id === activeCategory);
+    let filtered = PRODUCTS.filter(cat.match);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.keywords || []).some(k => k.toLowerCase().includes(q)) ||
+        (p.unit || '').toLowerCase().includes(q)
+      );
+    }
+    if (sortMode === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+    else if (sortMode === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+    else if (sortMode === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+    document.getElementById('result-count').textContent = `${filtered.length} of ${PRODUCTS.length} products`;
+
+    const grid = document.getElementById('product-grid');
+    if (!filtered.length) {
+      grid.innerHTML = `<div class="empty-results"><h3>No matches</h3><p>Try a different search or clear filters.</p></div>`;
+      return;
+    }
+    grid.innerHTML = filtered.map(p => {
+      const inv = INVENTORY[p.id];
+      const stock = inv?.stock ?? null;
+      const isOut = stock === 0;
+      const isLow = stock !== null && stock > 0 && stock <= (inv?.low_stock_threshold || 10);
+      const cat = CATEGORIES.find(c => c.id !== 'all' && c.match(p));
+      const qtyInCart = cart[p.id] || 0;
+      const atMaxStock = stock !== null && qtyInCart >= stock;
+      const inCart = qtyInCart > 0;
+      const control = isOut
+        ? `<button class="add-btn" disabled>Out of stock</button>`
+        : inCart
+          ? `<div class="qty-control-card">
+              <button class="qty-btn-card" data-qty-dec="${p.id}" aria-label="Decrease quantity">−</button>
+              <span class="qty-val-card">${qtyInCart}</span>
+              <button class="qty-btn-card" data-qty-inc="${p.id}" ${atMaxStock ? 'disabled' : ''} aria-label="Increase quantity">+</button>
+            </div>`
+          : `<button class="add-btn" data-add="${p.id}" aria-label="Add ${escapeHtml(p.name)} to cart">
+              <span class="plus">+</span> Add
+            </button>`;
+      const subPrice = (p.price * (1 - SUB_DISCOUNT)).toFixed(2);
+      const subscribeLink = isOut ? '' : `<button class="subscribe-link" data-subscribe="${p.id}">Subscribe & save 10% · $${subPrice}</button>`;
+      return `
+        <div class="product-card ${inCart ? 'in-cart' : ''}">
+          <div class="product-img">
+            ${inCart ? `<span class="cart-indicator">${qtyInCart}</span>` : ''}
+            ${isOut ? '<span class="stock-badge out">Out</span>' : isLow ? `<span class="stock-badge low">Only ${stock} left</span>` : ''}
+            <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" />
+          </div>
+          <div class="product-body">
+            <div class="product-cat">${cat?.label || 'Supplies'}</div>
+            <div class="product-name">${escapeHtml(p.name)}</div>
+            <div class="product-meta">${escapeHtml(p.unit || '')}</div>
+            <div class="product-row">
+              <span class="product-price">$${p.price.toFixed(2)}</span>
+              ${control}
+            </div>
+            ${subscribeLink}
+          </div>
+        </div>`;
+    }).join('');
+
+    grid.querySelectorAll('[data-add]').forEach(btn => btn.addEventListener('click', () => addToCart(btn.dataset.add)));
+    grid.querySelectorAll('[data-qty-inc]').forEach(btn => btn.addEventListener('click', () => changeQty(btn.dataset.qtyInc, 1)));
+    grid.querySelectorAll('[data-qty-dec]').forEach(btn => btn.addEventListener('click', () => changeQty(btn.dataset.qtyDec, -1)));
+    grid.querySelectorAll('[data-subscribe]').forEach(btn => btn.addEventListener('click', () => subscribeAndAdd(btn.dataset.subscribe)));
+  }
+
+  function addToCart(sku) {
+    cart[sku] = (cart[sku] || 0) + 1;
+    saveCart();
+    updateCartUI();
+    render();
+    if (window.ftBumpCart) window.ftBumpCart();
+    const product = PRODUCTS.find(p => p.id === sku);
+    toast(`${product?.name || 'Item'} added`);
+  }
+
+  function subscribeAndAdd(sku) {
+    const wasOneTime = cartMode === 'one-time';
+    cartMode = 'subscription';
+    cart[sku] = (cart[sku] || 0) + 1;
+    saveCart();
+    updateCartUI();
+    render();
+    if (window.ftBumpCart) window.ftBumpCart();
+    const product = PRODUCTS.find(p => p.id === sku);
+    toast(wasOneTime
+      ? `Cart switched to subscription · ${intervalLabel()}`
+      : `${product?.name || 'Item'} added · ${intervalLabel()}`);
+    openCart();
+  }
+
+  function changeQty(sku, delta) {
+    cart[sku] = (cart[sku] || 0) + delta;
+    if (cart[sku] <= 0) delete cart[sku];
+    // If cart goes empty, reset to one-time mode for next session
+    if (Object.keys(cart).length === 0) cartMode = 'one-time';
+    saveCart();
+    updateCartUI();
+    render();
+    if (delta > 0 && window.ftBumpCart) window.ftBumpCart();
+  }
+
+  function setCartMode(mode) {
+    cartMode = mode;
+    saveCart();
+    updateCartUI();
+    render();
+  }
+  function setCartInterval(key) {
+    cartInterval = key;
+    saveCart();
+    updateCartUI();
+  }
+
+  function removeFromCart(sku) {
+    delete cart[sku];
+    saveCart();
+    updateCartUI();
+    render();
+  }
+
+  function updateCartUI() {
+    document.getElementById('cart-count').textContent = cartCount();
+    const rawSubtotal = cartRawSubtotal();
+    const subtotal = cartSubtotal();
+    const savings = rawSubtotal - subtotal;
+    const shipping = subtotal >= FREE_SHIPPING ? 0 : SHIPPING_FLAT;
+    document.getElementById('cart-subtotal').textContent = `$${rawSubtotal.toFixed(2)}`;
+    document.getElementById('cart-total').textContent = `$${(subtotal + shipping).toFixed(2)}`;
+    document.getElementById('cart-shipping').innerHTML = subtotal >= FREE_SHIPPING
+      ? '<span class="free-tag">Free</span>'
+      : `$${shipping.toFixed(2)}`;
+    const savingsRow = document.getElementById('cart-savings-row');
+    if (cartMode === 'subscription' && savings > 0) {
+      savingsRow.style.display = '';
+      document.getElementById('cart-savings').textContent = `−$${savings.toFixed(2)}`;
+    } else {
+      savingsRow.style.display = 'none';
+    }
+
+    const note = document.getElementById('shipping-note');
+    if (subtotal === 0) {
+      note.textContent = '';
+      note.style.display = 'none';
+    } else if (subtotal >= FREE_SHIPPING) {
+      note.textContent = '✓ You qualify for free shipping.';
+      note.classList.remove('close');
+      note.style.display = '';
+    } else {
+      const diff = (FREE_SHIPPING - subtotal).toFixed(2);
+      note.textContent = `Add $${diff} more to get free shipping.`;
+      note.classList.add('close');
+      note.style.display = '';
+    }
+
+    const body = document.getElementById('cart-body');
+    const foot = document.getElementById('cart-foot');
+    const modeBar = document.getElementById('cart-mode-bar');
+    if (Object.keys(cart).length === 0) {
+      body.innerHTML = `<div class="cart-empty">
+        <div class="icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6z"/></svg></div>
+        <div style="font-family:'Parkinsans',sans-serif;font-weight:600;color:var(--teal);margin-bottom:6px;">Your cart is empty</div>
+        <div style="font-size:13px;">Browse products to add to your kit.</div>
+      </div>`;
+      foot.style.display = 'none';
+      if (modeBar) modeBar.style.display = 'none';
+      return;
+    }
+    foot.style.display = '';
+
+    // Cart mode bar at top of drawer
+    if (modeBar) {
+      modeBar.style.display = '';
+      const intervalOptions = SUBSCRIPTION_INTERVALS.map(i =>
+        `<option value="${i.key}" ${cartInterval === i.key ? 'selected' : ''}>${i.label}</option>`
+      ).join('');
+      modeBar.innerHTML = `
+        <div class="mode-toggle">
+          <button class="mode-btn ${cartMode === 'one-time' ? 'active' : ''}" data-mode="one-time">One-time</button>
+          <button class="mode-btn ${cartMode === 'subscription' ? 'active' : ''}" data-mode="subscription">Subscribe & save 10%</button>
+        </div>
+        ${cartMode === 'subscription' ? `
+          <div class="interval-row">
+            <span>Ship:</span>
+            <select id="interval-select" class="interval-select">${intervalOptions}</select>
+            <span class="cancel-note">Cancel anytime</span>
+          </div>` : ''}
+      `;
+      modeBar.querySelectorAll('[data-mode]').forEach(btn =>
+        btn.addEventListener('click', () => setCartMode(btn.dataset.mode))
+      );
+      const sel = document.getElementById('interval-select');
+      if (sel) sel.addEventListener('change', e => setCartInterval(e.target.value));
+    }
+
+    body.innerHTML = Object.entries(cart).map(([id, qty]) => {
+      const p = PRODUCTS.find(x => x.id === id);
+      if (!p) return '';
+      const effectivePrice = cartMode === 'subscription' ? p.price * (1 - SUB_DISCOUNT) : p.price;
+      const priceLabel = cartMode === 'subscription'
+        ? `<span style="text-decoration:line-through;color:var(--muted);font-weight:400;">$${p.price.toFixed(2)}</span> <strong>$${effectivePrice.toFixed(2)}</strong> each`
+        : `$${p.price.toFixed(2)} each`;
+      return `<div class="cart-item">
+        <div class="cart-item-img"><img src="${p.image}" alt="" /></div>
+        <div class="cart-item-info">
+          <div class="name">${escapeHtml(p.name)}</div>
+          <div class="meta">${priceLabel}</div>
+          <div class="cart-item-controls">
+            <div class="qty-control-small">
+              <button class="qty-btn-small" data-qty-dec="${id}">−</button>
+              <span class="qty-val-small">${qty}</span>
+              <button class="qty-btn-small" data-qty-inc="${id}">+</button>
+            </div>
+            <button class="cart-item-remove" data-remove="${id}" aria-label="Remove">×</button>
+          </div>
+        </div>
+        <div class="cart-item-price">$${(effectivePrice * qty).toFixed(2)}</div>
+      </div>`;
+    }).join('');
+    body.querySelectorAll('[data-qty-inc]').forEach(b => b.addEventListener('click', () => changeQty(b.dataset.qtyInc, 1)));
+    body.querySelectorAll('[data-qty-dec]').forEach(b => b.addEventListener('click', () => changeQty(b.dataset.qtyDec, -1)));
+    body.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => removeFromCart(b.dataset.remove)));
+
+    // Update checkout button label to reflect mode
+    const btn = document.getElementById('checkout-btn');
+    if (btn) {
+      btn.innerHTML = cartMode === 'subscription'
+        ? `Start subscription · ${intervalLabel()} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`
+        : `Continue to checkout <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+    }
+  }
+
+  // ---------- UI listeners ----------
+  document.getElementById('search-input').addEventListener('input', e => {
+    searchQuery = e.target.value;
+    render();
+  });
+  document.getElementById('sort-select').addEventListener('change', e => {
+    sortMode = e.target.value;
+    render();
+  });
+  document.getElementById('cart-toggle').addEventListener('click', () => openCart());
+  document.getElementById('cart-close').addEventListener('click', () => closeCart());
+  document.getElementById('cart-overlay').addEventListener('click', () => closeCart());
+  document.getElementById('checkout-btn').addEventListener('click', goCheckout);
+
+  function openCart() {
+    document.getElementById('cart-drawer').classList.add('open');
+    document.getElementById('cart-overlay').classList.add('open');
+  }
+  function closeCart() {
+    document.getElementById('cart-drawer').classList.remove('open');
+    document.getElementById('cart-overlay').classList.remove('open');
+  }
+
+  async function goCheckout() {
+    const btn = document.getElementById('checkout-btn');
+    btn.disabled = true;
+    const original = btn.innerHTML;
+    btn.textContent = 'Redirecting...';
+    try {
+      const items = Object.entries(cart).map(([sku_id, quantity]) => ({ sku_id, quantity }));
+      const body = {
+        source: cartMode === 'subscription' ? 'store-cart-subscription' : 'store-cart',
+        items,
+        mode: cartMode,
+        interval: cartInterval
+      };
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Checkout failed.');
+      window.location.href = data.url;
+    } catch (err) {
+      alert(err.message);
+      btn.disabled = false;
+      btn.innerHTML = original;
+    }
+  }
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(window._toastTimeout);
+    window._toastTimeout = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  init();
+</script>
+
+</body>
+</html>

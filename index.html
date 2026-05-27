@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fast Track School Supplies | Back to School Made Easy</title>
+<meta name="description" content="Upload your child's school supply list and let us handle the shopping. Save time, avoid stress, and get school ready fast." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&family=Caveat:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Pulled directly from fast-track-school-supplies.dudasites.com */
+    --teal: #223A3F;
+    --teal-soft: rgba(34, 58, 63, 0.75);
+    --teal-faint: rgba(34, 58, 63, 0.06);
+    --orange: #DC3D2D;
+    --yellow: #FDCA06;
+    --white: #ffffff;
+    --cream: #FAF6EF;
+    --line: #E8E4DC;
+    --muted: #6A6F71;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Barlow', system-ui, sans-serif;
+    background: var(--white);
+    color: var(--teal);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 0;
+  }
+  .wordmark {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--teal);
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .wordmark .dot { color: var(--orange); }
+  .wordmark .sub {
+    font-size: 13px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0.02em;
+  }
+
+  .nav-links {
+    display: flex; gap: 38px;
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 15px; font-weight: 500;
+  }
+  .nav-links a { color: var(--teal); transition: color 0.15s; }
+  .nav-links a:hover { color: var(--orange); }
+
+  .nav-actions { display: flex; align-items: center; gap: 16px; }
+  .cart-btn {
+    position: relative;
+    background: var(--teal); color: var(--white);
+    padding: 11px 22px; border-radius: 999px;
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 600; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 10px;
+    cursor: pointer; border: none;
+    transition: background 0.15s;
+  }
+  .cart-btn:hover { background: var(--orange); }
+  .cart-count {
+    background: var(--yellow); color: var(--teal);
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 999px;
+    font-family: 'Parkinsans', sans-serif;
+  }
+
+  /* Hero with background video */
+  .hero {
+    position: relative;
+    min-height: 92vh;
+    display: flex; align-items: center;
+    overflow: hidden;
+    background: var(--teal);
+  }
+  .hero-video-bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+  }
+  .hero-video-bg video,
+  .hero-video-bg img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    z-index: 2;
+    background:
+      linear-gradient(95deg, rgba(34, 58, 63, 0.78) 0%, rgba(34, 58, 63, 0.55) 55%, rgba(34, 58, 63, 0.35) 100%);
+  }
+  .hero-content {
+    position: relative; z-index: 3;
+    width: 100%;
+    padding: 120px 0;
+  }
+  .hero-inner { max-width: 720px; }
+  .hero h1 {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(52px, 7vw, 104px);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    color: var(--white);
+    margin-bottom: 28px;
+  }
+  .hero h1 .period { color: var(--orange); }
+  .hero p.lead {
+    font-size: 20px;
+    color: rgba(255,255,255,0.88);
+    max-width: 520px;
+    margin-bottom: 40px;
+    line-height: 1.55;
+  }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--orange); color: var(--white);
+    padding: 17px 32px; border-radius: 999px;
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 600; font-size: 16px;
+    display: inline-flex; align-items: center; gap: 10px;
+    border: none; cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .btn-primary:hover { background: #b22e21; transform: translateY(-1px); }
+  .btn-secondary {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    color: var(--white);
+    padding: 17px 32px; border-radius: 999px;
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 600; font-size: 16px;
+    display: inline-flex; align-items: center; gap: 10px;
+    border: 1px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); }
+  .scroll-hint {
+    position: absolute; bottom: 32px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    color: rgba(255,255,255,0.7);
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 12px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .scroll-hint svg { width: 16px; height: 16px; animation: nudge 2s infinite ease-in-out; }
+  @keyframes nudge {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50% { transform: translateY(4px); opacity: 1; }
+  }
+
+  /* Welcome strip */
+  .welcome {
+    background: var(--cream);
+    padding: 80px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .welcome-grid {
+    display: grid; grid-template-columns: 1fr 1.4fr; gap: 80px;
+    align-items: center;
+  }
+  .welcome h2 {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 600;
+    font-size: clamp(32px, 3.6vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--teal);
+  }
+  .welcome p {
+    font-size: 17px;
+    color: var(--teal-soft);
+    line-height: 1.65;
+    margin-bottom: 18px;
+  }
+  .welcome p:last-child { margin-bottom: 0; }
+  .welcome p strong { color: var(--orange); font-weight: 600; }
+
+  /* How it works */
+  .section { padding: 120px 0; }
+  .section-head { max-width: 700px; margin-bottom: 64px; }
+  .section-head h2 {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(36px, 4.2vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: var(--teal);
+    margin-bottom: 18px;
+  }
+  .section-head p { font-size: 18px; color: var(--teal-soft); max-width: 540px; }
+
+  .steps {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+  }
+  .step {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 32px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .step:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .step-icon {
+    width: 52px; height: 52px;
+    background: var(--teal);
+    border-radius: 12px;
+    display: grid; place-items: center;
+    margin-bottom: 28px;
+    color: var(--yellow);
+  }
+  .step-icon svg { width: 26px; height: 26px; }
+  .step h3 {
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 21px; font-weight: 600;
+    color: var(--teal);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .step p { font-size: 15px; color: var(--teal-soft); line-height: 1.55; }
+
+  /* Shop section */
+  .shop-section {
+    background: var(--cream);
+    padding: 120px 0;
+  }
+  .shop-head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 56px; flex-wrap: wrap; gap: 24px;
+  }
+  .shop-head h2 {
+    font-family: 'Parkinsans', sans-serif; font-weight: 700;
+    font-size: clamp(36px, 4.2vw, 56px); color: var(--teal);
+    letter-spacing: -0.025em; line-height: 1.05;
+    max-width: 600px;
+  }
+  .shop-head p {
+    font-size: 17px; color: var(--teal-soft);
+    margin-top: 12px; max-width: 540px;
+  }
+  .shop-link {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 600; color: var(--orange);
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 15px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid var(--orange);
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .product {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .product:hover {
+    transform: translateY(-3px);
+    border-color: var(--teal);
+    box-shadow: 0 18px 40px rgba(34, 58, 63, 0.08);
+  }
+  .product-img {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--white);
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+  }
+  .product-img img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 28px;
+  }
+  .product-body { padding: 18px 22px 22px; }
+  .product-name {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 600; font-size: 15px;
+    color: var(--teal); margin-bottom: 4px;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+  }
+  .product-meta {
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .product-row {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .product-price {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700; font-size: 19px; color: var(--teal);
+  }
+  .add-btn {
+    background: var(--teal); color: var(--white);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    border: none; cursor: pointer;
+    font-size: 18px; font-weight: 400;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: var(--orange); }
+
+  /* Upload banner */
+  .upload-banner {
+    background: var(--teal);
+    color: var(--white);
+    border-radius: 24px;
+    padding: 56px 64px;
+    margin-top: 100px;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 48px; align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .upload-banner h2 {
+    font-family: 'Parkinsans', sans-serif; font-weight: 700;
+    font-size: clamp(32px, 3.6vw, 46px);
+    line-height: 1.08; margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    color: var(--white);
+  }
+  .upload-banner p {
+    font-size: 17px; color: rgba(255,255,255,0.78);
+    margin-bottom: 32px; max-width: 480px;
+    line-height: 1.6;
+  }
+  .upload-banner .btn-yellow {
+    background: var(--yellow); color: var(--teal);
+    padding: 16px 30px; border-radius: 999px;
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700; font-size: 16px;
+    display: inline-flex; align-items: center; gap: 10px;
+    border: none; cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .upload-banner .btn-yellow:hover { background: #ffd83a; transform: translateY(-1px); }
+  .upload-visual {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: -32px;
+    background: var(--cream);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.32);
+    transform: rotate(-2deg);
+    transition: transform 0.3s;
+  }
+  .upload-visual:hover { transform: rotate(0deg); }
+  .upload-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  /* FAQ-ish strip */
+  .promise {
+    padding: 120px 0;
+  }
+  .promise-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+  }
+  .promise-item { padding-top: 28px; border-top: 2px solid var(--teal); }
+  .promise-item h3 {
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--teal);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .promise-item p { font-size: 16px; color: var(--teal-soft); line-height: 1.6; }
+
+  /* Final CTA */
+  .final-cta {
+    background: var(--orange);
+    padding: 140px 0;
+    text-align: center;
+    color: var(--white);
+  }
+  .final-cta h2 {
+    font-family: 'Parkinsans', sans-serif; font-weight: 800;
+    font-size: clamp(48px, 6vw, 84px);
+    color: var(--white);
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    max-width: 820px; margin-left: auto; margin-right: auto;
+  }
+  .final-cta p {
+    font-size: 19px; color: rgba(255,255,255,0.92);
+    margin-bottom: 40px;
+    max-width: 520px; margin-left: auto; margin-right: auto;
+  }
+  .final-cta .btn-light {
+    background: var(--white); color: var(--orange);
+    padding: 18px 36px; border-radius: 999px;
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700; font-size: 16px;
+    display: inline-flex; align-items: center; gap: 10px;
+    border: none; cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .final-cta .btn-light:hover { transform: translateY(-2px); }
+
+  /* Footer */
+  footer {
+    background: var(--teal);
+    color: rgba(255,255,255,0.85);
+    padding: 80px 0 32px;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: 56px; margin-bottom: 56px;
+  }
+  .footer-brand .wordmark { color: var(--white); }
+  .footer-brand .wordmark .sub { color: rgba(255,255,255,0.6); }
+  .footer-brand p {
+    font-size: 14px; opacity: 0.7;
+    margin-top: 18px; max-width: 300px;
+    line-height: 1.6;
+  }
+  .footer-col h5 {
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--yellow);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .footer-col a {
+    display: block;
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 14px; opacity: 0.85;
+    margin-bottom: 12px;
+    transition: opacity 0.15s, color 0.15s;
+  }
+  .footer-col a:hover { color: var(--orange); opacity: 1; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 24px;
+    display: flex; justify-content: space-between;
+    font-size: 13px; opacity: 0.6;
+    flex-wrap: wrap; gap: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid, .welcome-grid, .upload-banner { grid-template-columns: 1fr; gap: 48px; }
+    .steps, .promise-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .product-grid { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+    .upload-banner { padding: 40px; }
+    .section, .shop-section, .promise, .final-cta, .welcome { padding: 80px 0; }
+  }
+</style>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<link rel="stylesheet" href="/motion.css" />
+<script defer src="/motion.js"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container nav">
+    <a href="#" class="wordmark">
+      Fast Track<span class="dot">.</span>
+      <span class="sub">School Supplies</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#how">How It Works</a>
+      <a href="/kits">Kits</a>
+      <a href="/upload">Upload List</a>
+      <a href="/store">Store</a>
+      <a href="/gift">Gift</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="cart-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6zM9 22a1 1 0 100-2 1 1 0 000 2zM15 22a1 1 0 100-2 1 1 0 000 2z"/></svg>
+        Cart
+        <span class="cart-count">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- HERO IMAGE: kids in a classroom. Swap the src to your own photo when ready. -->
+  <div class="hero-video-bg">
+    <img src="https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&w=1920" alt="Elementary students raising hands in a classroom" />
+  </div>
+  <div class="hero-overlay"></div>
+
+  <!-- Floating supply icons -->
+  <div class="hero-floats" aria-hidden="true">
+    <div class="float-icon float-1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+    <div class="float-icon float-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+    <div class="float-icon float-3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <div class="float-icon float-4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 2v4M16 2v4M4 10h16"/></svg></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="container">
+      <div class="hero-inner">
+        <h1 class="ft-anim-1">Back to School<span class="period">.</span><br/>Handled<span class="period">.</span></h1>
+        <p class="lead ft-anim-2">Upload your child's school supply list and let us handle the shopping. Save time, avoid stress, and get school ready fast.</p>
+        <div class="hero-actions ft-anim-3">
+          <a href="/upload" class="btn-primary">
+            Upload Your List
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+          </a>
+          <a href="/store" class="btn-secondary">Shop the Store</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    Scroll
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- WELCOME -->
+<section class="welcome">
+  <div class="container welcome-grid">
+    <div>
+      <h2>Welcome to Fast Track School Supplies.</h2>
+    </div>
+    <div>
+      <p><strong>Fast Track School Supplies</strong> helps parents get back to school ready without the last minute stress.</p>
+      <p>We created this service for families who want school supplies done right without running from store to store or guessing what to buy. Our goal is simple. Save parents time and make sure schools get the supplies students actually need.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="container">
+    <div class="section-head">
+      <h2>How it works.</h2>
+      <p>Four straightforward steps from supply list to front door.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </div>
+        <h3>Upload your supply list</h3>
+        <p>Snap a photo, upload a PDF, or paste the text. We accept any format your school sends home.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h3>We match every item</h3>
+        <p>Our team confirms each product against your list. Teacher-specified brands or budget swaps, your call.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <h3>Order online</h3>
+        <p>Review your kit, confirm details, and check out securely. One cart for every kid in the house.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/><circle cx="9" cy="20" r="1"/><circle cx="20" cy="20" r="1"/></svg>
+        </div>
+        <h3>Delivered to your door</h3>
+        <p>Every item labeled and packed. Local delivery and nationwide shipping available.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THREE WAYS TO SHOP -->
+<section style="padding: 96px 0; background: var(--white);">
+  <div class="container">
+    <div class="section-head" style="text-align: center; margin: 0 auto 64px;">
+      <h2 style="font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(36px, 4.2vw, 56px); color: var(--teal); letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 14px;">Three ways to shop.</h2>
+      <p style="font-size: 18px; color: var(--teal-soft); max-width: 540px; margin: 0 auto;">Whatever path gets you to the first bell with everything they need.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+      <a href="/upload" style="background: var(--cream); border: 1px solid var(--line); border-radius: 20px; padding: 40px 32px; transition: transform 0.25s, border-color 0.2s, box-shadow 0.25s; display: block;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='var(--orange)';this.style.boxShadow='0 24px 56px rgba(34,58,63,0.1)'" onmouseout="this.style.transform='';this.style.borderColor='var(--line)';this.style.boxShadow=''">
+        <div style="width: 56px; height: 56px; background: var(--orange); border-radius: 14px; display: grid; place-items: center; color: var(--yellow); margin-bottom: 24px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </div>
+        <h3 style="font-family: 'Parkinsans', sans-serif; font-size: 24px; font-weight: 700; color: var(--teal); letter-spacing: -0.01em; margin-bottom: 10px;">Upload your list</h3>
+        <p style="font-size: 15px; color: var(--teal-soft); line-height: 1.55; margin-bottom: 20px;">Snap a photo of the teacher's supply list. We read every line and build the cart for you in seconds.</p>
+        <span style="font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; color: var(--orange);">Upload your list →</span>
+      </a>
+      <a href="/kits" style="background: var(--cream); border: 1px solid var(--line); border-radius: 20px; padding: 40px 32px; transition: transform 0.25s, border-color 0.2s, box-shadow 0.25s; display: block;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='var(--orange)';this.style.boxShadow='0 24px 56px rgba(34,58,63,0.1)'" onmouseout="this.style.transform='';this.style.borderColor='var(--line)';this.style.boxShadow=''">
+        <div style="width: 56px; height: 56px; background: var(--teal); border-radius: 14px; display: grid; place-items: center; color: var(--yellow); margin-bottom: 24px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <h3 style="font-family: 'Parkinsans', sans-serif; font-size: 24px; font-weight: 700; color: var(--teal); letter-spacing: -0.01em; margin-bottom: 10px;">Grab a pre-built kit</h3>
+        <p style="font-size: 15px; color: var(--teal-soft); line-height: 1.55; margin-bottom: 20px;">Eight grade-level kits, K through high school. Curated, bundled, ready to ship. Save 10% vs buying individually.</p>
+        <span style="font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; color: var(--orange);">Browse kits →</span>
+      </a>
+      <a href="/store" style="background: var(--cream); border: 1px solid var(--line); border-radius: 20px; padding: 40px 32px; transition: transform 0.25s, border-color 0.2s, box-shadow 0.25s; display: block;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='var(--orange)';this.style.boxShadow='0 24px 56px rgba(34,58,63,0.1)'" onmouseout="this.style.transform='';this.style.borderColor='var(--line)';this.style.boxShadow=''">
+        <div style="width: 56px; height: 56px; background: var(--yellow); border-radius: 14px; display: grid; place-items: center; color: var(--teal); margin-bottom: 24px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6z"/></svg>
+        </div>
+        <h3 style="font-family: 'Parkinsans', sans-serif; font-size: 24px; font-weight: 700; color: var(--teal); letter-spacing: -0.01em; margin-bottom: 10px;">Shop the store</h3>
+        <p style="font-size: 15px; color: var(--teal-soft); line-height: 1.55; margin-bottom: 20px;">Browse 50+ trusted school supplies. Subscribe & save 10% on items that run out mid-year.</p>
+        <span style="font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; color: var(--orange);">Browse all products →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- GIFT / GRANDPARENT SECTION -->
+<section style="padding: 96px 0; background: linear-gradient(180deg, #FFE9B8 0%, #FFD8C2 100%); position: relative; overflow: hidden;">
+  <!-- Floating school supply icons -->
+  <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; z-index: 0;">
+    <svg style="position: absolute; top: 8%; left: 6%; width: 72px; height: 72px; color: var(--teal); opacity: 0.14; transform: rotate(-18deg); animation: ft-float 9s ease-in-out infinite;" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+    <svg style="position: absolute; bottom: 12%; left: 4%; width: 56px; height: 56px; color: var(--teal); opacity: 0.16; transform: rotate(12deg); animation: ft-float 11s ease-in-out infinite 1.5s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg>
+    <svg style="position: absolute; top: 14%; left: 38%; width: 48px; height: 48px; color: var(--orange); opacity: 0.18; transform: rotate(-6deg); animation: ft-float 8s ease-in-out infinite 0.7s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+    <svg style="position: absolute; bottom: 18%; left: 36%; width: 64px; height: 64px; color: var(--teal); opacity: 0.12; transform: rotate(20deg); animation: ft-float 10s ease-in-out infinite 0.3s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 12h16"/><path d="M12 4v16"/></svg>
+    <svg style="position: absolute; top: 30%; left: 52%; width: 52px; height: 52px; color: var(--orange); opacity: 0.16; transform: rotate(8deg); animation: ft-float 12s ease-in-out infinite 2s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+    <svg style="position: absolute; top: 60%; right: 38%; width: 44px; height: 44px; color: var(--teal); opacity: 0.15; transform: rotate(-15deg); animation: ft-float 9s ease-in-out infinite 1s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+  </div>
+
+  <div class="container" style="position: relative; z-index: 1;">
+    <div style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 64px; align-items: center;">
+      <div>
+        <h2 style="font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(34px, 4vw, 50px); color: var(--teal); letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 20px;">Send a kit to your <span style="font-family: 'Caveat', cursive; color: var(--orange); font-size: 1.1em;">grandkid</span>.</h2>
+        <p style="font-size: 18px; color: var(--teal); max-width: 480px; margin-bottom: 28px; line-height: 1.55;">Pick a kit, ship it straight to their door, and we'll tuck a handwritten-style note inside. The best back-to-school surprise.</p>
+        <a href="/gift" style="display: inline-flex; align-items: center; gap: 10px; background: var(--teal); color: #fff; padding: 17px 30px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 16px; transition: background 0.15s, transform 0.15s;" onmouseover="this.style.background='var(--orange)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='var(--teal)';this.style.transform=''">
+          Send a kit
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        </a>
+      </div>
+      <div style="position: relative; max-width: 420px; aspect-ratio: 4/5; margin-left: auto;">
+        <div style="width: 100%; height: 100%; border-radius: 28px; overflow: hidden; box-shadow: 0 28px 60px rgba(34,58,63,0.22);">
+          <img src="https://images.pexels.com/photos/13198519/pexels-photo-13198519.jpeg?auto=compress&w=1200" alt="Happy kid with a backpack" style="width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block;" />
+        </div>
+        <div style="position: absolute; bottom: -22px; right: -22px; background: #fff; padding: 12px 18px 12px 26px; border-radius: 6px 12px 12px 6px; font-family: 'Caveat', cursive; font-size: 20px; color: var(--teal); transform: rotate(-5deg); box-shadow: 0 10px 24px rgba(34,58,63,0.18); z-index: 2;">To: Noah, 3rd Grade</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP -->
+<section class="shop-section" id="store">
+  <div class="container">
+    <div class="shop-head">
+      <div>
+        <h2>Shop the store.</h2>
+        <p>Need a single item or building a kit yourself? Browse our full selection of trusted school supplies.</p>
+      </div>
+      <a href="/store" class="shop-link">View all 50+ products
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="product-grid">
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencils.jpg" alt="Pencils" /></div>
+        <div class="product-body">
+          <div class="product-name">Ticonderoga Pencils</div>
+          <div class="product-meta">Pack of 12, pre-sharpened</div>
+          <div class="product-row">
+            <span class="product-price">$1.99</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Composition_Notebook.png" alt="Composition Notebook" /></div>
+        <div class="product-body">
+          <div class="product-name">Composition Notebook</div>
+          <div class="product-meta">Wide-ruled, 100 pages</div>
+          <div class="product-row">
+            <span class="product-price">$2.49</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Crayons.jpg" alt="Crayola Crayons" /></div>
+        <div class="product-body">
+          <div class="product-name">Crayola Crayons</div>
+          <div class="product-meta">24-count, classic colors</div>
+          <div class="product-row">
+            <span class="product-price">$1.99</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Backpack.png" alt="17 Inch Basic Backpack" /></div>
+        <div class="product-body">
+          <div class="product-name">17 Inch Basic Backpack</div>
+          <div class="product-meta">Durable, reinforced straps</div>
+          <div class="product-row">
+            <span class="product-price">$9.99</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Elmers_Glue_Stick.jpg" alt="Elmer's Glue Stick" /></div>
+        <div class="product-body">
+          <div class="product-name">Elmer's Glue Stick</div>
+          <div class="product-meta">Washable, acid-free</div>
+          <div class="product-row">
+            <span class="product-price">$0.55</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pocket_Folder.png" alt="Pocket Folder" /></div>
+        <div class="product-body">
+          <div class="product-name">Pocket Folder</div>
+          <div class="product-meta">Assorted colors</div>
+          <div class="product-row">
+            <span class="product-price">$0.49</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Markers.jpg" alt="Crayola Markers" /></div>
+        <div class="product-body">
+          <div class="product-name">Crayola Markers</div>
+          <div class="product-meta">Broad tip, 10-count</div>
+          <div class="product-row">
+            <span class="product-price">$3.49</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Highlighters_3_color.jpg" alt="Highlighters" /></div>
+        <div class="product-body">
+          <div class="product-name">Highlighters, 3 Colors</div>
+          <div class="product-meta">Chisel tip, fluorescent</div>
+          <div class="product-row">
+            <span class="product-price">$1.99</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Scissor_1.png" alt="Scissor" /></div>
+        <div class="product-body">
+          <div class="product-name">Scissor</div>
+          <div class="product-meta">Blunt tip, kid-safe</div>
+          <div class="product-row">
+            <span class="product-price">$0.99</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Binder_1.png" alt="Binder 1 Inch" /></div>
+        <div class="product-body">
+          <div class="product-name">Binder, 1 Inch</div>
+          <div class="product-meta">3-ring, view-front</div>
+          <div class="product-row">
+            <span class="product-price">$2.99</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Tissues.png" alt="Tissues" /></div>
+        <div class="product-body">
+          <div class="product-name">Tissues</div>
+          <div class="product-meta">160-count, 2-ply</div>
+          <div class="product-row">
+            <span class="product-price">$1.99</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product">
+        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Mechanical_Pencil.png" alt="Mechanical Pencil" /></div>
+        <div class="product-body">
+          <div class="product-name">Mechanical Pencil</div>
+          <div class="product-meta">0.7mm, refillable</div>
+          <div class="product-row">
+            <span class="product-price">$1.49</span>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPLOAD BANNER -->
+    <div class="upload-banner" id="getstarted">
+      <!-- Floating school supply icons -->
+      <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; z-index: 0;">
+        <svg style="position: absolute; top: 12%; left: 4%; width: 60px; height: 60px; color: var(--yellow); opacity: 0.18; transform: rotate(-18deg); animation: ft-float 9s ease-in-out infinite;" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        <svg style="position: absolute; bottom: 14%; left: 8%; width: 48px; height: 48px; color: var(--yellow); opacity: 0.14; transform: rotate(12deg); animation: ft-float 11s ease-in-out infinite 1.5s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg>
+        <svg style="position: absolute; top: 8%; left: 42%; width: 40px; height: 40px; color: var(--orange); opacity: 0.22; transform: rotate(-6deg); animation: ft-float 8s ease-in-out infinite 0.7s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+        <svg style="position: absolute; bottom: 10%; left: 44%; width: 52px; height: 52px; color: var(--yellow); opacity: 0.12; transform: rotate(20deg); animation: ft-float 10s ease-in-out infinite 0.3s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 12h16"/><path d="M12 4v16"/></svg>
+        <svg style="position: absolute; top: 50%; left: 60%; width: 44px; height: 44px; color: var(--orange); opacity: 0.18; transform: rotate(8deg); animation: ft-float 12s ease-in-out infinite 2s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+      </div>
+      <div style="position: relative; z-index: 1;">
+        <h2>Skip the list. Get the kit.</h2>
+        <p>Upload your child's supply list and we will handle the shopping. Every item matched, packed, and delivered. The way back-to-school should feel.</p>
+        <a href="/upload" class="btn-yellow">
+          Upload Your List
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+        </a>
+      </div>
+      <div class="upload-visual">
+        <img src="https://images.pexels.com/photos/8500288/pexels-photo-8500288.jpeg?auto=compress&w=900" alt="Child doing schoolwork at a desk" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROMISE -->
+<section class="promise">
+  <div class="container">
+    <div class="section-head">
+      <h2>Built around the busiest week of the year.</h2>
+    </div>
+    <div class="promise-grid">
+      <div class="promise-item">
+        <h3>Right item, every time</h3>
+        <p>Teacher-specified brands matched exactly. Generic swaps available when you want to save.</p>
+      </div>
+      <div class="promise-item">
+        <h3>One cart, every kid</h3>
+        <p>Different schools, different grades, different lists. Check out for the whole family in one go.</p>
+      </div>
+      <div class="promise-item">
+        <h3>Delivered before the bell</h3>
+        <p>Order before the back-to-school cutoff and your supplies arrive in time for day one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <h2>Less running around. More ready.</h2>
+    <p>Ninety seconds to upload. We take it from there.</p>
+    <a href="/upload" class="btn-light">
+      Get Started
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="wordmark">
+          Fast Track<span class="dot" style="color: var(--orange);">.</span>
+          <span class="sub">School Supplies</span>
+        </a>
+        <p>Back-to-school supplies, ordered, packed, and delivered. Built for families who want it done right.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Shop</h5>
+        <a href="#">All Products</a>
+        <a href="#">Upload a List</a>
+        <a href="#">Track Order</a>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <a href="#">How It Works</a>
+        <a href="#">Get Started</a>
+        <a href="#">Get in Touch</a>
+      </div>
+      <div class="footer-col">
+        <h5>Help</h5>
+        <a href="/shipping">Shipping</a>
+        <a href="/returns">Returns</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Fast Track School Supplies. All rights reserved.</span>
+      <span><a href="/privacy" style="color: inherit;">Privacy</a> · <a href="/terms" style="color: inherit;">Terms</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

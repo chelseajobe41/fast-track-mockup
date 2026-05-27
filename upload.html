@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Upload Your List | Fast Track School Supplies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #223A3F;
+    --teal-soft: rgba(34, 58, 63, 0.75);
+    --teal-faint: rgba(34, 58, 63, 0.06);
+    --orange: #DC3D2D;
+    --yellow: #FDCA06;
+    --white: #ffffff;
+    --cream: #FAF6EF;
+    --line: #E8E4DC;
+    --muted: #6A6F71;
+    --green: #2d8659;
+    --red: #c03434;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Barlow', system-ui, sans-serif;
+    background: var(--cream);
+    color: var(--teal);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .container { max-width: 980px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+    padding: 20px 0;
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; }
+  .wordmark {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700; font-size: 22px;
+    letter-spacing: -0.02em; color: var(--teal);
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .wordmark .dot { color: var(--orange); }
+  .wordmark .sub { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .back-link {
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    color: var(--teal-soft);
+  }
+  .nav-links { display: flex; gap: 38px; font-family: 'Parkinsans', sans-serif; font-size: 15px; font-weight: 500; }
+  .nav-links a { color: var(--teal); transition: color 0.15s; position: relative; }
+  .nav-links a:hover, .nav-links a.active { color: var(--orange); }
+  .nav-links a.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -22px; height: 3px; background: var(--orange); }
+  .cart-btn { background: var(--teal); color: var(--white); padding: 11px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; border: none; transition: background 0.15s; }
+  .cart-btn:hover { background: var(--orange); }
+  .cart-count { background: var(--yellow); color: var(--teal); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; min-width: 22px; text-align: center; }
+  @media (max-width: 800px) { .nav-links { display: none; } }
+
+  .main { padding: 56px 0 96px; }
+
+  h1 {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(36px, 4.4vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: var(--teal);
+    margin-bottom: 16px;
+  }
+  h1 .dot { color: var(--orange); }
+  .lead {
+    font-size: 18px; color: var(--teal-soft);
+    max-width: 580px; margin-bottom: 40px;
+  }
+
+  /* Dropzone */
+  .dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--white);
+    border: 2px dashed var(--line);
+    border-radius: 20px;
+    padding: 64px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .dropzone * { pointer-events: none; }
+  .dropzone:hover, .dropzone.dragover {
+    border-color: var(--orange);
+    background: #fff9f3;
+  }
+  .dropzone-icon {
+    width: 72px; height: 72px;
+    background: var(--teal);
+    border-radius: 18px;
+    display: grid; place-items: center;
+    margin: 0 auto 24px;
+    color: var(--yellow);
+  }
+  .dropzone-icon svg { width: 32px; height: 32px; }
+  .dropzone h2 {
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 24px; font-weight: 600;
+    color: var(--teal); margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .dropzone p { font-size: 15px; color: var(--muted); }
+  .dropzone .types { font-size: 13px; color: var(--muted); margin-top: 12px; }
+  #file-input { display: none; }
+
+  /* Loading state */
+  .loading {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 48px;
+    text-align: center;
+    border: 1px solid var(--line);
+  }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--line);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    margin: 0 auto 24px;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading h2 {
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--teal); margin-bottom: 10px;
+  }
+  .loading p { color: var(--muted); font-size: 15px; }
+  .loading-steps {
+    margin-top: 28px;
+    display: flex; justify-content: center; gap: 32px;
+    font-size: 13px; color: var(--muted);
+  }
+  .loading-step.active { color: var(--orange); font-weight: 600; }
+
+  /* Preview */
+  .preview-image {
+    max-height: 200px; max-width: 280px;
+    border-radius: 12px; margin: 0 auto 24px;
+    box-shadow: 0 8px 24px rgba(34, 58, 63, 0.12);
+  }
+
+  /* Results */
+  .results { display: grid; gap: 32px; }
+  .results-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    flex-wrap: wrap; gap: 16px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .results-header h2 {
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 28px; font-weight: 700;
+    color: var(--teal); letter-spacing: -0.02em;
+  }
+  .results-header .summary { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+  .items-list { display: flex; flex-direction: column; gap: 12px; }
+  .item {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 64px 1fr auto auto;
+    gap: 16px; align-items: center;
+  }
+  .item-img {
+    width: 64px; height: 64px;
+    background: var(--cream);
+    border-radius: 10px;
+    overflow: hidden;
+    display: grid; place-items: center;
+  }
+  .item-img img { width: 80%; height: 80%; object-fit: contain; }
+  .item-info { min-width: 0; }
+  .item-name {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 600; font-size: 15px;
+    color: var(--teal); margin-bottom: 4px;
+  }
+  .item-meta { font-size: 13px; color: var(--muted); }
+  .item-original {
+    font-size: 12px; color: var(--muted);
+    margin-top: 6px; font-style: italic;
+  }
+  .item-confidence {
+    display: inline-block;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 999px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    margin-left: 6px;
+  }
+  .conf-high { background: rgba(45, 134, 89, 0.1); color: var(--green); }
+  .conf-medium { background: rgba(253, 202, 6, 0.18); color: #8a6800; }
+  .conf-low { background: rgba(192, 52, 52, 0.1); color: var(--red); }
+
+  .qty-control {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--cream); border-radius: 999px; padding: 4px;
+  }
+  .qty-btn {
+    width: 28px; height: 28px;
+    border: none; background: var(--white);
+    border-radius: 50%; cursor: pointer;
+    font-size: 16px; font-weight: 600;
+    color: var(--teal);
+    display: grid; place-items: center;
+  }
+  .qty-btn:hover { background: var(--teal); color: var(--white); }
+  .qty-value {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700; min-width: 24px; text-align: center;
+  }
+  .item-price {
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700; font-size: 17px;
+    color: var(--teal); min-width: 70px; text-align: right;
+  }
+
+  /* Unmatched */
+  .unmatched {
+    background: rgba(253, 202, 6, 0.08);
+    border: 1px solid rgba(253, 202, 6, 0.4);
+    border-radius: 14px;
+    padding: 20px 24px;
+  }
+  .unmatched h3 {
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 16px; font-weight: 600;
+    color: var(--teal); margin-bottom: 12px;
+  }
+  .unmatched-item {
+    display: flex; justify-content: space-between;
+    padding: 8px 0;
+    font-size: 14px;
+    border-top: 1px solid rgba(253, 202, 6, 0.3);
+  }
+  .unmatched-item:first-of-type { border-top: none; }
+  .unmatched-reason { color: var(--muted); font-size: 13px; }
+
+  /* Totals */
+  .totals {
+    background: var(--teal); color: var(--white);
+    border-radius: 16px; padding: 28px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .totals-info {}
+  .totals-label {
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    opacity: 0.7;
+  }
+  .totals-amount {
+    font-family: 'Parkinsons', 'Parkinsans', sans-serif;
+    font-size: 36px; font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 4px;
+  }
+  .checkout-btn {
+    background: var(--yellow); color: var(--teal);
+    padding: 16px 30px; border-radius: 999px;
+    font-family: 'Parkinsans', sans-serif;
+    font-weight: 700; font-size: 16px;
+    border: none; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 10px;
+    transition: transform 0.15s;
+  }
+  .checkout-btn:hover { transform: translateY(-2px); }
+
+  .restart {
+    margin-top: 24px; text-align: center;
+  }
+  .restart button {
+    background: transparent; color: var(--teal-soft);
+    border: 1px solid var(--line);
+    padding: 10px 22px; border-radius: 999px;
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 14px; cursor: pointer;
+  }
+  .restart button:hover { color: var(--teal); border-color: var(--teal); }
+
+  .error {
+    background: rgba(192, 52, 52, 0.08);
+    border: 1px solid rgba(192, 52, 52, 0.3);
+    color: var(--red);
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    margin-top: 16px;
+  }
+
+  .usage-note {
+    margin-top: 20px;
+    font-size: 12px; color: var(--muted);
+    text-align: center;
+    font-family: 'Parkinsans', sans-serif;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .item { grid-template-columns: 56px 1fr; }
+    .item .qty-control, .item .item-price {
+      grid-column: span 2;
+      justify-self: end;
+    }
+    .totals { flex-direction: column; align-items: stretch; }
+  }
+</style>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<link rel="stylesheet" href="/motion.css" />
+<script defer src="/motion.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a href="/" class="wordmark">
+      Fast Track<span class="dot">.</span>
+      <span class="sub">School Supplies</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/#how">How It Works</a>
+      <a href="/kits">Kits</a>
+      <a href="/upload" class="active">Upload List</a>
+      <a href="/store">Store</a>
+      <a href="/gift">Gift</a>
+    </nav>
+    <button class="cart-btn" onclick="window.location.href='/store'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6zM9 22a1 1 0 100-2 1 1 0 000 2zM15 22a1 1 0 100-2 1 1 0 000 2z"/></svg>
+      Cart
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</header>
+
+<main class="main">
+  <div class="container">
+
+    <div id="intro">
+      <h1>Upload your supply list<span class="dot">.</span></h1>
+      <p class="lead">Drop a photo or PDF of your child's list. Our system reads every line, matches it to the right product, and builds your cart in seconds.</p>
+
+      <label for="file-input" class="dropzone" id="dropzone">
+        <div class="dropzone-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </div>
+        <h2>Drop your supply list here</h2>
+        <p>Or click to browse your files</p>
+        <p class="types">JPG, PNG, or WebP &middot; Up to 10MB</p>
+      </label>
+      <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/gif" />
+      <div id="error-box" class="error hidden"></div>
+    </div>
+
+    <div id="loading" class="loading hidden">
+      <img id="preview-img" class="preview-image hidden" alt="Uploaded list" />
+      <div class="spinner"></div>
+      <h2>Reading your list...</h2>
+      <p>Matching every item to our catalog.</p>
+      <div class="loading-steps">
+        <span class="loading-step active">Reading list</span>
+        <span class="loading-step">Matching items</span>
+        <span class="loading-step">Building cart</span>
+      </div>
+    </div>
+
+    <div id="results" class="results hidden">
+      <div class="results-header">
+        <div>
+          <h2>Your kit is ready</h2>
+          <div class="summary" id="results-summary"></div>
+        </div>
+        <div class="restart">
+          <button id="restart-btn">Upload another list</button>
+        </div>
+      </div>
+
+      <div class="items-list" id="items-list"></div>
+
+      <div class="unmatched hidden" id="unmatched-box">
+        <h3>We couldn't match these items</h3>
+        <div id="unmatched-list"></div>
+      </div>
+
+      <div class="totals">
+        <div class="totals-info">
+          <div class="totals-label">Subtotal</div>
+          <div class="totals-amount" id="subtotal-amount">$0.00</div>
+        </div>
+        <button class="checkout-btn" id="checkout-btn">
+          Continue to checkout
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+
+      <div class="usage-note" id="usage-note"></div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  const intro = document.getElementById('intro');
+  const loading = document.getElementById('loading');
+  const results = document.getElementById('results');
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  const errorBox = document.getElementById('error-box');
+  const previewImg = document.getElementById('preview-img');
+  const itemsList = document.getElementById('items-list');
+  const unmatchedBox = document.getElementById('unmatched-box');
+  const unmatchedList = document.getElementById('unmatched-list');
+  const subtotalAmount = document.getElementById('subtotal-amount');
+  const resultsSummary = document.getElementById('results-summary');
+  const usageNote = document.getElementById('usage-note');
+  const restartBtn = document.getElementById('restart-btn');
+  const checkoutBtn = document.getElementById('checkout-btn');
+
+  let cartState = [];
+
+  ['dragover', 'dragenter'].forEach(ev => {
+    dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+  });
+  ['dragleave', 'drop'].forEach(ev => {
+    dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('dragover'); });
+  });
+  dropzone.addEventListener('drop', e => {
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', e => {
+    if (e.target.files.length) handleFile(e.target.files[0]);
+  });
+
+  async function handleFile(file) {
+    errorBox.classList.add('hidden');
+
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+      showError('Please upload a JPG, PNG, GIF, or WebP image.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showError('File is too large. Please upload under 10MB.');
+      return;
+    }
+
+    previewImg.src = URL.createObjectURL(file);
+    previewImg.classList.remove('hidden');
+    intro.classList.add('hidden');
+    loading.classList.remove('hidden');
+    cycleLoadingSteps();
+
+    const formData = new FormData();
+    formData.append('list', file);
+
+    try {
+      const res = await fetch('/api/parse-list', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Unable to parse the list.');
+      renderResults(data);
+    } catch (err) {
+      loading.classList.add('hidden');
+      intro.classList.remove('hidden');
+      showError(err.message);
+    }
+  }
+
+  function cycleLoadingSteps() {
+    const steps = document.querySelectorAll('.loading-step');
+    let i = 0;
+    const interval = setInterval(() => {
+      steps.forEach((s, idx) => s.classList.toggle('active', idx === i));
+      i = (i + 1) % steps.length;
+      if (results.classList.contains('hidden') === false || intro.classList.contains('hidden') === false) {
+        clearInterval(interval);
+      }
+    }, 1200);
+  }
+
+  function renderResults(data) {
+    cartState = data.matched_items;
+    loading.classList.add('hidden');
+    results.classList.remove('hidden');
+
+    resultsSummary.textContent = `${data.matched_items.length} items matched${data.unmatched.length ? `, ${data.unmatched.length} need your input` : ''}.`;
+
+    itemsList.innerHTML = cartState.map((item, idx) => `
+      <div class="item">
+        <div class="item-img"><img src="${item.image}" alt="${escapeHtml(item.name)}" /></div>
+        <div class="item-info">
+          <div class="item-name">
+            ${escapeHtml(item.name)}
+            <span class="item-confidence conf-${item.confidence}">${item.confidence}</span>
+          </div>
+          <div class="item-meta">${escapeHtml(item.unit)} &middot; $${item.price.toFixed(2)} each</div>
+          <div class="item-original">From list: "${escapeHtml(item.original_text)}"${item.note ? ` &middot; ${escapeHtml(item.note)}` : ''}</div>
+        </div>
+        <div class="qty-control">
+          <button class="qty-btn" data-action="dec" data-idx="${idx}">−</button>
+          <span class="qty-value" id="qty-${idx}">${item.quantity}</span>
+          <button class="qty-btn" data-action="inc" data-idx="${idx}">+</button>
+        </div>
+        <div class="item-price" id="line-${idx}">$${item.line_total.toFixed(2)}</div>
+      </div>
+    `).join('');
+
+    if (data.unmatched && data.unmatched.length) {
+      unmatchedBox.classList.remove('hidden');
+      unmatchedList.innerHTML = data.unmatched.map(u => `
+        <div class="unmatched-item">
+          <div>
+            <strong>${escapeHtml(u.original_text)}</strong>
+            ${u.quantity > 1 ? ` &times;${u.quantity}` : ''}
+            <div class="unmatched-reason">${escapeHtml(u.reason)}</div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      unmatchedBox.classList.add('hidden');
+    }
+
+    updateSubtotal();
+
+    const usage = data.usage || {};
+    const cacheHit = usage.cache_read_input_tokens || 0;
+    const cacheWrite = usage.cache_creation_input_tokens || 0;
+    usageNote.textContent = `Parsed in one Claude call · ${usage.input_tokens || 0} input + ${usage.output_tokens || 0} output tokens` +
+      (cacheHit ? ` · ${cacheHit} cache read` : '') +
+      (cacheWrite ? ` · ${cacheWrite} cache write` : '');
+
+    itemsList.querySelectorAll('.qty-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const idx = +e.currentTarget.dataset.idx;
+        const action = e.currentTarget.dataset.action;
+        const item = cartState[idx];
+        if (action === 'inc') item.quantity++;
+        else if (action === 'dec' && item.quantity > 1) item.quantity--;
+        item.line_total = +(item.price * item.quantity).toFixed(2);
+        document.getElementById(`qty-${idx}`).textContent = item.quantity;
+        document.getElementById(`line-${idx}`).textContent = `$${item.line_total.toFixed(2)}`;
+        updateSubtotal();
+      });
+    });
+  }
+
+  function updateSubtotal() {
+    const subtotal = cartState.reduce((s, i) => s + i.line_total, 0);
+    subtotalAmount.textContent = `$${subtotal.toFixed(2)}`;
+  }
+
+  restartBtn.addEventListener('click', () => {
+    results.classList.add('hidden');
+    intro.classList.remove('hidden');
+    previewImg.classList.add('hidden');
+    fileInput.value = '';
+    errorBox.classList.add('hidden');
+  });
+
+  checkoutBtn.addEventListener('click', async () => {
+    if (!cartState.length) return;
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = 'Redirecting...';
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'upload',
+          items: cartState.map(i => ({ sku_id: i.sku_id, quantity: i.quantity }))
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Checkout failed.');
+      window.location.href = data.url;
+    } catch (err) {
+      alert(err.message);
+      checkoutBtn.disabled = false;
+      checkoutBtn.innerHTML = 'Continue to checkout <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    }
+  });
+
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.classList.remove('hidden');
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  // Sync the header cart count with the localStorage cart from /store
+  (function syncCartCount() {
+    try {
+      const stored = JSON.parse(localStorage.getItem('fastTrackCart') || '{}');
+      const count = Object.values(stored).reduce((s, q) => s + q, 0);
+      const el = document.getElementById('cart-count');
+      if (el) el.textContent = count;
+    } catch {}
+  })();
+</script>
+
+</body>
+</html>

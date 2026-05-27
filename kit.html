@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kit | Fast Track School Supplies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<link rel="stylesheet" href="/motion.css" />
+<script defer src="/motion.js"></script>
+<style>
+  :root {
+    --teal:#223A3F; --teal-soft:rgba(34,58,63,0.75); --orange:#DC3D2D; --yellow:#FDCA06;
+    --white:#ffffff; --cream:#FAF6EF; --line:#E8E4DC; --muted:#6A6F71; --green:#2d8659;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', system-ui, sans-serif; background: var(--white); color: var(--teal); line-height: 1.55; }
+  .container { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.96); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+  .wordmark { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 22px; color: var(--teal); display: inline-block; }
+  .nav-links { display: flex; gap: 38px; font-family: 'Parkinsans', sans-serif; font-size: 15px; font-weight: 500; }
+  .nav-links a { color: var(--teal); transition: color 0.15s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--orange); }
+  .cart-btn { background: var(--teal); color: var(--white); padding: 11px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; border: none; }
+  .cart-count { background: var(--yellow); color: var(--teal); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; min-width: 22px; text-align: center; }
+
+  .crumbs { padding: 18px 0; background: var(--cream); border-bottom: 1px solid var(--line); }
+  .crumbs nav { font-family: 'Parkinsans', sans-serif; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .crumbs a { color: var(--teal-soft); }
+  .crumbs .sep { opacity: 0.4; }
+  .crumbs .current { color: var(--teal); font-weight: 600; }
+
+  /* Kit hero */
+  .kit-hero { padding: 48px 0 40px; }
+  .kit-hero-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; align-items: start; }
+  .grade-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: var(--cream); font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 13px; padding: 8px 16px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 20px; }
+  .kit-hero h1 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(36px, 4.6vw, 56px); line-height: 1.05; letter-spacing: -0.025em; color: var(--teal); margin-bottom: 8px; }
+  .kit-hero .age { font-size: 16px; color: var(--muted); font-family: 'Parkinsans', sans-serif; font-weight: 500; margin-bottom: 16px; }
+  .kit-hero .tagline { font-size: 18px; color: var(--teal); max-width: 560px; margin-bottom: 28px; line-height: 1.55; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; background: var(--cream); color: var(--teal); border: 1px solid var(--line); }
+  .badge.green { background: rgba(45,134,89,0.1); color: var(--green); border-color: rgba(45,134,89,0.2); }
+  .badge.discount { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+  /* Checkout card */
+  .checkout-card { background: var(--white); border: 1px solid var(--line); border-radius: 18px; padding: 28px; box-shadow: 0 20px 50px rgba(34,58,63,0.08); position: sticky; top: 100px; }
+  .checkout-card .label { font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+  .checkout-card .total { font-family: 'Parkinsans', sans-serif; font-size: 40px; font-weight: 700; color: var(--teal); letter-spacing: -0.025em; line-height: 1; }
+  .checkout-card .strike-total { font-size: 16px; color: var(--muted); text-decoration: line-through; margin-bottom: 4px; font-family: 'Parkinsans', sans-serif; }
+  .checkout-card .breakdown { margin: 20px 0; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; color: var(--teal-soft); }
+  .row.bold { font-weight: 700; color: var(--teal); font-family: 'Parkinsans', sans-serif; font-size: 16px; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .row .free { color: var(--green); font-weight: 700; }
+  .row .savings { color: var(--green); font-weight: 700; }
+  .checkout-btn { width: 100%; background: var(--orange); color: #fff; padding: 18px 24px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 16px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.15s, transform 0.15s; margin-bottom: 10px; }
+  .checkout-btn:hover:not(:disabled) { background: #b22e21; transform: translateY(-1px); }
+  .checkout-btn.secondary { background: var(--cream); color: var(--teal); border: 1px solid var(--line); }
+  .checkout-btn.secondary:hover:not(:disabled) { background: var(--white); border-color: var(--teal); }
+  .secure { font-size: 12px; color: var(--muted); text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; }
+
+  /* Items list */
+  .items-section { padding: 32px 0 96px; }
+  .items-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; align-items: start; }
+  .items-section-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
+  .items-section-head h2 { font-family: 'Parkinsans', sans-serif; font-size: 22px; font-weight: 700; color: var(--teal); letter-spacing: -0.01em; }
+  .items-section-head .count { font-size: 14px; color: var(--muted); font-family: 'Parkinsans', sans-serif; }
+  .items-list { display: flex; flex-direction: column; gap: 10px; }
+  .item-row { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; display: grid; grid-template-columns: 60px 1fr auto auto; gap: 16px; align-items: center; }
+  .item-row.removed { opacity: 0.45; }
+  .item-row-img { width: 60px; height: 60px; background: var(--cream); border-radius: 10px; padding: 8px; display: grid; place-items: center; }
+  .item-row-img img { width: 100%; height: 100%; object-fit: contain; }
+  .item-row-name { font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; color: var(--teal); margin-bottom: 2px; }
+  .item-row-meta { font-size: 12px; color: var(--muted); }
+  .qty-control { display: flex; align-items: center; gap: 6px; background: var(--cream); border-radius: 999px; padding: 3px; }
+  .qty-btn { width: 26px; height: 26px; border: none; background: var(--white); border-radius: 50%; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--teal); display: grid; place-items: center; }
+  .qty-btn:hover { background: var(--teal); color: var(--white); }
+  .qty-btn.remove { color: var(--muted); }
+  .qty-btn.remove:hover { background: var(--orange); color: var(--white); }
+  .qty-value { font-family: 'Parkinsans', sans-serif; font-weight: 700; min-width: 22px; text-align: center; font-size: 14px; }
+  .item-row-price { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 15px; color: var(--teal); min-width: 64px; text-align: right; }
+  .restore-btn { background: none; border: none; color: var(--orange); font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .removed-msg { font-size: 12px; color: var(--orange); font-family: 'Parkinsans', sans-serif; font-weight: 600; }
+
+  .loading { padding: 80px 0; text-align: center; color: var(--muted); font-family: 'Parkinsans', sans-serif; }
+
+  footer { background: var(--teal); color: rgba(255,255,255,0.85); padding: 80px 0 32px; }
+  .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
+  .footer-brand .wordmark { color: var(--white); }
+  .footer-brand p { font-size: 14px; opacity: 0.7; margin-top: 18px; max-width: 300px; line-height: 1.6; }
+  .footer-col h5 { font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 20px; color: var(--yellow); letter-spacing: 0.05em; text-transform: uppercase; }
+  .footer-col a { display: block; font-family: 'Parkinsans', sans-serif; font-size: 14px; opacity: 0.85; margin-bottom: 12px; }
+  .footer-col a:hover { color: var(--orange); opacity: 1; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 24px; display: flex; justify-content: space-between; font-size: 13px; opacity: 0.6; flex-wrap: wrap; gap: 16px; }
+
+  @media (max-width: 900px) {
+    .kit-hero-grid, .items-grid { grid-template-columns: 1fr; gap: 32px; }
+    .checkout-card { position: static; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a href="/" class="wordmark">Fast Track</a>
+    <nav class="nav-links">
+      <a href="/#how">How It Works</a>
+      <a href="/kits" class="active">Kits</a>
+      <a href="/upload">Upload List</a>
+      <a href="/store">Store</a>
+      <a href="/gift">Gift</a>
+    </nav>
+    <button class="cart-btn" onclick="window.location.href='/store'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6z"/></svg>
+      Cart <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</header>
+
+<div class="crumbs">
+  <div class="container">
+    <nav>
+      <a href="/">Home</a><span class="sep">/</span>
+      <a href="/kits">Kits</a><span class="sep">/</span>
+      <span class="current" id="crumb-current">Kit</span>
+    </nav>
+  </div>
+</div>
+
+<div class="loading" id="loading">Loading kit...</div>
+
+<div id="kit-content" style="display:none;">
+  <section class="kit-hero">
+    <div class="container kit-hero-grid">
+      <div>
+        <span class="grade-chip" id="grade-chip">Grade</span>
+        <h1 id="kit-title">Kit</h1>
+        <div class="age" id="kit-age">Ages</div>
+        <p class="tagline" id="kit-tagline"></p>
+        <div class="badge-row">
+          <span class="badge discount">10% bundle discount</span>
+          <span class="badge green">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            All items in stock
+          </span>
+          <span class="badge">Ships in 1 business day</span>
+        </div>
+      </div>
+      <aside class="checkout-card">
+        <div class="label">Order total</div>
+        <div class="strike-total" id="strike-total"></div>
+        <div class="total" id="total-display">$0.00</div>
+        <div class="breakdown">
+          <div class="row"><span>Bundle subtotal</span><span id="subtotal-display">$0.00</span></div>
+          <div class="row" id="savings-row" style="display:none;"><span>Bundle savings</span><span class="savings" id="savings-display">−$0.00</span></div>
+          <div class="row"><span>Shipping</span><span id="shipping-display">Calculated at checkout</span></div>
+          <div class="row bold"><span>Total</span><span id="total-bold">$0.00</span></div>
+        </div>
+        <button class="checkout-btn" id="checkout-btn">
+          Buy this kit
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <button class="checkout-btn secondary" id="gift-btn">
+          Send as a gift
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+        </button>
+        <div class="secure">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Secure checkout via Stripe
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="items-section">
+    <div class="container">
+      <div class="items-grid">
+        <div>
+          <div class="items-section-head">
+            <h2>What's in this kit</h2>
+            <span class="count" id="item-count">0 items</span>
+          </div>
+          <div class="items-list" id="items-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="wordmark">Fast Track</a>
+        <p>Back-to-school supplies, ordered, packed, and delivered.</p>
+      </div>
+      <div class="footer-col"><h5>Shop</h5><a href="/kits">Grade Kits</a><a href="/store">All Products</a><a href="/upload">Upload a List</a><a href="/gift">Gift a Kit</a></div>
+      <div class="footer-col"><h5>About</h5><a href="/#how">How It Works</a></div>
+      <div class="footer-col"><h5>Help</h5><a href="/shipping">Shipping</a><a href="/returns">Returns</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Fast Track School Supplies.</span>
+      <span><a href="/privacy" style="color: inherit;">Privacy</a> · <a href="/terms" style="color: inherit;">Terms</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const FREE_SHIPPING = 35;
+  const SHIPPING_FLAT = 5;
+  let kitData = null;
+  let cartState = [];
+
+  function getKitId() { return new URLSearchParams(window.location.search).get('id'); }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  async function loadKit() {
+    const kitId = getKitId();
+    if (!kitId) { document.getElementById('loading').textContent = 'No kit specified.'; return; }
+    try {
+      const res = await fetch(`/api/kits/${kitId}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Kit not found.');
+      kitData = data;
+      cartState = data.items.map(i => ({ ...i, removed: false }));
+      render();
+    } catch (err) {
+      document.getElementById('loading').textContent = err.message;
+    }
+  }
+
+  function render() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('kit-content').style.display = '';
+    document.title = `${kitData.name} | Fast Track School Supplies`;
+    document.getElementById('crumb-current').textContent = kitData.name;
+    document.getElementById('grade-chip').textContent = kitData.grade_label;
+    document.getElementById('kit-title').textContent = kitData.name;
+    document.getElementById('kit-age').textContent = kitData.age_range;
+    document.getElementById('kit-tagline').textContent = kitData.tagline;
+
+    // Apply hero color tint to grade chip
+    document.querySelector('.kit-hero').style.background = `linear-gradient(180deg, ${kitData.hero_color}55, transparent 60%)`;
+
+    renderItems();
+    updateTotals();
+  }
+
+  function renderItems() {
+    const active = cartState.filter(i => !i.removed);
+    document.getElementById('item-count').textContent = `${active.length} items`;
+    document.getElementById('items-list').innerHTML = cartState.map((item, idx) => `
+      <div class="item-row ${item.removed ? 'removed' : ''}">
+        <div class="item-row-img"><img src="${item.image}" alt="${escapeHtml(item.name)}" /></div>
+        <div>
+          <div class="item-row-name">${escapeHtml(item.name)}</div>
+          <div class="item-row-meta">${escapeHtml(item.unit || '')} · $${item.price.toFixed(2)} each</div>
+        </div>
+        ${item.removed
+          ? `<span class="removed-msg">Removed</span><button class="restore-btn" data-action="restore" data-idx="${idx}">Restore</button>`
+          : `<div class="qty-control">
+              <button class="qty-btn" data-action="dec" data-idx="${idx}">−</button>
+              <span class="qty-value">${item.quantity}</span>
+              <button class="qty-btn" data-action="inc" data-idx="${idx}">+</button>
+              <button class="qty-btn remove" data-action="remove" data-idx="${idx}" title="Remove">×</button>
+            </div>
+            <div class="item-row-price">$${(item.price * item.quantity).toFixed(2)}</div>`
+        }
+      </div>
+    `).join('');
+    document.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', () => {
+      const idx = +btn.dataset.idx;
+      const action = btn.dataset.action;
+      const item = cartState[idx];
+      if (action === 'inc') item.quantity++;
+      else if (action === 'dec' && item.quantity > 1) item.quantity--;
+      else if (action === 'remove') item.removed = true;
+      else if (action === 'restore') item.removed = false;
+      renderItems();
+      updateTotals();
+    }));
+  }
+
+  function updateTotals() {
+    const active = cartState.filter(i => !i.removed);
+    const subtotal = active.reduce((s, i) => s + i.price * i.quantity, 0);
+    const rawSubtotal = active.reduce((s, i) => s + i.original_price * i.quantity, 0);
+    const savings = rawSubtotal - subtotal;
+    const shipping = subtotal >= FREE_SHIPPING ? 0 : SHIPPING_FLAT;
+    const total = subtotal + shipping;
+    document.getElementById('subtotal-display').textContent = `$${rawSubtotal.toFixed(2)}`;
+    document.getElementById('shipping-display').innerHTML = subtotal >= FREE_SHIPPING ? '<span class="free">Free</span>' : `$${shipping.toFixed(2)}`;
+    document.getElementById('total-display').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('total-bold').textContent = `$${total.toFixed(2)}`;
+    if (savings > 0) {
+      document.getElementById('savings-row').style.display = '';
+      document.getElementById('savings-display').textContent = `−$${savings.toFixed(2)}`;
+      document.getElementById('strike-total').textContent = `$${(rawSubtotal + shipping).toFixed(2)}`;
+    } else {
+      document.getElementById('savings-row').style.display = 'none';
+      document.getElementById('strike-total').textContent = '';
+    }
+    document.getElementById('checkout-btn').disabled = active.length === 0;
+  }
+
+  document.getElementById('checkout-btn').addEventListener('click', () => doCheckout(false));
+  document.getElementById('gift-btn').addEventListener('click', () => {
+    window.location.href = `/gift?kit=${getKitId()}`;
+  });
+
+  async function doCheckout() {
+    const btn = document.getElementById('checkout-btn');
+    btn.disabled = true; const original = btn.innerHTML; btn.textContent = 'Redirecting...';
+    try {
+      const items = cartState.filter(i => !i.removed).map(i => ({ sku_id: i.sku_id, quantity: i.quantity }));
+      const res = await fetch('/api/checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: 'kit-page', kit_id: getKitId(), items })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Checkout failed.');
+      window.location.href = data.url;
+    } catch (err) { alert(err.message); btn.disabled = false; btn.innerHTML = original; }
+  }
+
+  try {
+    const stored = JSON.parse(localStorage.getItem('fastTrackCart') || '{}');
+    document.getElementById('cart-count').textContent = Object.values(stored).reduce((s, q) => s + q, 0);
+  } catch {}
+
+  loadKit();
+</script>
+
+</body>
+</html>

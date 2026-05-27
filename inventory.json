@@ -1,0 +1,210 @@
+{
+  "pencils-12": {
+    "stock": 200,
+    "low_stock_threshold": 20
+  },
+  "mech-pencil": {
+    "stock": 150,
+    "low_stock_threshold": 20
+  },
+  "pen-black": {
+    "stock": 300,
+    "low_stock_threshold": 30
+  },
+  "pen-red": {
+    "stock": 200,
+    "low_stock_threshold": 30
+  },
+  "composition-notebook": {
+    "stock": 180,
+    "low_stock_threshold": 20
+  },
+  "college-notebook": {
+    "stock": 120,
+    "low_stock_threshold": 15
+  },
+  "filler-paper": {
+    "stock": 250,
+    "low_stock_threshold": 25
+  },
+  "cardstock": {
+    "stock": 60,
+    "low_stock_threshold": 10
+  },
+  "construction-9x12": {
+    "stock": 80,
+    "low_stock_threshold": 10
+  },
+  "construction-8x12": {
+    "stock": 60,
+    "low_stock_threshold": 10
+  },
+  "index-cards": {
+    "stock": 120,
+    "low_stock_threshold": 15
+  },
+  "sticky-notes": {
+    "stock": 150,
+    "low_stock_threshold": 20
+  },
+  "binder-1in": {
+    "stock": 90,
+    "low_stock_threshold": 15
+  },
+  "binder-half": {
+    "stock": 70,
+    "low_stock_threshold": 10
+  },
+  "pocket-folder": {
+    "stock": 400,
+    "low_stock_threshold": 50
+  },
+  "dividers-plastic": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "dividers-insertable": {
+    "stock": 80,
+    "low_stock_threshold": 15
+  },
+  "sheet-protectors": {
+    "stock": 70,
+    "low_stock_threshold": 10
+  },
+  "pencil-pouch": {
+    "stock": 130,
+    "low_stock_threshold": 15
+  },
+  "pencil-box": {
+    "stock": 90,
+    "low_stock_threshold": 15
+  },
+  "glue-stick": {
+    "stock": 500,
+    "low_stock_threshold": 75
+  },
+  "glue-stick-large": {
+    "stock": 150,
+    "low_stock_threshold": 20
+  },
+  "glue-bottle": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "scotch-tape": {
+    "stock": 80,
+    "low_stock_threshold": 10
+  },
+  "scissors-blunt": {
+    "stock": 150,
+    "low_stock_threshold": 20
+  },
+  "scissors-fiskars": {
+    "stock": 80,
+    "low_stock_threshold": 15
+  },
+  "ruler": {
+    "stock": 200,
+    "low_stock_threshold": 25
+  },
+  "calculator": {
+    "stock": 40,
+    "low_stock_threshold": 10
+  },
+  "crayons": {
+    "stock": 180,
+    "low_stock_threshold": 20
+  },
+  "color-pencils": {
+    "stock": 130,
+    "low_stock_threshold": 20
+  },
+  "crayola-markers": {
+    "stock": 140,
+    "low_stock_threshold": 20
+  },
+  "marker-broad": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "marker-fine": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "sharpie-fine": {
+    "stock": 120,
+    "low_stock_threshold": 15
+  },
+  "sharpie-ultra": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "dry-erase-black": {
+    "stock": 180,
+    "low_stock_threshold": 25
+  },
+  "dry-erase-fine": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "highlighters-3": {
+    "stock": 130,
+    "low_stock_threshold": 20
+  },
+  "highlighters-5": {
+    "stock": 90,
+    "low_stock_threshold": 15
+  },
+  "whiteboard-eraser": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "white-out": {
+    "stock": 80,
+    "low_stock_threshold": 15
+  },
+  "eraser-pink": {
+    "stock": 250,
+    "low_stock_threshold": 30
+  },
+  "eraser-arrowhead": {
+    "stock": 150,
+    "low_stock_threshold": 25
+  },
+  "pencil-sharpener": {
+    "stock": 80,
+    "low_stock_threshold": 15
+  },
+  "tissues": {
+    "stock": 200,
+    "low_stock_threshold": 30
+  },
+  "paper-towel": {
+    "stock": 90,
+    "low_stock_threshold": 15
+  },
+  "disinfectant-wipes": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "gallon-bags": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "quart-bags": {
+    "stock": 80,
+    "low_stock_threshold": 15
+  },
+  "sandwich-bags": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "water-bottle": {
+    "stock": 50,
+    "low_stock_threshold": 10
+  },
+  "backpack": {
+    "stock": 60,
+    "low_stock_threshold": 10
+  }
+}
