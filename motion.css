@@ -96,6 +96,130 @@ header .nav { padding: 14px 0 !important; }
 /* ---------- Toast slide-in (already exists, just smoother) ---------- */
 .toast { transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.2s; }
 
+/* ============================================== */
+/* MOBILE — global responsive baseline             */
+/* ============================================== */
+
+/* Prevent horizontal scroll anywhere */
+html, body { overflow-x: hidden; max-width: 100%; }
+
+/* Homepage inline-styled grids */
+.three-ways-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.gift-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 64px; align-items: center; }
+
+/* Mobile menu button (hamburger) — hidden on desktop */
+.mobile-menu-btn {
+  display: none;
+  background: var(--teal, #223A3F);
+  color: #fff;
+  border: none;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.mobile-menu-btn svg { width: 22px; height: 22px; }
+
+/* Mobile menu drawer */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0; right: 0;
+  width: 280px; max-width: 80vw;
+  height: 100vh;
+  background: var(--teal, #223A3F);
+  color: #fff;
+  z-index: 200;
+  padding: 28px 24px;
+  transform: translateX(100%);
+  transition: transform 0.25s ease-out;
+  box-shadow: -8px 0 30px rgba(0,0,0,0.2);
+}
+.mobile-menu.open { transform: translateX(0); }
+.mobile-menu-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 199;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.mobile-menu-overlay.open { opacity: 1; pointer-events: auto; }
+.mobile-menu-close {
+  background: rgba(255,255,255,0.12);
+  border: none; color: #fff;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid; place-items: center;
+  margin-bottom: 24px;
+  margin-left: auto;
+}
+.mobile-menu a {
+  display: block;
+  font-family: 'Parkinsans', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  text-decoration: none;
+}
+.mobile-menu a:hover { color: var(--yellow, #FDCA06); }
+
+/* ---------- Sub-768 mobile ---------- */
+@media (max-width: 768px) {
+  /* Show hamburger, swap to mobile menu */
+  .mobile-menu-btn { display: inline-flex; }
+  .mobile-menu { display: block; }
+  .mobile-menu-overlay { display: block; }
+  .nav-links { display: none !important; }
+
+  /* Collapse the homepage 3-up grids */
+  .three-ways-grid { grid-template-columns: 1fr; gap: 16px; }
+  .gift-grid { grid-template-columns: 1fr; gap: 40px; }
+
+  /* Generic containers — tighten padding */
+  .container { padding: 0 20px !important; }
+
+  /* Brand logo a touch smaller on mobile */
+  .brand-logo { height: 48px !important; }
+  .brand-logo-footer { height: 60px !important; }
+
+  /* Reduce massive section padding on mobile */
+  section { padding-left: 0; padding-right: 0; }
+
+  /* Make sticky checkout cards no longer sticky on mobile (they take up too much space) */
+  .checkout-card, .gift-summary { position: static !important; }
+
+  /* Cart drawer should be near-full width on phones */
+  .cart-drawer { width: 100vw !important; max-width: 100vw !important; }
+
+  /* Buttons big enough to tap */
+  button, .btn-primary, .btn-secondary, .btn-yellow, .hero-cta, .checkout-btn { min-height: 44px; }
+
+  /* Hero typography scales down */
+  .hero h1 { font-size: clamp(38px, 9vw, 56px) !important; }
+  .hero p.lead { font-size: 17px !important; }
+
+  /* Upload-banner — let photo center, no negative margin spill */
+  .upload-visual { margin-right: auto !important; margin-left: auto !important; max-width: 240px !important; }
+  .upload-banner { padding: 40px 28px !important; grid-template-columns: 1fr !important; }
+}
+
+/* ---------- Sub-480 small phones (iPhone SE, etc) ---------- */
+@media (max-width: 480px) {
+  .container { padding: 0 16px !important; }
+  .hero h1 { font-size: 36px !important; }
+  .nav { padding: 12px 0 !important; }
+  .brand-logo { height: 42px !important; }
+  /* No tilted shadows; keep things clean at tiny widths */
+  .upload-visual { transform: none !important; }
+}
+
 /* ---------- Respect reduced motion preference ---------- */
 @media (prefers-reduced-motion: reduce) {
   .wordmark .dot, .float-icon, .ft-anim-1, .ft-anim-2, .ft-anim-3, .ft-anim-4, .ft-fade-in, .cart-count.bump, .reveal {
