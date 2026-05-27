@@ -71,6 +71,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://fast-track-mockup.onrender.com/manage</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  <url>
     <loc>https://fast-track-mockup.onrender.com/shipping</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

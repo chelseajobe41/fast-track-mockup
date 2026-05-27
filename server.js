@@ -276,6 +276,36 @@ app.get('/faq', (_req, res) => res.sendFile(join(__dirname, 'faq.html')));
 app.get('/help', (_req, res) => res.redirect(301, '/faq'));
 app.get('/admin', requireAdmin, (_req, res) => res.sendFile(join(__dirname, 'admin.html')));
 
+// Manage subscription: redirect to Stripe's hosted customer-portal login page.
+// Client configures this once in Stripe Dashboard -> Settings -> Billing -> Customer portal
+// -> "Login link" -> copy URL into STRIPE_PORTAL_URL env var.
+app.get('/manage', (_req, res) => {
+  const portalUrl = process.env.STRIPE_PORTAL_URL;
+  if (portalUrl) return res.redirect(302, portalUrl);
+  // Fallback if not yet configured: a friendly page explaining where to find the portal link.
+  res.status(200).type('html').send(`<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manage your subscription | Fast Track School Supplies</title>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+<style>
+  body { font-family: 'Barlow', system-ui, sans-serif; background: #FAF6EF; color: #223A3F; min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 40px 24px; line-height: 1.6; }
+  .card { background: #fff; border-radius: 22px; padding: 48px 40px; max-width: 520px; box-shadow: 0 20px 60px rgba(34,58,63,0.08); text-align: center; }
+  h1 { font-family: 'Parkinsans', sans-serif; font-size: 28px; margin: 0 0 12px; }
+  p { color: #6A6F71; margin: 0 0 18px; font-size: 16px; }
+  a { color: #DC3D2D; font-weight: 600; }
+  .btn { display: inline-block; margin-top: 12px; background: #223A3F; color: #fff; padding: 14px 26px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; text-decoration: none; }
+</style></head>
+<body><div class="card">
+  <h1>Manage your subscription</h1>
+  <p>To update your card, change your delivery schedule, or cancel, open the most recent Fast Track email from Stripe. The portal link is in the receipt.</p>
+  <p>Don't have it handy? Email us and we'll send a fresh link.</p>
+  <a class="btn" href="/">Back to home</a>
+</div></body></html>`);
+});
+
 // ---------- Rate limiter for the AI endpoint ----------
 // Each IP can call /api/parse-list up to 8 times per rolling hour.
 const PARSE_RATE_LIMIT = 8;
