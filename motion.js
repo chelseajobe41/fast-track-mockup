@@ -50,6 +50,57 @@
     });
   });
 
+  // ---------- Accessibility: skip link + ARIA upgrades ----------
+  document.addEventListener('DOMContentLoaded', () => {
+    // Add a skip-to-main-content link as the first thing in body
+    const main = document.querySelector('main') || document.querySelector('section.hero') || document.querySelector('section');
+    if (main) {
+      // Ensure target has id="main"
+      if (!main.id) main.id = 'main';
+      const skip = document.createElement('a');
+      skip.href = '#' + main.id;
+      skip.className = 'skip-link';
+      skip.textContent = 'Skip to main content';
+      document.body.insertBefore(skip, document.body.firstChild);
+    }
+
+    // Cart drawer: add dialog semantics
+    const cartDrawer = document.getElementById('cart-drawer');
+    if (cartDrawer) {
+      cartDrawer.setAttribute('role', 'dialog');
+      cartDrawer.setAttribute('aria-modal', 'true');
+      cartDrawer.setAttribute('aria-label', 'Shopping cart');
+    }
+
+    // Cart count badge — give it a live region so screen readers announce updates
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+      cartCount.setAttribute('aria-label', 'Items in cart');
+      cartCount.setAttribute('aria-live', 'polite');
+    }
+
+    // Hamburger / close buttons — ensure aria-label is set (motion.js may have already added these, but cover dynamic cases)
+    document.querySelectorAll('.cart-btn:not([aria-label])').forEach(b => b.setAttribute('aria-label', 'Open shopping cart'));
+    document.querySelectorAll('.close-btn:not([aria-label])').forEach(b => b.setAttribute('aria-label', 'Close'));
+    document.querySelectorAll('.qty-btn:not([aria-label]), .qty-btn-small:not([aria-label]), .qty-btn-card:not([aria-label])').forEach(b => {
+      const text = b.textContent.trim();
+      if (text === '+' || text === '+') b.setAttribute('aria-label', 'Increase quantity');
+      else if (text === '−' || text === '-') b.setAttribute('aria-label', 'Decrease quantity');
+      else if (text === '×' || text === 'x') b.setAttribute('aria-label', 'Remove item');
+    });
+
+    // Search inputs — add aria-label if missing a label
+    document.querySelectorAll('input[type="text"]:not([aria-label]):not([aria-labelledby])').forEach(i => {
+      if (i.placeholder) i.setAttribute('aria-label', i.placeholder);
+    });
+    document.querySelectorAll('textarea:not([aria-label]):not([aria-labelledby])').forEach(t => {
+      if (t.placeholder) t.setAttribute('aria-label', t.placeholder);
+    });
+    document.querySelectorAll('select:not([aria-label]):not([aria-labelledby])').forEach(s => {
+      s.setAttribute('aria-label', 'Sort');
+    });
+  });
+
   // ---------- Mobile menu (hamburger) ----------
   document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelector('header .nav-links');

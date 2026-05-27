@@ -97,6 +97,68 @@ header .nav { padding: 14px 0 !important; }
 .toast { transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.2s; }
 
 /* ============================================== */
+/* ACCESSIBILITY (WCAG 2.1 AA)                     */
+/* ============================================== */
+
+/* Screen-reader-only utility (visually hidden, readable by assistive tech) */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0;
+}
+
+/* Skip-to-main-content link — only visible when focused */
+.skip-link {
+  position: absolute;
+  top: -100px; left: 0;
+  background: var(--teal, #223A3F);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 0 0 8px 0;
+  font-family: 'Parkinsans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  z-index: 1000;
+  transition: top 0.15s;
+}
+.skip-link:focus { top: 0; outline: 3px solid var(--yellow, #FDCA06); outline-offset: 0; }
+
+/* Visible focus indicator for all interactive elements */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: 3px solid var(--orange, #DC3D2D);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Tighter focus ring on rounded buttons/pills */
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-yellow:focus-visible,
+.cart-btn:focus-visible,
+.checkout-btn:focus-visible,
+.hero-cta:focus-visible,
+.add-btn:focus-visible,
+.qty-btn-card:focus-visible,
+.qty-btn:focus-visible,
+.qty-btn-small:focus-visible,
+.kit-card-btn:focus-visible,
+.close-btn:focus-visible,
+.mobile-menu-btn:focus-visible {
+  outline-offset: 4px;
+}
+
+/* Remove default outline only for non-keyboard focus (mouse clicks) */
+:focus:not(:focus-visible) { outline: none; }
+
+/* ============================================== */
 /* MOBILE — global responsive baseline             */
 /* ============================================== */
 
