@@ -51,4 +51,4 @@ Allow: /
 User-agent: meta-externalagent
 Allow: /
 
-Sitemap: https://fast-track-mockup.onrender.com/sitemap.xml
+Sitemap: https://fasttrackschoolsupplies.com/sitemap.xml
