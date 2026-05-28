@@ -563,12 +563,15 @@
 
     updateSubtotal();
 
-    const usage = data.usage || {};
-    const cacheHit = usage.cache_read_input_tokens || 0;
-    const cacheWrite = usage.cache_creation_input_tokens || 0;
-    usageNote.textContent = `Parsed in one Claude call · ${usage.input_tokens || 0} input + ${usage.output_tokens || 0} output tokens` +
-      (cacheHit ? ` · ${cacheHit} cache read` : '') +
-      (cacheWrite ? ` · ${cacheWrite} cache write` : '');
+    // Developer telemetry hidden from customers. Uncomment to re-enable while testing.
+    // const usage = data.usage || {};
+    // const cacheHit = usage.cache_read_input_tokens || 0;
+    // const cacheWrite = usage.cache_creation_input_tokens || 0;
+    // usageNote.textContent = `Parsed in one Claude call · ${usage.input_tokens || 0} input + ${usage.output_tokens || 0} output tokens` +
+    //   (cacheHit ? ` · ${cacheHit} cache read` : '') +
+    //   (cacheWrite ? ` · ${cacheWrite} cache write` : '');
+    usageNote.textContent = '';
+    usageNote.style.display = 'none';
 
     itemsList.querySelectorAll('.qty-btn').forEach(btn => {
       btn.addEventListener('click', e => {
