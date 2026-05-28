@@ -141,7 +141,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://images.pexels.com", "https://images.unsplash.com", "https://irp.cdn-website.com"],
+      imgSrc: ["'self'", "data:", "blob:", "https://images.pexels.com", "https://images.unsplash.com", "https://irp.cdn-website.com"],
       connectSrc: ["'self'", "https://api.stripe.com"],
       frameSrc: ["https://js.stripe.com", "https://hooks.stripe.com", "https://checkout.stripe.com"],
       objectSrc: ["'none'"],
