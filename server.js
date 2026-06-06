@@ -554,9 +554,9 @@ app.post('/api/checkout', async (req, res) => {
       }
     };
 
-    // Subscriptions need a customer record so the user can manage it later.
+    // customer_creation is only valid in 'payment' mode. In 'subscription' mode,
+    // Stripe creates the customer automatically (required for recurring billing).
     if (isSubscription) {
-      sessionParams.customer_creation = 'always';  // disabled in 'payment' mode default
       sessionParams.subscription_data = {
         description: `Fast Track recurring kit · ${recurring.label}`,
         metadata: {
