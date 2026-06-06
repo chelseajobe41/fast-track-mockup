@@ -259,8 +259,47 @@
     // Apply hero color tint to grade chip
     document.querySelector('.kit-hero').style.background = `linear-gradient(180deg, ${kitData.hero_color}55, transparent 60%)`;
 
+    injectProductSchema();
     renderItems();
     updateTotals();
+  }
+
+  // Inject Product JSON-LD for SEO / Google rich results
+  function injectProductSchema() {
+    const kitId = getKitId();
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": kitData.name,
+      "description": kitData.tagline,
+      "category": "School Supply Kit",
+      "brand": { "@type": "Brand", "name": "Fast Track School Supplies" },
+      "audience": {
+        "@type": "EducationalAudience",
+        "audienceType": kitData.age_range,
+        "educationalRole": "Student"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": (kitData.subtotal || 0).toFixed(2),
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": `https://fasttrackschoolsupplies.com/kit?id=${kitId}`,
+        "seller": { "@type": "Organization", "name": "Fast Track School Supplies" }
+      },
+      "url": `https://fasttrackschoolsupplies.com/kit?id=${kitId}`,
+      "isRelatedTo": (kitData.items || []).slice(0, 8).map(i => ({
+        "@type": "Product",
+        "name": i.name
+      }))
+    };
+    // Remove any existing dynamic schema before inserting fresh one
+    document.querySelectorAll('script[data-dynamic-schema]').forEach(s => s.remove());
+    const tag = document.createElement('script');
+    tag.type = 'application/ld+json';
+    tag.setAttribute('data-dynamic-schema', 'product');
+    tag.textContent = JSON.stringify(schema);
+    document.head.appendChild(tag);
   }
 
   function renderItems() {

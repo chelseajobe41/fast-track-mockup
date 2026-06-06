@@ -348,6 +348,17 @@
     }
     .totals { flex-direction: column; align-items: stretch; }
   }
+
+  /* Footer */
+  footer { background: var(--teal); color: rgba(255,255,255,0.85); padding: 80px 0 32px; margin-top: 80px; }
+  .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
+  .footer-brand .wordmark { color: var(--white); }
+  .footer-brand p { font-size: 14px; opacity: 0.7; margin-top: 18px; max-width: 300px; line-height: 1.6; }
+  .footer-col h5 { font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 20px; color: var(--yellow); letter-spacing: 0.05em; text-transform: uppercase; }
+  .footer-col a { display: block; font-family: 'Parkinsans', sans-serif; font-size: 14px; opacity: 0.85; margin-bottom: 12px; text-decoration: none; color: rgba(255,255,255,0.85); }
+  .footer-col a:hover { color: var(--orange); opacity: 1; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 24px; display: flex; justify-content: space-between; font-size: 13px; opacity: 0.6; flex-wrap: wrap; gap: 16px; }
+  @media (max-width: 700px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; } }
 </style>
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 <link rel="stylesheet" href="/motion.css" />
@@ -642,6 +653,41 @@
     } catch {}
   })();
 </script>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="wordmark">Fast Track</a>
+        <p>Back-to-school supplies, ordered, packed, and delivered. Built for families who want it done right.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Shop</h5>
+        <a href="/kits">Grade Kits</a>
+        <a href="/store">All Products</a>
+        <a href="/upload">Upload a List</a>
+        <a href="/gift">Gift a Kit</a>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <a href="/#how">How It Works</a>
+      </div>
+      <div class="footer-col">
+        <h5>Help</h5>
+        <a href="/faq">FAQ</a>
+        <a href="/manage">Manage subscription</a>
+        <a href="/shipping">Shipping</a>
+        <a href="/returns">Returns</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Fast Track School Supplies. All rights reserved.</span>
+      <span><a href="/privacy" style="color: inherit;">Privacy</a> · <a href="/terms" style="color: inherit;">Terms</a></span>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>
