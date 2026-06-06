@@ -295,8 +295,7 @@
 </footer>
 
 <script>
-  const FREE_SHIPPING = 35;
-  const SHIPPING_FLAT = 5;
+  const SHIPPING_FLAT = 10;
   let selectedKit = null;
   let allKits = [];
 
@@ -355,7 +354,7 @@
     }
     const k = allKits.find(x => x.kit_id === selectedKit);
     if (!k) return;
-    const shipping = k.price >= FREE_SHIPPING ? 0 : SHIPPING_FLAT;
+    const shipping = SHIPPING_FLAT;
     const total = k.price + shipping;
     box.innerHTML = `
       <div class="kit-summary">

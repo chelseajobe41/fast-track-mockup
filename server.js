@@ -18,8 +18,7 @@ const PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
 const INVENTORY_PATH = join(__dirname, 'inventory.json');
 const ORDERS_PATH = join(__dirname, 'orders.json');
 
-const FREE_SHIPPING_THRESHOLD = 35;
-const STANDARD_SHIPPING_CENTS = 500;
+const FLAT_SHIPPING_CENTS = 1000;  // Flat $10 shipping on every order
 const SUBSCRIPTION_DISCOUNT = 0.10;  // 10% off subscribed items
 
 // Map customer-facing interval choice → Stripe recurring config
@@ -520,13 +519,12 @@ app.post('/api/checkout', async (req, res) => {
       return { price_data: priceData, quantity: item.quantity };
     });
 
-    const subtotal = line_items.reduce((s, li) => s + (li.price_data.unit_amount / 100) * li.quantity, 0);
     const shipping_options = [{
       shipping_rate_data: {
         type: 'fixed_amount',
-        display_name: subtotal >= FREE_SHIPPING_THRESHOLD ? 'Free shipping' : 'Standard shipping',
+        display_name: 'Standard shipping',
         fixed_amount: {
-          amount: subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_CENTS,
+          amount: FLAT_SHIPPING_CENTS,
           currency: 'usd'
         },
         delivery_estimate: {

@@ -223,8 +223,7 @@
 </footer>
 
 <script>
-  const FREE_SHIPPING = 35;
-  const SHIPPING_FLAT = 5;
+  const SHIPPING_FLAT = 10;
   let kitData = null;
   let cartState = [];
 
@@ -342,10 +341,10 @@
     const subtotal = active.reduce((s, i) => s + i.price * i.quantity, 0);
     const rawSubtotal = active.reduce((s, i) => s + i.original_price * i.quantity, 0);
     const savings = rawSubtotal - subtotal;
-    const shipping = subtotal >= FREE_SHIPPING ? 0 : SHIPPING_FLAT;
+    const shipping = subtotal > 0 ? SHIPPING_FLAT : 0;
     const total = subtotal + shipping;
     document.getElementById('subtotal-display').textContent = `$${rawSubtotal.toFixed(2)}`;
-    document.getElementById('shipping-display').innerHTML = subtotal >= FREE_SHIPPING ? '<span class="free">Free</span>' : `$${shipping.toFixed(2)}`;
+    document.getElementById('shipping-display').innerHTML = `$${shipping.toFixed(2)}`;
     document.getElementById('total-display').textContent = `$${total.toFixed(2)}`;
     document.getElementById('total-bold').textContent = `$${total.toFixed(2)}`;
     if (savings > 0) {

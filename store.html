@@ -4,12 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Store | Fast Track School Supplies</title>
-<meta name="description" content="Browse 50+ trusted school supplies. Search, filter, add to cart. Subscribe & save 10% on items that run out mid-year. Free shipping over $35." />
+<meta name="description" content="Browse 50+ trusted school supplies. Search, filter, add to cart. Subscribe & save 10% on items that run out mid-year. Flat $10 shipping." />
 <link rel="canonical" href="https://fasttrackschoolsupplies.com/store" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://fasttrackschoolsupplies.com/store" />
 <meta property="og:title" content="Shop School Supplies | Fast Track" />
-<meta property="og:description" content="50+ trusted school supplies. Search, filter, subscribe & save. Free shipping over $35." />
+<meta property="og:description" content="50+ trusted school supplies. Search, filter, subscribe & save. Flat $10 shipping." />
 <meta property="og:image" content="https://fasttrackschoolsupplies.com/assets/logo.png" />
 <meta property="og:site_name" content="Fast Track School Supplies" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -207,7 +207,7 @@
 <section class="store-hero">
   <div class="container">
     <h1>Shop the store<span class="dot">.</span></h1>
-    <p>Build your own kit or pick up something for next semester. Free shipping on orders over $35.</p>
+    <p>Build your own kit or pick up something for next semester. Flat $10 shipping on every order.</p>
   </div>
 </section>
 
@@ -269,8 +269,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const FREE_SHIPPING = 35;
-  const SHIPPING_FLAT = 5;
+  const SHIPPING_FLAT = 10;
 
   // ---------- Category rules (keyword-based) ----------
   const CATEGORIES = [
@@ -485,12 +484,10 @@
     const rawSubtotal = cartRawSubtotal();
     const subtotal = cartSubtotal();
     const savings = rawSubtotal - subtotal;
-    const shipping = subtotal >= FREE_SHIPPING ? 0 : SHIPPING_FLAT;
+    const shipping = subtotal > 0 ? SHIPPING_FLAT : 0;
     document.getElementById('cart-subtotal').textContent = `$${rawSubtotal.toFixed(2)}`;
     document.getElementById('cart-total').textContent = `$${(subtotal + shipping).toFixed(2)}`;
-    document.getElementById('cart-shipping').innerHTML = subtotal >= FREE_SHIPPING
-      ? '<span class="free-tag">Free</span>'
-      : `$${shipping.toFixed(2)}`;
+    document.getElementById('cart-shipping').innerHTML = `$${shipping.toFixed(2)}`;
     const savingsRow = document.getElementById('cart-savings-row');
     if (cartMode === 'subscription' && savings > 0) {
       savingsRow.style.display = '';
@@ -500,19 +497,8 @@
     }
 
     const note = document.getElementById('shipping-note');
-    if (subtotal === 0) {
-      note.textContent = '';
-      note.style.display = 'none';
-    } else if (subtotal >= FREE_SHIPPING) {
-      note.textContent = '✓ You qualify for free shipping.';
-      note.classList.remove('close');
-      note.style.display = '';
-    } else {
-      const diff = (FREE_SHIPPING - subtotal).toFixed(2);
-      note.textContent = `Add $${diff} more to get free shipping.`;
-      note.classList.add('close');
-      note.style.display = '';
-    }
+    note.textContent = '';
+    note.style.display = 'none';
 
     const body = document.getElementById('cart-body');
     const foot = document.getElementById('cart-foot');
