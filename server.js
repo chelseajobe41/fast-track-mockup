@@ -542,6 +542,9 @@ app.post('/api/checkout', async (req, res) => {
       shipping_address_collection: { allowed_countries: ['US'] },
       automatic_tax: { enabled: false },
       phone_number_collection: { enabled: true },
+      // Lets customers enter promo codes at checkout. Codes are created in
+      // Stripe Dashboard -> Products -> Coupons -> Create promotion code.
+      allow_promotion_codes: true,
       success_url: `${BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${BASE_URL}/cancel`,
       metadata: {
