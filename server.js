@@ -540,7 +540,6 @@ app.post('/api/checkout', async (req, res) => {
       mode: isSubscription ? 'subscription' : 'payment',
       line_items,
       shipping_address_collection: { allowed_countries: ['US'] },
-      shipping_options,
       automatic_tax: { enabled: false },
       phone_number_collection: { enabled: true },
       success_url: `${BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -554,7 +553,8 @@ app.post('/api/checkout', async (req, res) => {
       }
     };
 
-    // customer_creation is only valid in 'payment' mode. In 'subscription' mode,
+    // shipping_options and customer_creation are only valid in 'payment' mode.
+    // In 'subscription' mode, shipping is baked into the recurring price and
     // Stripe creates the customer automatically (required for recurring billing).
     if (isSubscription) {
       sessionParams.subscription_data = {
@@ -565,6 +565,7 @@ app.post('/api/checkout', async (req, res) => {
         }
       };
     } else {
+      sessionParams.shipping_options = shipping_options;
       sessionParams.customer_creation = 'if_required';
     }
 
