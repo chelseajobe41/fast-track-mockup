@@ -663,5 +663,70 @@
       "book bag",
       "bookbag"
     ]
+  },
+  {
+    "id": "construction-12x18",
+    "name": "Construction Paper 12x18",
+    "price": 3.99,
+    "unit": "Assorted colors, 48 sheets",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "construction paper",
+      "construction paper 12x18",
+      "12 by 18 construction paper",
+      "large construction paper",
+      "12x18",
+      "assorted colors"
+    ]
+  },
+  {
+    "id": "expo-markers-4pk",
+    "name": "EXPO Dry Erase Markers (4 Pack) - Chisel Tip",
+    "price": 4.99,
+    "unit": "4-pack, chisel tip",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "expo markers",
+      "expo dry erase",
+      "expo dry erase markers",
+      "dry erase markers 4 pack",
+      "chisel tip dry erase",
+      "expo chisel tip",
+      "4 pack dry erase markers"
+    ]
+  },
+  {
+    "id": "headphones",
+    "name": "Headphones",
+    "price": 9.99,
+    "unit": "Over-ear, 3.5mm wired",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "headphones",
+      "headphone",
+      "earbuds",
+      "kids headphones",
+      "school headphones",
+      "wired headphones",
+      "over-ear headphones",
+      "audio"
+    ]
+  },
+  {
+    "id": "watercolor",
+    "name": "Watercolor",
+    "price": 2.93,
+    "unit": "8-color set with brush",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "watercolor",
+      "water color",
+      "watercolors",
+      "watercolor paint",
+      "paint set",
+      "art supplies",
+      "kids paint",
+      "school paint"
+    ]
   }
 ]

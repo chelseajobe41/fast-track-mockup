@@ -206,5 +206,21 @@
   "backpack": {
     "stock": 60,
     "low_stock_threshold": 10
+  },
+  "construction-12x18": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "expo-markers-4pk": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "headphones": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "watercolor": {
+    "stock": 100,
+    "low_stock_threshold": 15
   }
 }
