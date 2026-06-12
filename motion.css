@@ -19,17 +19,17 @@ h2 .dot, h2 .period,
 }
 .wordmark:hover { transform: scale(1.05); }
 .brand-logo {
-  height: 64px;
+  height: 140px;
   width: auto;
   display: block;
-  max-width: 280px;
+  max-width: 340px;
 }
 .brand-logo-footer {
-  height: 80px;
+  height: 140px;
   filter: drop-shadow(0 4px 14px rgba(0,0,0,0.18));
   background: rgba(255, 255, 255, 0.96);
-  padding: 10px 16px;
-  border-radius: 14px;
+  padding: 14px 22px;
+  border-radius: 18px;
 }
 header .nav { padding: 14px 0 !important; }
 @keyframes ft-logo-wobble {
@@ -264,8 +264,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .container { padding: 0 20px !important; }
 
   /* Brand logo a touch smaller on mobile */
-  .brand-logo { height: 48px !important; }
-  .brand-logo-footer { height: 60px !important; }
+  .brand-logo { height: 96px !important; }
+  .brand-logo-footer { height: 110px !important; }
 
   /* Reduce massive section padding on mobile */
   section { padding-left: 0; padding-right: 0; }
@@ -293,7 +293,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .container { padding: 0 16px !important; }
   .hero h1 { font-size: 36px !important; }
   .nav { padding: 12px 0 !important; }
-  .brand-logo { height: 42px !important; }
+  .brand-logo { height: 78px !important; }
   /* No tilted shadows; keep things clean at tiny widths */
   .upload-visual { transform: none !important; }
 }
