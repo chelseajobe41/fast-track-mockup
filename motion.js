@@ -46,7 +46,7 @@
       el.setAttribute('aria-label', 'Fast Track School Supplies');
       // Tag context so we can style header vs footer differently
       const isFooter = el.closest('footer') !== null;
-      el.innerHTML = `<img src="/assets/logo.png" alt="Fast Track School Supplies" class="brand-logo${isFooter ? ' brand-logo-footer' : ''}" />`;
+      el.innerHTML = `<img src="/assets/logo.png" alt="" class="brand-logo${isFooter ? ' brand-logo-footer' : ''}" /><span class="brand-name${isFooter ? ' brand-name-footer' : ''}">Fast Track<span class="brand-name-sub">School Supplies</span></span>`;
     });
   });
 

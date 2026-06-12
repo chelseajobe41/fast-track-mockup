@@ -12,24 +12,53 @@ h2 .dot, h2 .period,
 .wordmark {
   padding: 0 !important;
   min-width: 0 !important;
-  gap: 0 !important;
-  font-size: 0;  /* hide any text fallback */
-  display: inline-block !important;
+  gap: 14px !important;
+  font-size: 0;
+  display: inline-flex !important;
+  align-items: center;
+  text-decoration: none;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.wordmark:hover { transform: scale(1.05); }
+.wordmark:hover { transform: scale(1.03); }
 .brand-logo {
-  height: 140px;
+  height: 90px;
   width: auto;
   display: block;
   max-width: 340px;
 }
+.brand-name {
+  font-family: 'Parkinsans', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  color: var(--teal, #223A3F);
+  line-height: 1;
+  white-space: nowrap;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.brand-name-sub {
+  font-family: 'Parkinsans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--orange, #DC3D2D);
+  line-height: 1;
+}
 .brand-logo-footer {
-  height: 140px;
+  height: 90px;
   filter: drop-shadow(0 4px 14px rgba(0,0,0,0.18));
   background: rgba(255, 255, 255, 0.96);
-  padding: 14px 22px;
-  border-radius: 18px;
+  padding: 10px 14px;
+  border-radius: 14px;
+}
+.brand-name-footer {
+  color: #fff;
+}
+.brand-name-footer .brand-name-sub {
+  color: var(--yellow, #FDCA06);
 }
 header .nav { padding: 14px 0 !important; }
 @keyframes ft-logo-wobble {
@@ -264,8 +293,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .container { padding: 0 20px !important; }
 
   /* Brand logo a touch smaller on mobile */
-  .brand-logo { height: 96px !important; }
-  .brand-logo-footer { height: 110px !important; }
+  .brand-logo { height: 72px !important; }
+  .brand-logo-footer { height: 78px !important; }
+  .brand-name { font-size: 24px; }
+  .brand-name-sub { font-size: 11px; }
 
   /* Reduce massive section padding on mobile */
   section { padding-left: 0; padding-right: 0; }
@@ -293,7 +324,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .container { padding: 0 16px !important; }
   .hero h1 { font-size: 36px !important; }
   .nav { padding: 12px 0 !important; }
-  .brand-logo { height: 78px !important; }
+  .brand-logo { height: 56px !important; }
+  .brand-name { font-size: 19px; }
+  .brand-name-sub { font-size: 9px; letter-spacing: 0.06em; }
+  .wordmark { gap: 10px !important; }
   /* No tilted shadows; keep things clean at tiny widths */
   .upload-visual { transform: none !important; }
 }
