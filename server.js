@@ -504,12 +504,15 @@ app.post('/api/checkout', async (req, res) => {
     // Build line items. Apply subscription discount to unit price.
     const line_items = cart.map(item => {
       const effectivePrice = isSubscription ? item.price * (1 - SUBSCRIPTION_DISCOUNT) : item.price;
+      // Stripe requires absolute HTTPS URLs for product images. Relative URLs (like
+      // placeholder /assets/photo-coming.svg) cause "Not a valid URL" errors.
+      const isAbsoluteHttps = item.image && /^https:\/\//i.test(item.image);
       const priceData = {
         currency: 'usd',
         product_data: {
           name: item.name + (isSubscription ? ` (${recurring.label})` : ''),
           description: item.unit || undefined,
-          images: item.image ? [item.image] : []
+          images: isAbsoluteHttps ? [item.image] : []
         },
         unit_amount: Math.round(effectivePrice * 100)
       };
