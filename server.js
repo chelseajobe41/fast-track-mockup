@@ -257,6 +257,35 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
 });
 
 app.use(express.json());
+
+// Lock down direct file access. express.static below would otherwise serve
+// anything in __dirname, including order data, inventory, source code, and
+// node_modules. Anything intentionally public (motion.js, motion.css,
+// /assets/*, products.json, robots.txt, sitemap.xml, llms.txt) is not in
+// the deny list and still gets served normally.
+const DENY_PATHS = new Set([
+  '/orders.json',         // PII: customer names, emails, addresses
+  '/inventory.json',      // business info — use /api/inventory-public for public view
+  '/kits.json',           // use /api/kits for public view
+  '/server.js',
+  '/package.json',
+  '/package-lock.json',
+  '/.gitignore',
+  '/.env',
+  '/.env.example',
+  '/README.md'
+]);
+const DENY_PREFIXES = ['/node_modules', '/.git', '/.claude'];
+app.use((req, res, next) => {
+  if (DENY_PATHS.has(req.path)) return res.status(404).end();
+  for (const prefix of DENY_PREFIXES) {
+    if (req.path === prefix || req.path.startsWith(prefix + '/')) {
+      return res.status(404).end();
+    }
+  }
+  next();
+});
+
 app.use(express.static(__dirname));
 
 // Page routes
