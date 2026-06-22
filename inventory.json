@@ -35,10 +35,6 @@
     "stock": 80,
     "low_stock_threshold": 10
   },
-  "construction-8x12": {
-    "stock": 60,
-    "low_stock_threshold": 10
-  },
   "index-cards": {
     "stock": 120,
     "low_stock_threshold": 15
@@ -131,10 +127,6 @@
     "stock": 100,
     "low_stock_threshold": 15
   },
-  "sharpie-fine": {
-    "stock": 120,
-    "low_stock_threshold": 15
-  },
   "sharpie-ultra": {
     "stock": 100,
     "low_stock_threshold": 15
@@ -220,6 +212,14 @@
     "low_stock_threshold": 15
   },
   "watercolor": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "crayon": {
+    "stock": 100,
+    "low_stock_threshold": 15
+  },
+  "glue-stick-small": {
     "stock": 100,
     "low_stock_threshold": 15
   }

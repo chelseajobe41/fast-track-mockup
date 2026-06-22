@@ -1,657 +1,5 @@
 [
   {
-    "id": "pencils-12",
-    "name": "Ticonderoga Pencils",
-    "price": 1.99,
-    "unit": "Pack of 12",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencils.jpg",
-    "keywords": [
-      "pencil",
-      "pencils",
-      "#2 pencil",
-      "no 2 pencil",
-      "no. 2 pencil",
-      "ticonderoga",
-      "yellow pencils",
-      "wooden pencils",
-      "sharpened pencils"
-    ]
-  },
-  {
-    "id": "mech-pencil",
-    "name": "Mechanical Pencil",
-    "price": 1.49,
-    "unit": "0.7mm refillable",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Mechanical_Pencil.png",
-    "keywords": [
-      "mechanical pencil",
-      "mech pencil",
-      "click pencil",
-      "0.7mm pencil",
-      "lead pencil"
-    ]
-  },
-  {
-    "id": "pen-black",
-    "name": "Black Pen",
-    "price": 0.49,
-    "unit": "Single, ballpoint",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Black_Pen.png",
-    "keywords": [
-      "black pen",
-      "black ballpoint",
-      "pen black"
-    ]
-  },
-  {
-    "id": "pen-red",
-    "name": "Red Pen",
-    "price": 0.49,
-    "unit": "Single, ballpoint",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Red_Pen.png",
-    "keywords": [
-      "red pen",
-      "red ballpoint",
-      "grading pen"
-    ]
-  },
-  {
-    "id": "composition-notebook",
-    "name": "Composition Notebook",
-    "price": 2.49,
-    "unit": "Wide-ruled, 100 pages",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Composition_Notebook.png",
-    "keywords": [
-      "composition book",
-      "composition notebook",
-      "comp book",
-      "comp notebook",
-      "marble notebook",
-      "black and white notebook"
-    ]
-  },
-  {
-    "id": "college-notebook",
-    "name": "College-Ruled Notebook",
-    "price": 2.49,
-    "unit": "100 pages",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/College_Ruled_Notebook.jpg",
-    "keywords": [
-      "college ruled notebook",
-      "spiral notebook",
-      "college notebook",
-      "narrow ruled notebook"
-    ]
-  },
-  {
-    "id": "filler-paper",
-    "name": "Filler Paper",
-    "price": 1.99,
-    "unit": "200 sheets, wide-ruled",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Filler_Paper.jpg",
-    "keywords": [
-      "filler paper",
-      "loose leaf",
-      "loose leaf paper",
-      "notebook paper",
-      "ruled paper",
-      "lined paper",
-      "binder paper"
-    ]
-  },
-  {
-    "id": "cardstock",
-    "name": "Cardstock",
-    "price": 3.99,
-    "unit": "8.5x11, 50 sheets",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Cardstock.jpg",
-    "keywords": [
-      "cardstock",
-      "card stock",
-      "heavy paper",
-      "white cardstock"
-    ]
-  },
-  {
-    "id": "construction-9x12",
-    "name": "Construction Paper 9x12",
-    "price": 3.49,
-    "unit": "Assorted colors, 48 sheets",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Construction_Paper_9x12.jpg",
-    "keywords": [
-      "construction paper",
-      "construction paper 9x12",
-      "colored construction paper"
-    ]
-  },
-  {
-    "id": "construction-8x12",
-    "name": "Construction Paper 8x12",
-    "price": 2.99,
-    "unit": "Assorted colors, 48 sheets",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Construction_Paper_8x12.png",
-    "keywords": [
-      "construction paper 8x12",
-      "smaller construction paper"
-    ]
-  },
-  {
-    "id": "index-cards",
-    "name": "Index Cards",
-    "price": 1.49,
-    "unit": "3x5, 100 ct",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Indext_Cards.jpg",
-    "keywords": [
-      "index cards",
-      "flash cards",
-      "note cards",
-      "3x5 cards"
-    ]
-  },
-  {
-    "id": "sticky-notes",
-    "name": "Sticky Notes",
-    "price": 1.99,
-    "unit": "3x3, 100 sheets",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Sticky_Notes.jpg",
-    "keywords": [
-      "sticky notes",
-      "post-it",
-      "post it",
-      "post-its",
-      "post its"
-    ]
-  },
-  {
-    "id": "binder-1in",
-    "name": "Binder, 1 Inch",
-    "price": 2.99,
-    "unit": "3-ring, view-front",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Binder_1.png",
-    "keywords": [
-      "binder",
-      "1 inch binder",
-      "1\" binder",
-      "3 ring binder",
-      "three ring binder"
-    ]
-  },
-  {
-    "id": "binder-half",
-    "name": "Binder, 0.5 Inch",
-    "price": 2.49,
-    "unit": "3-ring, view-front",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Binder_0.5.jpg",
-    "keywords": [
-      "binder 1/2",
-      "half inch binder",
-      "0.5 binder",
-      ".5 binder",
-      "small binder"
-    ]
-  },
-  {
-    "id": "pocket-folder",
-    "name": "Pocket Folder",
-    "price": 0.49,
-    "unit": "Assorted colors",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pocket_Folder.png",
-    "keywords": [
-      "folder",
-      "pocket folder",
-      "paper folder",
-      "two pocket folder"
-    ]
-  },
-  {
-    "id": "dividers-plastic",
-    "name": "Plastic Dividers",
-    "price": 2.49,
-    "unit": "5-tab",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Plastic_Dividers.jpg",
-    "keywords": [
-      "dividers",
-      "plastic dividers",
-      "binder dividers",
-      "tabbed dividers",
-      "5 tab dividers"
-    ]
-  },
-  {
-    "id": "dividers-insertable",
-    "name": "Insertable Dividers",
-    "price": 1.99,
-    "unit": "8-tab",
-    "image": "/assets/photo-coming.svg",
-    "keywords": [
-      "insertable dividers",
-      "customizable dividers",
-      "label dividers"
-    ]
-  },
-  {
-    "id": "sheet-protectors",
-    "name": "Sheet Protectors",
-    "price": 3.49,
-    "unit": "50 ct",
-    "image": "/assets/photo-coming.svg",
-    "keywords": [
-      "sheet protectors",
-      "page protectors",
-      "plastic sleeves",
-      "clear sleeves"
-    ]
-  },
-  {
-    "id": "pencil-pouch",
-    "name": "Pencil Pouch",
-    "price": 2.49,
-    "unit": "Zippered, 3-hole",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencil_Pouch.jpg",
-    "keywords": [
-      "pencil pouch",
-      "zipper pouch",
-      "supply pouch"
-    ]
-  },
-  {
-    "id": "pencil-box",
-    "name": "Pencil Box",
-    "price": 1.99,
-    "unit": "Plastic, 8x5",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencil_Box.jpg",
-    "keywords": [
-      "pencil box",
-      "supply box",
-      "plastic pencil box"
-    ]
-  },
-  {
-    "id": "glue-stick",
-    "name": "Elmer's Glue Stick",
-    "price": 0.55,
-    "unit": "Washable, small",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Elmers_Glue_Stick.jpg",
-    "keywords": [
-      "glue stick",
-      "elmer's glue stick",
-      "small glue stick",
-      "elmers"
-    ]
-  },
-  {
-    "id": "glue-stick-large",
-    "name": "Large Glue Stick",
-    "price": 1.49,
-    "unit": "Jumbo",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Large_Glue_Stick.jpg",
-    "keywords": [
-      "large glue stick",
-      "jumbo glue stick",
-      "big glue stick"
-    ]
-  },
-  {
-    "id": "glue-bottle",
-    "name": "Elmer's Glue Bottle",
-    "price": 1.99,
-    "unit": "Washable, 4 oz",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Glue_Bottle.jpg",
-    "keywords": [
-      "glue bottle",
-      "white glue",
-      "school glue",
-      "elmer's glue bottle",
-      "liquid glue"
-    ]
-  },
-  {
-    "id": "scotch-tape",
-    "name": "Scotch Tape",
-    "price": 1.49,
-    "unit": "Roll with dispenser",
-    "image": "/assets/photo-coming.svg",
-    "keywords": [
-      "scotch tape",
-      "tape",
-      "clear tape",
-      "transparent tape"
-    ]
-  },
-  {
-    "id": "scissors-blunt",
-    "name": "Scissors",
-    "price": 0.99,
-    "unit": "Blunt tip, kid-safe",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Scissor_1.png",
-    "keywords": [
-      "scissors",
-      "kid scissors",
-      "blunt scissors",
-      "safety scissors"
-    ]
-  },
-  {
-    "id": "scissors-fiskars",
-    "name": "Fiskars Scissors",
-    "price": 3.99,
-    "unit": "Pointed tip",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Scissor_2.png",
-    "keywords": [
-      "fiskars scissors",
-      "pointed scissors",
-      "fiskars"
-    ]
-  },
-  {
-    "id": "ruler",
-    "name": "Plastic Ruler",
-    "price": 0.99,
-    "unit": "12 inch, metric + imperial",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Plastic_Ruler.jpg",
-    "keywords": [
-      "ruler",
-      "12 inch ruler",
-      "plastic ruler",
-      "measuring ruler"
-    ]
-  },
-  {
-    "id": "calculator",
-    "name": "Calculator",
-    "price": 7.49,
-    "unit": "Basic, 8-digit",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Calculator.png",
-    "keywords": [
-      "calculator",
-      "basic calculator",
-      "ti calculator",
-      "scientific calculator"
-    ]
-  },
-  {
-    "id": "crayons",
-    "name": "Crayola Crayons",
-    "price": 1.99,
-    "unit": "24-count, classic",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Crayons.jpg",
-    "keywords": [
-      "crayons",
-      "crayola crayons",
-      "24 ct crayons",
-      "box of crayons"
-    ]
-  },
-  {
-    "id": "color-pencils",
-    "name": "Colored Pencils",
-    "price": 2.99,
-    "unit": "12-count",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Color_Pencils.png",
-    "keywords": [
-      "colored pencils",
-      "color pencils",
-      "12 colored pencils"
-    ]
-  },
-  {
-    "id": "crayola-markers",
-    "name": "Crayola Markers",
-    "price": 3.49,
-    "unit": "Broad tip, 10-count",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Markers.jpg",
-    "keywords": [
-      "crayola markers",
-      "markers",
-      "washable markers",
-      "broad tip markers"
-    ]
-  },
-  {
-    "id": "marker-broad",
-    "name": "Marker Broad Tip",
-    "price": 2.99,
-    "unit": "Single, washable",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Markers_-_Broad_Tip.png",
-    "keywords": [
-      "broad tip marker",
-      "thick marker"
-    ]
-  },
-  {
-    "id": "marker-fine",
-    "name": "Marker Fine Tip",
-    "price": 2.99,
-    "unit": "Single",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Marker_-_Fine_Tip.jpg",
-    "keywords": [
-      "fine tip marker",
-      "thin marker"
-    ]
-  },
-  {
-    "id": "sharpie-fine",
-    "name": "Sharpie Marker Fine Tip",
-    "price": 1.49,
-    "unit": "Permanent, black",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Marker_-_Ultra_Fine_Tip.png",
-    "keywords": [
-      "sharpie",
-      "sharpie fine",
-      "fine tip sharpie",
-      "permanent marker"
-    ]
-  },
-  {
-    "id": "sharpie-ultra",
-    "name": "Sharpie Marker Ultra Fine Tip",
-    "price": 1.49,
-    "unit": "Permanent, black",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Marker_-_Ultra_Fine_Tip.png",
-    "keywords": [
-      "sharpie ultra fine",
-      "ultra fine sharpie",
-      "extra fine sharpie"
-    ]
-  },
-  {
-    "id": "dry-erase-black",
-    "name": "Black Dry Erase Marker",
-    "price": 0.99,
-    "unit": "Single, low odor",
-    "image": "/assets/photo-coming.svg",
-    "keywords": [
-      "dry erase",
-      "dry erase marker",
-      "black dry erase",
-      "whiteboard marker",
-      "expo marker"
-    ]
-  },
-  {
-    "id": "dry-erase-fine",
-    "name": "Dry Erase Marker Fine Tip",
-    "price": 0.99,
-    "unit": "Single",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Dry_Erase_-_Fine_Tip_.png",
-    "keywords": [
-      "fine tip dry erase",
-      "fine dry erase"
-    ]
-  },
-  {
-    "id": "highlighters-3",
-    "name": "Highlighters, 3 Colors",
-    "price": 1.99,
-    "unit": "Chisel tip",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Highlighters_3_color.jpg",
-    "keywords": [
-      "highlighter",
-      "highlighters",
-      "3 highlighters",
-      "yellow highlighter"
-    ]
-  },
-  {
-    "id": "highlighters-5",
-    "name": "Highlighters, 5 Colors",
-    "price": 2.99,
-    "unit": "Chisel tip",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Highlighters_5_color.png",
-    "keywords": [
-      "5 highlighters",
-      "five highlighters",
-      "highlighter set"
-    ]
-  },
-  {
-    "id": "whiteboard-eraser",
-    "name": "Whiteboard Eraser",
-    "price": 0.99,
-    "unit": "Felt",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Whiteboard_Eraser.png",
-    "keywords": [
-      "whiteboard eraser",
-      "dry erase eraser"
-    ]
-  },
-  {
-    "id": "white-out",
-    "name": "White-out",
-    "price": 1.49,
-    "unit": "Tape, 0.2in x 26ft",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/White-out.png",
-    "keywords": [
-      "white out",
-      "white-out",
-      "correction tape",
-      "correction fluid"
-    ]
-  },
-  {
-    "id": "eraser-pink",
-    "name": "Pink Eraser",
-    "price": 0.39,
-    "unit": "Large",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pink_Eraser.png",
-    "keywords": [
-      "pink eraser",
-      "rubber eraser",
-      "block eraser"
-    ]
-  },
-  {
-    "id": "eraser-arrowhead",
-    "name": "Arrowhead Eraser",
-    "price": 0.49,
-    "unit": "Cap eraser",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Arrowhead_Eraser.jpg",
-    "keywords": [
-      "arrowhead eraser",
-      "pencil cap eraser",
-      "cap erasers"
-    ]
-  },
-  {
-    "id": "pencil-sharpener",
-    "name": "Pencil Sharpener",
-    "price": 0.99,
-    "unit": "Handheld, dual hole",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencil_Sharpener.jpg",
-    "keywords": [
-      "pencil sharpener",
-      "sharpener",
-      "handheld sharpener"
-    ]
-  },
-  {
-    "id": "tissues",
-    "name": "Tissues",
-    "price": 1.99,
-    "unit": "160-count box, 2-ply",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Tissues.png",
-    "keywords": [
-      "tissues",
-      "kleenex",
-      "facial tissues",
-      "box of tissues"
-    ]
-  },
-  {
-    "id": "paper-towel",
-    "name": "Paper Towels",
-    "price": 2.49,
-    "unit": "Single roll",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Paper_Towel.jpg",
-    "keywords": [
-      "paper towel",
-      "paper towels",
-      "roll of paper towels"
-    ]
-  },
-  {
-    "id": "disinfectant-wipes",
-    "name": "Disinfectant Wipes",
-    "price": 3.99,
-    "unit": "75 ct, Clorox",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Disinfectant_Wipes.png",
-    "keywords": [
-      "disinfectant wipes",
-      "clorox wipes",
-      "lysol wipes",
-      "cleaning wipes",
-      "sanitizing wipes"
-    ]
-  },
-  {
-    "id": "gallon-bags",
-    "name": "Gallon Ziploc Bags",
-    "price": 2.99,
-    "unit": "Box of 19",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Gallon_Bags.png",
-    "keywords": [
-      "gallon bags",
-      "gallon ziploc",
-      "gallon size ziploc"
-    ]
-  },
-  {
-    "id": "quart-bags",
-    "name": "Quart Ziploc Bags",
-    "price": 2.49,
-    "unit": "Box of 30",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Quart_Bags.png",
-    "keywords": [
-      "quart bags",
-      "quart ziploc",
-      "quart size ziploc"
-    ]
-  },
-  {
-    "id": "sandwich-bags",
-    "name": "Sandwich Ziploc Bags",
-    "price": 1.99,
-    "unit": "Box of 50",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Sandwhich_Bags.jpg",
-    "keywords": [
-      "sandwich bags",
-      "sandwich ziploc",
-      "snack bags"
-    ]
-  },
-  {
-    "id": "water-bottle",
-    "name": "Insulated Water Bottle",
-    "price": 6.99,
-    "unit": "20 oz, leak-proof",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Water_Bottle.jpg",
-    "keywords": [
-      "water bottle",
-      "reusable water bottle",
-      "insulated bottle"
-    ]
-  },
-  {
     "id": "backpack",
     "name": "17 Inch Basic Backpack",
     "price": 9.99,
@@ -665,10 +13,166 @@
     ]
   },
   {
-    "id": "construction-12x18",
-    "name": "Construction Paper 12x18",
+    "id": "eraser-arrowhead",
+    "name": "Arrowhead Eraser",
+    "price": 0.2,
+    "unit": "Cap eraser",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Arrowhead_Eraser.jpg",
+    "keywords": [
+      "arrowhead eraser",
+      "pencil cap eraser",
+      "cap erasers"
+    ]
+  },
+  {
+    "id": "binder-half",
+    "name": "Binder, 0.5 Inch",
+    "price": 3.59,
+    "unit": "3-ring, view-front",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Binder_0.5.jpg",
+    "keywords": [
+      "binder 1/2",
+      "half inch binder",
+      "0.5 binder",
+      ".5 binder",
+      "small binder"
+    ]
+  },
+  {
+    "id": "binder-1in",
+    "name": "Binder, 1 Inch",
     "price": 3.99,
-    "unit": "Assorted colors, 48 sheets",
+    "unit": "3-ring, view-front",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Binder_1.png",
+    "keywords": [
+      "binder",
+      "1 inch binder",
+      "1\" binder",
+      "3 ring binder",
+      "three ring binder"
+    ]
+  },
+  {
+    "id": "dry-erase-black",
+    "name": "Black Dry Erase Marker",
+    "price": 1.49,
+    "unit": "Single, low odor",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "dry erase",
+      "dry erase marker",
+      "black dry erase",
+      "whiteboard marker",
+      "expo marker"
+    ]
+  },
+  {
+    "id": "pen-black",
+    "name": "Black Pen",
+    "price": 0.39,
+    "unit": "Single, ballpoint",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Black_Pen.png",
+    "keywords": [
+      "black pen",
+      "black ballpoint",
+      "pen black"
+    ]
+  },
+  {
+    "id": "scissors-blunt",
+    "name": "Blunt Tip Scissor",
+    "price": 3.29,
+    "unit": "Blunt tip, kid-safe",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Scissor_1.png",
+    "keywords": [
+      "scissors",
+      "kid scissors",
+      "blunt scissors",
+      "safety scissors"
+    ]
+  },
+  {
+    "id": "marker-broad",
+    "name": "Broad Tip Markers",
+    "price": 3.69,
+    "unit": "8 ct",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Markers_-_Broad_Tip.png",
+    "keywords": [
+      "broad tip marker",
+      "thick marker"
+    ]
+  },
+  {
+    "id": "calculator",
+    "name": "Calculator",
+    "price": 4.49,
+    "unit": "Basic, 8-digit",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Calculator.png",
+    "keywords": [
+      "calculator",
+      "basic calculator",
+      "ti calculator",
+      "scientific calculator"
+    ]
+  },
+  {
+    "id": "cardstock",
+    "name": "Cardstock",
+    "price": 7.49,
+    "unit": "8.5x11, 50 sheets",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Cardstock.jpg",
+    "keywords": [
+      "cardstock",
+      "card stock",
+      "heavy paper",
+      "white cardstock"
+    ]
+  },
+  {
+    "id": "college-notebook",
+    "name": "College-Ruled Notebook",
+    "price": 1.88,
+    "unit": "70 pages",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/College_Ruled_Notebook.jpg",
+    "keywords": [
+      "college ruled notebook",
+      "spiral notebook",
+      "college notebook",
+      "narrow ruled notebook"
+    ]
+  },
+  {
+    "id": "color-pencils",
+    "name": "Colored Pencils",
+    "price": 4.99,
+    "unit": "12-count",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Color_Pencils.png",
+    "keywords": [
+      "colored pencils",
+      "color pencils",
+      "12 colored pencils"
+    ]
+  },
+  {
+    "id": "composition-notebook",
+    "name": "Composition Notebook",
+    "price": 1.99,
+    "unit": "Wide-ruled, 100 pages",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Composition_Notebook.png",
+    "keywords": [
+      "composition book",
+      "composition notebook",
+      "comp book",
+      "comp notebook",
+      "marble notebook",
+      "black and white notebook"
+    ]
+  },
+  {
+    "id": "construction-12x18",
+    "name": "Construction Paper 18x12",
+    "price": 3.99,
+    "unit": "Assorted colors, 18 ct",
     "image": "/assets/photo-coming.svg",
     "keywords": [
       "construction paper",
@@ -680,8 +184,71 @@
     ]
   },
   {
+    "id": "construction-9x12",
+    "name": "Construction Paper 9x12",
+    "price": 2.99,
+    "unit": "Assorted colors, 40 sheets",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Construction_Paper_9x12.jpg",
+    "keywords": [
+      "construction paper",
+      "construction paper 9x12",
+      "colored construction paper"
+    ]
+  },
+  {
+    "id": "crayons",
+    "name": "Crayola Crayons",
+    "price": 2.89,
+    "unit": "24-count, classic",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Crayons.jpg",
+    "keywords": [
+      "crayons",
+      "crayola crayons",
+      "24 ct crayons",
+      "box of crayons"
+    ]
+  },
+  {
+    "id": "crayon",
+    "name": "Crayon",
+    "price": 2.19,
+    "unit": "Single, large",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "crayon",
+      "wax crayon",
+      "single crayon",
+      "large crayon"
+    ]
+  },
+  {
+    "id": "disinfectant-wipes",
+    "name": "Disinfectant Wipes",
+    "price": 2.49,
+    "unit": "20 ct",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Disinfectant_Wipes.png",
+    "keywords": [
+      "disinfectant wipes",
+      "clorox wipes",
+      "lysol wipes",
+      "cleaning wipes",
+      "sanitizing wipes"
+    ]
+  },
+  {
+    "id": "dry-erase-fine",
+    "name": "Dry Erase Marker Fine Tip",
+    "price": 1.24,
+    "unit": "Single",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Dry_Erase_-_Fine_Tip_.png",
+    "keywords": [
+      "fine tip dry erase",
+      "fine dry erase"
+    ]
+  },
+  {
     "id": "expo-markers-4pk",
-    "name": "EXPO Dry Erase Markers (4 Pack) - Chisel Tip",
+    "name": "Dry Erase Markers",
     "price": 4.99,
     "unit": "4-pack, chisel tip",
     "image": "/assets/photo-coming.svg",
@@ -693,6 +260,61 @@
       "chisel tip dry erase",
       "expo chisel tip",
       "4 pack dry erase markers"
+    ]
+  },
+  {
+    "id": "filler-paper",
+    "name": "Filler Paper",
+    "price": 3.69,
+    "unit": "200 sheets, wide-ruled",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Filler_Paper.jpg",
+    "keywords": [
+      "filler paper",
+      "loose leaf",
+      "loose leaf paper",
+      "notebook paper",
+      "ruled paper",
+      "lined paper",
+      "binder paper"
+    ]
+  },
+  {
+    "id": "gallon-bags",
+    "name": "Gallon Ziploc Bags",
+    "price": 2.99,
+    "unit": "12 ct",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Gallon_Bags.png",
+    "keywords": [
+      "gallon bags",
+      "gallon ziploc",
+      "gallon size ziploc"
+    ]
+  },
+  {
+    "id": "glue-bottle",
+    "name": "Glue Bottle",
+    "price": 3.19,
+    "unit": "Washable, 4 oz",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Glue_Bottle.jpg",
+    "keywords": [
+      "glue bottle",
+      "white glue",
+      "school glue",
+      "elmer's glue bottle",
+      "liquid glue"
+    ]
+  },
+  {
+    "id": "glue-stick",
+    "name": "Glue Stick",
+    "price": 0.68,
+    "unit": "Washable, small",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Elmers_Glue_Stick.jpg",
+    "keywords": [
+      "glue stick",
+      "elmer's glue stick",
+      "small glue stick",
+      "elmers"
     ]
   },
   {
@@ -713,6 +335,362 @@
     ]
   },
   {
+    "id": "highlighters-3",
+    "name": "Highlighters, 3 Colors",
+    "price": 2.99,
+    "unit": "Chisel tip",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Highlighters_3_color.jpg",
+    "keywords": [
+      "highlighter",
+      "highlighters",
+      "3 highlighters",
+      "yellow highlighter"
+    ]
+  },
+  {
+    "id": "highlighters-5",
+    "name": "Highlighters, 5 Colors",
+    "price": 3.99,
+    "unit": "Chisel tip",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Highlighters_5_color.png",
+    "keywords": [
+      "5 highlighters",
+      "five highlighters",
+      "highlighter set"
+    ]
+  },
+  {
+    "id": "index-cards",
+    "name": "Index Cards",
+    "price": 1.49,
+    "unit": "3x5, 100 ct",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Indext_Cards.jpg",
+    "keywords": [
+      "index cards",
+      "flash cards",
+      "note cards",
+      "3x5 cards"
+    ]
+  },
+  {
+    "id": "dividers-insertable",
+    "name": "Insertable Dividers",
+    "price": 2.19,
+    "unit": "5-tabs",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "insertable dividers",
+      "customizable dividers",
+      "label dividers"
+    ]
+  },
+  {
+    "id": "glue-stick-large",
+    "name": "Large Glue Stick",
+    "price": 2.59,
+    "unit": "Jumbo",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Large_Glue_Stick.jpg",
+    "keywords": [
+      "large glue stick",
+      "jumbo glue stick",
+      "big glue stick"
+    ]
+  },
+  {
+    "id": "marker-fine",
+    "name": "Marker Fine Tip",
+    "price": 1.48,
+    "unit": "Single",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Marker_-_Fine_Tip.jpg",
+    "keywords": [
+      "fine tip marker",
+      "thin marker"
+    ]
+  },
+  {
+    "id": "crayola-markers",
+    "name": "Markers",
+    "price": 4.99,
+    "unit": "Broad tip, 10-count",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Markers.jpg",
+    "keywords": [
+      "crayola markers",
+      "markers",
+      "washable markers",
+      "broad tip markers"
+    ]
+  },
+  {
+    "id": "mech-pencil",
+    "name": "Mechanical Pencil",
+    "price": 0.49,
+    "unit": "0.7mm refillable",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Mechanical_Pencil.png",
+    "keywords": [
+      "mechanical pencil",
+      "mech pencil",
+      "click pencil",
+      "0.7mm pencil",
+      "lead pencil"
+    ]
+  },
+  {
+    "id": "paper-towel",
+    "name": "Paper Towels",
+    "price": 2.18,
+    "unit": "Single roll",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Paper_Towel.jpg",
+    "keywords": [
+      "paper towel",
+      "paper towels",
+      "roll of paper towels"
+    ]
+  },
+  {
+    "id": "pencil-box",
+    "name": "Pencil Box",
+    "price": 3.49,
+    "unit": "Plastic, 8x5",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencil_Box.jpg",
+    "keywords": [
+      "pencil box",
+      "supply box",
+      "plastic pencil box"
+    ]
+  },
+  {
+    "id": "pencil-pouch",
+    "name": "Pencil Pouch",
+    "price": 2.79,
+    "unit": "Zippered, 3-hole",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencil_Pouch.jpg",
+    "keywords": [
+      "pencil pouch",
+      "zipper pouch",
+      "supply pouch"
+    ]
+  },
+  {
+    "id": "pencil-sharpener",
+    "name": "Pencil Sharpener",
+    "price": 0.99,
+    "unit": "Handheld, single hole",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencil_Sharpener.jpg",
+    "keywords": [
+      "pencil sharpener",
+      "sharpener",
+      "handheld sharpener"
+    ]
+  },
+  {
+    "id": "pencils-12",
+    "name": "Pencils",
+    "price": 3.49,
+    "unit": "Pack of 12",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencils.jpg",
+    "keywords": [
+      "pencil",
+      "pencils",
+      "#2 pencil",
+      "no 2 pencil",
+      "no. 2 pencil",
+      "ticonderoga",
+      "yellow pencils",
+      "wooden pencils",
+      "sharpened pencils"
+    ]
+  },
+  {
+    "id": "eraser-pink",
+    "name": "Pink Eraser",
+    "price": 0.99,
+    "unit": "Large",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pink_Eraser.png",
+    "keywords": [
+      "pink eraser",
+      "rubber eraser",
+      "block eraser"
+    ]
+  },
+  {
+    "id": "dividers-plastic",
+    "name": "Plastic Dividers",
+    "price": 2.49,
+    "unit": "5-tab",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Plastic_Dividers.jpg",
+    "keywords": [
+      "dividers",
+      "plastic dividers",
+      "binder dividers",
+      "tabbed dividers",
+      "5 tab dividers"
+    ]
+  },
+  {
+    "id": "ruler",
+    "name": "Plastic Ruler",
+    "price": 0.99,
+    "unit": "12 inch, metric + imperial",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Plastic_Ruler.jpg",
+    "keywords": [
+      "ruler",
+      "12 inch ruler",
+      "plastic ruler",
+      "measuring ruler"
+    ]
+  },
+  {
+    "id": "pocket-folder",
+    "name": "Pocket Folder",
+    "price": 1.35,
+    "unit": "Assorted colors",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pocket_Folder.png",
+    "keywords": [
+      "folder",
+      "pocket folder",
+      "paper folder",
+      "two pocket folder"
+    ]
+  },
+  {
+    "id": "scissors-fiskars",
+    "name": "Pointed Tip Scissor",
+    "price": 1.99,
+    "unit": "Pointed tip",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Scissor_2.png",
+    "keywords": [
+      "fiskars scissors",
+      "pointed scissors",
+      "fiskars"
+    ]
+  },
+  {
+    "id": "quart-bags",
+    "name": "Quart Ziploc Bags",
+    "price": 3.99,
+    "unit": "35 ct",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Quart_Bags.png",
+    "keywords": [
+      "quart bags",
+      "quart ziploc",
+      "quart size ziploc"
+    ]
+  },
+  {
+    "id": "pen-red",
+    "name": "Red Pen",
+    "price": 0.39,
+    "unit": "Single, ballpoint",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Red_Pen.png",
+    "keywords": [
+      "red pen",
+      "red ballpoint",
+      "grading pen"
+    ]
+  },
+  {
+    "id": "water-bottle",
+    "name": "Reusable Water Bottle",
+    "price": 4.97,
+    "unit": "25 oz",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Water_Bottle.jpg",
+    "keywords": [
+      "water bottle",
+      "reusable water bottle",
+      "insulated bottle"
+    ]
+  },
+  {
+    "id": "sandwich-bags",
+    "name": "Sandwich Ziploc Bags",
+    "price": 1.99,
+    "unit": "Box of 50",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Sandwhich_Bags.jpg",
+    "keywords": [
+      "sandwich bags",
+      "sandwich ziploc",
+      "snack bags"
+    ]
+  },
+  {
+    "id": "scotch-tape",
+    "name": "Scotch Tape",
+    "price": 2.29,
+    "unit": "Roll with dispenser",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "scotch tape",
+      "tape",
+      "clear tape",
+      "transparent tape"
+    ]
+  },
+  {
+    "id": "sharpie-ultra",
+    "name": "Sharpie Marker Ultra Fine Tip",
+    "price": 1.48,
+    "unit": "Permanent, black",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Marker_-_Ultra_Fine_Tip.png",
+    "keywords": [
+      "sharpie ultra fine",
+      "ultra fine sharpie",
+      "extra fine sharpie"
+    ]
+  },
+  {
+    "id": "sheet-protectors",
+    "name": "Sheet Protectors",
+    "price": 4.99,
+    "unit": "25 ct",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "sheet protectors",
+      "page protectors",
+      "plastic sleeves",
+      "clear sleeves"
+    ]
+  },
+  {
+    "id": "glue-stick-small",
+    "name": "Small Glue Stick",
+    "price": 0.6,
+    "unit": "0.21 oz, washable",
+    "image": "/assets/photo-coming.svg",
+    "keywords": [
+      "glue stick",
+      "small glue stick",
+      "mini glue stick",
+      "washable glue"
+    ]
+  },
+  {
+    "id": "sticky-notes",
+    "name": "Sticky Notes",
+    "price": 1.37,
+    "unit": "3x3, 100 sheets",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Sticky_Notes.jpg",
+    "keywords": [
+      "sticky notes",
+      "post-it",
+      "post it",
+      "post-its",
+      "post its"
+    ]
+  },
+  {
+    "id": "tissues",
+    "name": "Tissues",
+    "price": 1.99,
+    "unit": "100 ct",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Tissues.png",
+    "keywords": [
+      "tissues",
+      "kleenex",
+      "facial tissues",
+      "box of tissues"
+    ]
+  },
+  {
     "id": "watercolor",
     "name": "Watercolor",
     "price": 2.93,
@@ -727,6 +705,30 @@
       "art supplies",
       "kids paint",
       "school paint"
+    ]
+  },
+  {
+    "id": "white-out",
+    "name": "White-out",
+    "price": 2.32,
+    "unit": "Tape, 0.2in x 26ft",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/White-out.png",
+    "keywords": [
+      "white out",
+      "white-out",
+      "correction tape",
+      "correction fluid"
+    ]
+  },
+  {
+    "id": "whiteboard-eraser",
+    "name": "Whiteboard Eraser",
+    "price": 1.96,
+    "unit": "Felt",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Whiteboard_Eraser.png",
+    "keywords": [
+      "whiteboard eraser",
+      "dry erase eraser"
     ]
   }
 ]

@@ -18,7 +18,7 @@ const PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
 const INVENTORY_PATH = join(__dirname, 'inventory.json');
 const ORDERS_PATH = join(__dirname, 'orders.json');
 
-const FLAT_SHIPPING_CENTS = 1000;  // Flat $10 shipping on every order
+const FLAT_SHIPPING_CENTS = 995;  // Flat $9.95 shipping on every order
 const SUBSCRIPTION_DISCOUNT = 0.10;  // 10% off subscribed items
 
 // Map customer-facing interval choice → Stripe recurring config
