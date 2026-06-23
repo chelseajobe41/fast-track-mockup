@@ -570,7 +570,7 @@ app.post('/api/checkout', async (req, res) => {
       mode: isSubscription ? 'subscription' : 'payment',
       line_items,
       shipping_address_collection: { allowed_countries: ['US'] },
-      automatic_tax: { enabled: false },
+      automatic_tax: { enabled: true },
       phone_number_collection: { enabled: true },
       // Lets customers enter promo codes at checkout. Codes are created in
       // Stripe Dashboard -> Products -> Coupons -> Create promotion code.
