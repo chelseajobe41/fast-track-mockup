@@ -158,6 +158,10 @@
   .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .secure-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
+  /* Clear cart */
+  .clear-cart-btn { width: 100%; background: none; border: none; color: var(--muted); font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; padding: 12px 0 4px; text-decoration: underline; transition: color 0.15s; }
+  .clear-cart-btn:hover { color: var(--red); }
+
   /* Toast */
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--teal); color: #fff; padding: 14px 24px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; box-shadow: 0 20px 50px rgba(0,0,0,0.2); opacity: 0; transition: transform 0.25s, opacity 0.2s; pointer-events: none; z-index: 110; }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -263,6 +267,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       Secure checkout via Stripe
     </div>
+    <button class="clear-cart-btn" id="clear-cart-btn" type="button">Clear cart</button>
   </div>
 </aside>
 
@@ -590,6 +595,14 @@
   document.getElementById('cart-close').addEventListener('click', () => closeCart());
   document.getElementById('cart-overlay').addEventListener('click', () => closeCart());
   document.getElementById('checkout-btn').addEventListener('click', goCheckout);
+  document.getElementById('clear-cart-btn').addEventListener('click', () => {
+    cart = {};
+    cartMode = 'one-time';
+    saveCart();
+    updateCartUI();
+    render();
+    toast('Cart cleared');
+  });
 
   function openCart() {
     document.getElementById('cart-drawer').classList.add('open');
