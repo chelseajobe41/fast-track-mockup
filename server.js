@@ -14,6 +14,20 @@ const PRODUCTS = JSON.parse(readFileSync(join(__dirname, 'products.json'), 'utf8
 const KITS = JSON.parse(readFileSync(join(__dirname, 'kits.json'), 'utf8'));
 const KIT_DISCOUNT = 0.10;  // 10% bundle discount vs buying items individually
 const PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
+const SITE_URL = 'https://fasttrackschoolsupplies.com';
+
+// Templates for server-side-rendered pages (read once at boot; Render restarts on every deploy).
+// We inject per-page SEO tags + valid JSON-LD into these before serving so Google sees correct
+// canonical/title/schema in the INITIAL HTML rather than client-rendered-after-load.
+const KIT_TEMPLATE = readFileSync(join(__dirname, 'kit.html'), 'utf8');
+const STORE_TEMPLATE = readFileSync(join(__dirname, 'store.html'), 'utf8');
+
+// Escape text for safe injection into HTML attributes/text nodes.
+function htmlEscape(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
 
 const INVENTORY_PATH = join(__dirname, 'inventory.json');
 const ORDERS_PATH = join(__dirname, 'orders.json');
@@ -273,7 +287,9 @@ const DENY_PATHS = new Set([
   '/.gitignore',
   '/.env',
   '/.env.example',
-  '/README.md'
+  '/README.md',
+  '/kit.html',            // SSR template — served only via /kits/:id with tokens filled
+  '/store.html'           // SSR template — served only via /store with schema injected
 ]);
 const DENY_PREFIXES = ['/node_modules', '/.git', '/.claude'];
 app.use((req, res, next) => {
@@ -290,9 +306,16 @@ app.use(express.static(__dirname));
 
 // Page routes
 app.get('/upload', (_req, res) => res.sendFile(join(__dirname, 'upload.html')));
-app.get('/store', (_req, res) => res.sendFile(join(__dirname, 'store.html')));
+app.get('/store', (_req, res) => res.type('html').send(renderStorePage()));
 app.get('/kits', (_req, res) => res.sendFile(join(__dirname, 'kits.html')));
-app.get('/kit', (_req, res) => res.sendFile(join(__dirname, 'kit.html')));
+// Old query-param kit URLs 301 to clean paths (preserves any existing inbound links/shares).
+app.get('/kit', (req, res) => res.redirect(301, KITS[req.query.id] ? `/kits/${req.query.id}` : '/kits'));
+// Server-side-rendered kit detail page (clean URL). Fills SEO tokens + valid Product JSON-LD.
+app.get('/kits/:kitId', (req, res) => {
+  const detail = buildKitDetail(req.params.kitId);
+  if (!detail.found) return res.redirect(302, '/kits');
+  res.type('html').send(renderKitPage(detail));
+});
 app.get('/gift', (_req, res) => res.sendFile(join(__dirname, 'gift.html')));
 app.get('/success', (_req, res) => res.sendFile(join(__dirname, 'success.html')));
 app.get('/cancel', (_req, res) => res.sendFile(join(__dirname, 'cancel.html')));
@@ -461,9 +484,11 @@ app.get('/api/kits', (_req, res) => {
   res.json({ kits: list, discount_percent: Math.round(KIT_DISCOUNT * 100) });
 });
 
-app.get('/api/kits/:kitId', (req, res) => {
-  const kit = KITS[req.params.kitId];
-  if (!kit) return res.status(404).json({ error: 'Kit not found.' });
+// Shared kit-detail computation. Single source of truth for the /api/kits/:id
+// JSON response AND the server-side-rendered /kits/:id HTML page.
+function buildKitDetail(kitId) {
+  const kit = KITS[kitId];
+  if (!kit) return { found: false };
   const inventory = readInventory();
   const items = kit.items
     .map(({ id, quantity }) => {
@@ -488,8 +513,9 @@ app.get('/api/kits/:kitId', (req, res) => {
     .filter(Boolean);
   const subtotal = +items.reduce((s, i) => s + i.line_total, 0).toFixed(2);
   const raw_subtotal = +items.reduce((s, i) => s + i.original_price * i.quantity, 0).toFixed(2);
-  res.json({
-    kit_id: req.params.kitId,
+  return {
+    found: true,
+    kit_id: kitId,
     name: kit.name,
     grade_label: kit.grade_label,
     age_range: kit.age_range,
@@ -498,9 +524,89 @@ app.get('/api/kits/:kitId', (req, res) => {
     items,
     subtotal,
     raw_subtotal,
-    savings: +(raw_subtotal - subtotal).toFixed(2)
-  });
+    savings: +(raw_subtotal - subtotal).toFixed(2),
+    all_in_stock: items.every(i => i.in_stock)
+  };
+}
+
+app.get('/api/kits/:kitId', (req, res) => {
+  const detail = buildKitDetail(req.params.kitId);
+  if (!detail.found) return res.status(404).json({ error: 'Kit not found.' });
+  const { found, all_in_stock, ...payload } = detail;
+  res.json(payload);
 });
+
+// Server-side render of a kit detail page: fills SEO placeholder tokens in KIT_TEMPLATE
+// with per-kit values and injects a VALID Product JSON-LD (real price/availability).
+function renderKitPage(detail) {
+  const url = `${SITE_URL}/kits/${detail.kit_id}`;
+  const title = `${detail.name} | Fast Track School Supplies`;
+  const description = `${detail.tagline} Ages ${detail.age_range}. ${detail.items.length} items, bundled at ${Math.round(KIT_DISCOUNT * 100)}% off and shipped to your door.`;
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: detail.name,
+    description: detail.tagline,
+    category: 'School Supply Kit',
+    brand: { '@type': 'Brand', name: 'Fast Track School Supplies' },
+    audience: { '@type': 'EducationalAudience', audienceType: detail.age_range, educationalRole: 'Student' },
+    offers: {
+      '@type': 'Offer',
+      price: detail.subtotal.toFixed(2),
+      priceCurrency: 'USD',
+      availability: detail.all_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url,
+      seller: { '@type': 'Organization', name: 'Fast Track School Supplies' }
+    },
+    url,
+    isRelatedTo: detail.items.slice(0, 8).map(i => ({ '@type': 'Product', name: i.name }))
+  };
+  const jsonLd = `<script type="application/ld+json">\n${JSON.stringify(productSchema, null, 2)}\n</script>`;
+  return KIT_TEMPLATE
+    .split('{{KIT_TITLE}}').join(htmlEscape(title))
+    .split('{{KIT_OG_TITLE}}').join(htmlEscape(title))
+    .split('{{KIT_DESCRIPTION}}').join(htmlEscape(description))
+    .split('{{KIT_CANONICAL}}').join(url)
+    .split('{{KIT_H1}}').join(htmlEscape(detail.name))
+    .split('<!--KIT_JSONLD-->').join(jsonLd);
+}
+
+// Server-side render of /store: injects an ItemList of Products (with offers) so the
+// collection page exposes price/availability schema in the initial HTML.
+function renderStorePage() {
+  const inventory = readInventory();
+  const elements = PRODUCTS.map((p, i) => {
+    const stock = inventory[p.id]?.stock ?? 0;
+    return {
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Product',
+        name: p.name,
+        category: 'School Supplies',
+        ...(p.image && /^https:\/\//i.test(p.image) ? { image: p.image } : {}),
+        brand: { '@type': 'Brand', name: 'Fast Track School Supplies' },
+        offers: {
+          '@type': 'Offer',
+          price: p.price.toFixed(2),
+          priceCurrency: 'USD',
+          availability: stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          url: `${SITE_URL}/store`,
+          seller: { '@type': 'Organization', name: 'Fast Track School Supplies' }
+        }
+      }
+    };
+  });
+  const itemList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Fast Track School Supplies — Full Catalog',
+    numberOfItems: elements.length,
+    itemListElement: elements
+  };
+  const jsonLd = `<script type="application/ld+json">\n${JSON.stringify(itemList, null, 2)}\n</script>\n</head>`;
+  return STORE_TEMPLATE.replace('</head>', jsonLd);
+}
 
 // ---------- Stripe checkout (handles one-time AND subscription) ----------
 app.post('/api/checkout', async (req, res) => {

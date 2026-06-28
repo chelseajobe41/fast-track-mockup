@@ -2,96 +2,115 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://fasttrackschoolsupplies.com/</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/upload</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/kits</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/store</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/gift</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fasttrackschoolsupplies.com/kit?id=kindergarten</loc>
+    <loc>https://fasttrackschoolsupplies.com/kits/kindergarten</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fasttrackschoolsupplies.com/kit?id=1st-grade</loc>
+    <loc>https://fasttrackschoolsupplies.com/kits/1st-grade</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fasttrackschoolsupplies.com/kit?id=2nd-grade</loc>
+    <loc>https://fasttrackschoolsupplies.com/kits/2nd-grade</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fasttrackschoolsupplies.com/kit?id=3rd-grade</loc>
+    <loc>https://fasttrackschoolsupplies.com/kits/3rd-grade</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fasttrackschoolsupplies.com/kit?id=4th-grade</loc>
+    <loc>https://fasttrackschoolsupplies.com/kits/4th-grade</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fasttrackschoolsupplies.com/kit?id=5th-grade</loc>
+    <loc>https://fasttrackschoolsupplies.com/kits/5th-grade</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fasttrackschoolsupplies.com/kit?id=middle-school</loc>
+    <loc>https://fasttrackschoolsupplies.com/kits/middle-school</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fasttrackschoolsupplies.com/kit?id=high-school</loc>
+    <loc>https://fasttrackschoolsupplies.com/kits/high-school</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/faq</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/manage</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/shipping</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/returns</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/privacy</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
     <loc>https://fasttrackschoolsupplies.com/terms</loc>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>

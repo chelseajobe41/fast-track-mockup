@@ -136,10 +136,10 @@ keys — that is expected and fine for editing content/markup.
 | Kit contents / quantities | `kits.json` |
 | Stock levels / low-stock thresholds | `inventory.json` (admin dashboard also writes this) |
 | Homepage copy/layout | `index.html` |
-| Store page (search, filters, cart drawer) | `store.html` |
+| Store page (search, filters, cart drawer) | `store.html` (SSR — see note below) |
 | AI upload page | `upload.html` |
 | Kits listing | `kits.html` |
-| Single kit page (+ Product JSON-LD) | `kit.html` |
+| Single kit page (+ Product JSON-LD) | `kit.html` (SSR template — see note below) |
 | Grandparent gift flow | `gift.html` |
 | FAQ (+ FAQPage schema) | `faq.html` |
 | Legal pages | `terms.html`, `privacy.html`, `shipping.html`, `returns.html` |
@@ -156,6 +156,26 @@ Relative paths break Stripe Checkout ("Not a valid URL"). The placeholder
 
 Key server.js constants: `FLAT_SHIPPING_CENTS` (currently 995 = $9.95), `KIT_DISCOUNT` (0.10),
 `SUBSCRIPTION_DISCOUNT` (0.10).
+
+### Server-side rendering (SEO) — do NOT revert to sendFile
+
+Kit detail pages and the store page are **server-side rendered** so Google sees correct
+canonical/title/schema in the initial HTML (client JS runs too late for crawlers).
+
+- **Kit pages use clean URLs: `/kits/<id>`** (e.g. `/kits/kindergarten`). The old `/kit?id=<id>`
+  301-redirects to the clean path. `kit.html` is a TEMPLATE with placeholder tokens
+  (`{{KIT_TITLE}}`, `{{KIT_CANONICAL}}`, `{{KIT_DESCRIPTION}}`, `{{KIT_OG_TITLE}}`, `{{KIT_H1}}`,
+  and the `<!--KIT_JSONLD-->` comment). `renderKitPage()` in server.js fills these per kit with a
+  self-referencing canonical and a VALID Product JSON-LD (real price/availability) built from
+  `buildKitDetail()`. The client JS hydrates the interactive cart and reads the kit id from the
+  URL path (`getKitId()` parses the path, not a query string).
+- **`/store` is rendered by `renderStorePage()`** which injects an `ItemList` of Products (with
+  offers) before `</head>` in `store.html`.
+- `kit.html` and `store.html` are in the deny-list so the raw templates (with unfilled tokens)
+  cannot be fetched directly.
+- When editing these two files, KEEP the placeholder tokens / `</head>` structure intact, and
+  do NOT re-add a client-side Product schema injector to kit.html (the server provides the only
+  valid one). Internal links to kits must use `/kits/<id>`, never `/kit?id=`.
 
 ---
 
