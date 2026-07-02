@@ -21,10 +21,10 @@ h2 .dot, h2 .period,
 }
 .wordmark:hover { transform: scale(1.03); }
 .brand-logo {
-  height: 90px;
+  height: 120px;
   width: auto;
   display: block;
-  max-width: 340px;
+  max-width: 400px;
 }
 .brand-name {
   font-family: 'Parkinsans', sans-serif;
@@ -293,8 +293,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .container { padding: 0 20px !important; }
 
   /* Brand logo a touch smaller on mobile */
-  .brand-logo { height: 72px !important; }
-  .brand-logo-footer { height: 78px !important; }
+  .brand-logo { height: 92px !important; }
+  .brand-logo-footer { height: 92px !important; }
   .brand-name { font-size: 24px; }
   .brand-name-sub { font-size: 11px; }
 
@@ -324,7 +324,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .container { padding: 0 16px !important; }
   .hero h1 { font-size: 36px !important; }
   .nav { padding: 12px 0 !important; }
-  .brand-logo { height: 56px !important; }
+  .brand-logo { height: 72px !important; }
   .brand-name { font-size: 19px; }
   .brand-name-sub { font-size: 9px; letter-spacing: 0.06em; }
   .wordmark { gap: 10px !important; }

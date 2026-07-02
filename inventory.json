@@ -27,10 +27,6 @@
     "stock": 250,
     "low_stock_threshold": 25
   },
-  "cardstock": {
-    "stock": 60,
-    "low_stock_threshold": 10
-  },
   "construction-9x12": {
     "stock": 80,
     "low_stock_threshold": 10

@@ -16,7 +16,7 @@
     "id": "eraser-arrowhead",
     "name": "Arrowhead Eraser",
     "price": 0.2,
-    "unit": "Cap eraser",
+    "unit": "Single, cap eraser",
     "image": "https://fasttrackschoolsupplies.com/assets/products/eraser-arrowhead.png",
     "keywords": [
       "arrowhead eraser",
@@ -116,19 +116,6 @@
     ]
   },
   {
-    "id": "cardstock",
-    "name": "Cardstock",
-    "price": 7.49,
-    "unit": "8.5x11, 50 sheets",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Cardstock.jpg",
-    "keywords": [
-      "cardstock",
-      "card stock",
-      "heavy paper",
-      "white cardstock"
-    ]
-  },
-  {
     "id": "college-notebook",
     "name": "College-Ruled Notebook",
     "price": 1.88,
@@ -145,7 +132,7 @@
     "id": "color-pencils",
     "name": "Colored Pencils",
     "price": 4.99,
-    "unit": "12-count",
+    "unit": "24 count",
     "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Color_Pencils.png",
     "keywords": [
       "colored pencils",
@@ -209,10 +196,23 @@
     ]
   },
   {
+    "id": "crayola-markers",
+    "name": "Crayola Markers",
+    "price": 4.99,
+    "unit": "Broad tip, 10-count",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Markers.jpg",
+    "keywords": [
+      "crayola markers",
+      "markers",
+      "washable markers",
+      "broad tip markers"
+    ]
+  },
+  {
     "id": "crayon",
     "name": "Crayon",
     "price": 2.19,
-    "unit": "Single, large",
+    "unit": "24 count",
     "image": "https://fasttrackschoolsupplies.com/assets/products/crayon.png",
     "keywords": [
       "crayon",
@@ -263,10 +263,23 @@
     ]
   },
   {
+    "id": "glue-stick",
+    "name": "Elmer's Glue Stick",
+    "price": 0.68,
+    "unit": "Washable, small",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Elmers_Glue_Stick.jpg",
+    "keywords": [
+      "glue stick",
+      "elmer's glue stick",
+      "small glue stick",
+      "elmers"
+    ]
+  },
+  {
     "id": "filler-paper",
     "name": "Filler Paper",
     "price": 3.69,
-    "unit": "200 sheets, wide-ruled",
+    "unit": "100 sheets",
     "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Filler_Paper.jpg",
     "keywords": [
       "filler paper",
@@ -305,23 +318,10 @@
     ]
   },
   {
-    "id": "glue-stick",
-    "name": "Glue Stick",
-    "price": 0.68,
-    "unit": "Washable, small",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Elmers_Glue_Stick.jpg",
-    "keywords": [
-      "glue stick",
-      "elmer's glue stick",
-      "small glue stick",
-      "elmers"
-    ]
-  },
-  {
     "id": "headphones",
-    "name": "Headphones",
+    "name": "Headphone",
     "price": 9.99,
-    "unit": "Over-ear, 3.5mm wired",
+    "unit": "Over-ear",
     "image": "https://fasttrackschoolsupplies.com/assets/products/headphones.png",
     "keywords": [
       "headphones",
@@ -397,34 +397,10 @@
     ]
   },
   {
-    "id": "marker-fine",
-    "name": "Marker Fine Tip",
-    "price": 1.48,
-    "unit": "Single",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Marker_-_Fine_Tip.jpg",
-    "keywords": [
-      "fine tip marker",
-      "thin marker"
-    ]
-  },
-  {
-    "id": "crayola-markers",
-    "name": "Markers",
-    "price": 4.99,
-    "unit": "Broad tip, 10-count",
-    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Markers.jpg",
-    "keywords": [
-      "crayola markers",
-      "markers",
-      "washable markers",
-      "broad tip markers"
-    ]
-  },
-  {
     "id": "mech-pencil",
     "name": "Mechanical Pencil",
     "price": 0.49,
-    "unit": "0.7mm refillable",
+    "unit": "Single, 0.7mm refillable",
     "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Mechanical_Pencil.png",
     "keywords": [
       "mechanical pencil",
@@ -504,7 +480,7 @@
     "id": "eraser-pink",
     "name": "Pink Eraser",
     "price": 0.99,
-    "unit": "Large",
+    "unit": "Single",
     "image": "https://fasttrackschoolsupplies.com/assets/products/eraser-pink.png",
     "keywords": [
       "pink eraser",
@@ -530,7 +506,7 @@
     "id": "ruler",
     "name": "Plastic Ruler",
     "price": 0.99,
-    "unit": "12 inch, metric + imperial",
+    "unit": "Single",
     "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Plastic_Ruler.jpg",
     "keywords": [
       "ruler",
@@ -626,6 +602,17 @@
     ]
   },
   {
+    "id": "marker-fine",
+    "name": "Sharpie Marker Fine Tip",
+    "price": 1.48,
+    "unit": "Single",
+    "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Marker_-_Fine_Tip.jpg",
+    "keywords": [
+      "fine tip marker",
+      "thin marker"
+    ]
+  },
+  {
     "id": "sharpie-ultra",
     "name": "Sharpie Marker Ultra Fine Tip",
     "price": 1.48,
@@ -654,7 +641,7 @@
     "id": "glue-stick-small",
     "name": "Small Glue Stick",
     "price": 0.6,
-    "unit": "0.21 oz, washable",
+    "unit": "9g, washable",
     "image": "https://fasttrackschoolsupplies.com/assets/products/glue-stick-small.jpg",
     "keywords": [
       "glue stick",
@@ -711,7 +698,7 @@
     "id": "white-out",
     "name": "White-out",
     "price": 2.32,
-    "unit": "Tape, 0.2in x 26ft",
+    "unit": "Single",
     "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/White-out.png",
     "keywords": [
       "white out",
@@ -724,7 +711,7 @@
     "id": "whiteboard-eraser",
     "name": "Whiteboard Eraser",
     "price": 1.96,
-    "unit": "Felt",
+    "unit": "Single",
     "image": "https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Whiteboard_Eraser.png",
     "keywords": [
       "whiteboard eraser",

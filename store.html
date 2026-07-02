@@ -85,6 +85,10 @@
   .product-card:hover { transform: translateY(-3px); border-color: var(--teal); box-shadow: 0 16px 36px rgba(34,58,63,0.08); }
   .product-img { position: relative; width: 100%; aspect-ratio: 1/1; background: var(--cream); overflow: hidden; border-bottom: 1px solid var(--line); }
   .product-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 24px; }
+  /* Transparent guard over product images. Suppresses the browser's "Search image /
+     Google Lens" hover chip (a browser feature, not part of the site) by making the
+     topmost hover target this layer instead of the <img>. */
+  .product-img::after { content: ''; position: absolute; inset: 0; z-index: 2; }
   .stock-badge { position: absolute; top: 12px; right: 12px; padding: 4px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
   .stock-badge.low { background: rgba(220,61,45,0.12); color: var(--orange); }
   .subscribe-link { display: block; width: 100%; margin-top: 10px; padding: 8px 12px; background: var(--cream); border: 1px dashed var(--line); border-radius: 999px; color: var(--teal); font-family: 'Parkinsans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: border-color 0.15s, background 0.15s; text-align: center; }
