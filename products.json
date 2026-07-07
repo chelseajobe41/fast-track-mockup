@@ -17,7 +17,7 @@
     "name": "Arrowhead Eraser",
     "price": 0.2,
     "unit": "Single, cap eraser",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/eraser-arrowhead.png",
+    "image": "/assets/products/eraser-arrowhead.png",
     "keywords": [
       "arrowhead eraser",
       "pencil cap eraser",
@@ -57,7 +57,7 @@
     "name": "Black Dry Erase Marker",
     "price": 1.49,
     "unit": "Single, low odor",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/dry-erase-black.png",
+    "image": "/assets/products/dry-erase-black.png",
     "keywords": [
       "dry erase",
       "dry erase marker",
@@ -160,7 +160,7 @@
     "name": "Construction Paper 18x12",
     "price": 3.99,
     "unit": "Assorted colors, 18 ct",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/construction-12x18.png",
+    "image": "/assets/products/construction-12x18.png",
     "keywords": [
       "construction paper",
       "construction paper 18x12",
@@ -213,7 +213,7 @@
     "name": "Crayon",
     "price": 2.19,
     "unit": "24 count",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/crayon.png",
+    "image": "/assets/products/crayon.png",
     "keywords": [
       "crayon",
       "wax crayon",
@@ -240,7 +240,7 @@
     "name": "Dry Erase Marker Fine Tip",
     "price": 1.24,
     "unit": "Single",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/dry-erase-fine.png",
+    "image": "/assets/products/dry-erase-fine.png",
     "keywords": [
       "fine tip dry erase",
       "fine dry erase"
@@ -251,7 +251,7 @@
     "name": "Dry Erase Markers",
     "price": 4.99,
     "unit": "4-pack, chisel tip",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/expo-markers-4pk.png",
+    "image": "/assets/products/expo-markers-4pk.png",
     "keywords": [
       "expo markers",
       "expo dry erase",
@@ -267,7 +267,7 @@
     "name": "Elmer's Glue Stick",
     "price": 0.68,
     "unit": "Washable, small",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/glue-stick.jpg",
+    "image": "/assets/products/glue-stick.jpg",
     "keywords": [
       "glue stick",
       "elmer's glue stick",
@@ -296,7 +296,7 @@
     "name": "Gallon Ziploc Bags",
     "price": 2.99,
     "unit": "12 ct",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/gallon-bags.png",
+    "image": "/assets/products/gallon-bags.png",
     "keywords": [
       "gallon bags",
       "gallon ziploc",
@@ -322,7 +322,7 @@
     "name": "Headphone",
     "price": 9.99,
     "unit": "Over-ear",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/headphones.png",
+    "image": "/assets/products/headphones.png",
     "keywords": [
       "headphones",
       "headphone",
@@ -377,7 +377,7 @@
     "name": "Insertable Dividers",
     "price": 2.19,
     "unit": "5-tabs",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/dividers-insertable.png",
+    "image": "/assets/products/dividers-insertable.png",
     "keywords": [
       "insertable dividers",
       "customizable dividers",
@@ -481,7 +481,7 @@
     "name": "Pink Eraser",
     "price": 0.99,
     "unit": "Single",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/eraser-pink.png",
+    "image": "/assets/products/eraser-pink.png",
     "keywords": [
       "pink eraser",
       "rubber eraser",
@@ -593,7 +593,7 @@
     "name": "Scotch Tape",
     "price": 2.29,
     "unit": "Roll with dispenser",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/scotch-tape.png",
+    "image": "/assets/products/scotch-tape.png",
     "keywords": [
       "scotch tape",
       "tape",
@@ -629,7 +629,7 @@
     "name": "Sheet Protectors",
     "price": 4.99,
     "unit": "25 ct",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/sheet-protectors.jpg",
+    "image": "/assets/products/sheet-protectors.jpg",
     "keywords": [
       "sheet protectors",
       "page protectors",
@@ -642,7 +642,7 @@
     "name": "Small Glue Stick",
     "price": 0.6,
     "unit": "9g, washable",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/glue-stick-small.jpg",
+    "image": "/assets/products/glue-stick-small.jpg",
     "keywords": [
       "glue stick",
       "small glue stick",
@@ -682,7 +682,7 @@
     "name": "Watercolor",
     "price": 2.93,
     "unit": "8-color set with brush",
-    "image": "https://fasttrackschoolsupplies.com/assets/products/watercolor.png",
+    "image": "/assets/products/watercolor.png",
     "keywords": [
       "watercolor",
       "water color",

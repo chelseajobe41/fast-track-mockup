@@ -13,6 +13,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SITE_URL = 'https://fasttrackschoolsupplies.com';
 const KIT_DISCOUNT = 0.10;  // 10% bundle discount vs buying items individually
 
+// Product images are stored as site-relative paths: uploaded photos live at /uploads/<file>,
+// placeholders/bundled art at /assets/... . Relative paths let the storefront <img> tags resolve
+// correctly whether we're on localhost (local review) or the live domain. Stripe and schema.org,
+// however, require absolute https URLs — absolutize() upgrades a leading-slash path to the public
+// domain at those points of use. Already-absolute URLs (e.g. external CDN photos) pass through.
+function absolutize(url) {
+  if (!url) return url;
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith('/')) return SITE_URL + url;
+  return url;
+}
+
 // Live mutable data (products, inventory, orders, settings, uploaded images) lives in DATA_DIR so
 // it survives Render deploys — a git checkout would otherwise revert repo-tracked data files, wiping
 // admin edits and order history. Locally DATA_DIR defaults to the repo dir (today's behavior);
@@ -683,7 +695,7 @@ function renderStorePage() {
         '@type': 'Product',
         name: p.name,
         category: 'School Supplies',
-        ...(p.image && /^https:\/\//i.test(p.image) ? { image: p.image } : {}),
+        ...(absolutize(p.image) && /^https:\/\//i.test(absolutize(p.image)) ? { image: absolutize(p.image) } : {}),
         brand: { '@type': 'Brand', name: 'Fast Track School Supplies' },
         offers: {
           '@type': 'Offer',
@@ -738,15 +750,17 @@ app.post('/api/checkout', async (req, res) => {
     // Build line items. Apply subscription discount to unit price.
     const line_items = cart.map(item => {
       const effectivePrice = isSubscription ? item.price * (1 - SUBSCRIPTION_DISCOUNT) : item.price;
-      // Stripe requires absolute HTTPS URLs for product images. Relative URLs (like
-      // placeholder /assets/photo-coming.svg) cause "Not a valid URL" errors.
-      const isAbsoluteHttps = item.image && /^https:\/\//i.test(item.image);
+      // Stripe requires absolute HTTPS URLs for product images. Site-relative paths (uploaded
+      // photos at /uploads/..., placeholder /assets/photo-coming.svg) are upgraded to the public
+      // domain; anything still not https (shouldn't happen) is dropped to avoid "Not a valid URL".
+      const absImage = absolutize(item.image);
+      const isAbsoluteHttps = absImage && /^https:\/\//i.test(absImage);
       const priceData = {
         currency: 'usd',
         product_data: {
           name: item.name + (isSubscription ? ` (${recurring.label})` : ''),
           description: item.unit || undefined,
-          images: isAbsoluteHttps ? [item.image] : []
+          images: isAbsoluteHttps ? [absImage] : []
         },
         unit_amount: Math.round(effectivePrice * 100)
       };
@@ -1051,7 +1065,9 @@ app.post('/api/admin/products/:id/image', requireAdmin, upload.single('image'), 
   if (!ext) return res.status(400).json({ error: 'Image must be JPG, PNG, WebP, or GIF.' });
   const filename = `${product.id}.${ext}`;
   writeFileSync(join(IMAGES_DIR, filename), req.file.buffer);
-  product.image = `${SITE_URL}/uploads/${filename}`;
+  // Store relative so the photo resolves both on the live domain and during local review; it's
+  // absolutized (via absolutize()) only where Stripe/schema.org need a full https URL.
+  product.image = `/uploads/${filename}`;
   writeProducts(products);
   reloadCatalog();
   res.json({ image: product.image });

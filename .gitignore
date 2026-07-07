@@ -6,3 +6,6 @@ npm-debug.log*
 
 # Local persistent-data dir for testing the admin (DATA_DIR)
 .localdata/
+
+# Uploaded product photos live on the data disk (DATA_DIR), never in the repo
+product-images/
