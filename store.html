@@ -168,7 +168,9 @@
   .cart-foot { border-top: 1px solid var(--line); padding: 12px 22px max(14px, env(safe-area-inset-bottom)); box-shadow: 0 -10px 20px rgba(34,58,63,0.05); }
   .cart-summary { margin-bottom: 6px; }
   .summary-row { display: flex; justify-content: space-between; font-size: 13px; padding: 2px 0; color: var(--teal-soft); }
-  .summary-row.bold { font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); font-size: 16px; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .summary-row.bold { font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); font-size: 19px; align-items: baseline; }
+  .summary-fine { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .checkout-amt { font-weight: 800; padding-left: 11px; margin-left: 1px; border-left: 1px solid rgba(255,255,255,0.4); }
   .free-tag { color: var(--green); font-weight: 700; }
   .shipping-note { font-size: 12px; color: var(--muted); margin-top: 6px; padding: 8px 12px; background: var(--cream); border-radius: 8px; }
   .shipping-note.close { color: var(--orange); }
@@ -305,10 +307,8 @@
   <div class="cart-body" id="cart-body"></div>
   <div class="cart-foot" id="cart-foot" style="display:none;">
     <div class="cart-summary">
-      <div class="summary-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
-      <div class="summary-row" id="cart-savings-row" style="display:none;"><span>Subscription savings</span><span id="cart-savings" class="free-tag">−$0.00</span></div>
-      <div class="summary-row"><span>Shipping</span><span id="cart-shipping">Calculated at checkout</span></div>
       <div class="summary-row bold"><span>Total</span><span id="cart-total">$0.00</span></div>
+      <div class="summary-fine" id="cart-fine"></div>
     </div>
     <div class="shipping-note" id="shipping-note"></div>
     <div class="cart-code">
@@ -581,15 +581,16 @@
     const subtotal = cartSubtotal();
     const savings = rawSubtotal - subtotal;
     const shipping = computeShipping(subtotal);
-    document.getElementById('cart-subtotal').textContent = `$${rawSubtotal.toFixed(2)}`;
-    document.getElementById('cart-total').textContent = `$${(subtotal + shipping).toFixed(2)}`;
-    document.getElementById('cart-shipping').innerHTML = `$${shipping.toFixed(2)}`;
-    const savingsRow = document.getElementById('cart-savings-row');
-    if (cartMode === 'subscription' && savings > 0) {
-      savingsRow.style.display = '';
-      document.getElementById('cart-savings').textContent = `−$${savings.toFixed(2)}`;
-    } else {
-      savingsRow.style.display = 'none';
+    const grandTotal = subtotal + shipping;
+    document.getElementById('cart-total').textContent = `$${grandTotal.toFixed(2)}`;
+    // Keep it lean, but stay honest about what's in the total (flat shipping can dwarf a small
+    // order, and subscription savings deserve the credit) — one small line under the total.
+    const fine = document.getElementById('cart-fine');
+    if (fine) {
+      const bits = [];
+      if (cartMode === 'subscription' && savings > 0) bits.push(`You save $${savings.toFixed(2)}`);
+      bits.push(shipping > 0 ? `Includes $${shipping.toFixed(2)} shipping` : 'Free shipping');
+      fine.textContent = bits.join(' · ');
     }
 
     const note = document.getElementById('shipping-note');
@@ -672,9 +673,11 @@
     // Update checkout button label to reflect mode
     const btn = document.getElementById('checkout-btn');
     if (btn) {
+      const amt = `<span class="checkout-amt">$${grandTotal.toFixed(2)}</span>`;
+      const arrow = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
       btn.innerHTML = cartMode === 'subscription'
-        ? `Start subscription · ${intervalLabel()} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`
-        : `Continue to checkout <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+        ? `<span>Start subscription</span>${amt}${arrow}`
+        : `<span>Continue to checkout</span>${amt}${arrow}`;
     }
   }
 
