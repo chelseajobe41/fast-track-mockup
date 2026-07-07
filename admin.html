@@ -126,6 +126,25 @@
   .photo-btn { position: relative; overflow: hidden; }
   .photo-btn input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
+  /* Shipping settings */
+  .ship-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px; max-width: 620px; }
+  .ship-intro { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .ship-modes { display: grid; gap: 12px; margin-bottom: 22px; }
+  .ship-mode { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; font-size: 13px; color: var(--muted); }
+  .ship-mode strong { color: var(--teal); font-family: 'Parkinsans', sans-serif; font-size: 14px; }
+  .ship-mode input { margin-top: 3px; }
+  .ship-section { border-top: 1px solid var(--line); padding-top: 20px; }
+  .ship-field { display: flex; flex-direction: column; gap: 8px; font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .ship-input-wrap { display: inline-flex; align-items: center; gap: 4px; font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); }
+  .ship-input-wrap input { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--teal); text-align: right; }
+  .ship-tier-head, .ship-tier-row, .ship-final-row { display: grid; grid-template-columns: 1fr 1fr 40px; gap: 12px; align-items: center; margin-bottom: 10px; }
+  .ship-tier-head { font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .ship-final-row { border-top: 1px dashed var(--line); padding-top: 12px; margin-top: 4px; font-family: 'Parkinsans', sans-serif; font-weight: 600; color: var(--teal); font-size: 13px; }
+  .ship-remove { background: #fff; border: 1px solid rgba(192,52,52,0.35); color: var(--red); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-weight: 700; }
+  .ship-remove:hover { background: var(--red); color: #fff; }
+  .ship-hint { color: var(--muted); font-size: 12px; margin-top: 12px; font-style: italic; }
+  #ship-add-tier { margin: 6px 0 4px; }
+
   /* Toast */
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--teal); color: #fff; padding: 14px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(120px); opacity: 0; transition: transform 0.2s, opacity 0.2s; pointer-events: none; }
   .toast.show { transform: translateY(0); opacity: 1; }
@@ -162,6 +181,7 @@
     <button class="tab" data-panel="orders">Orders</button>
     <button class="tab" data-panel="products">Products</button>
     <button class="tab" data-panel="inventory">Inventory</button>
+    <button class="tab" data-panel="shipping">Shipping</button>
   </div>
 </div>
 
@@ -279,6 +299,40 @@
       </div>
     </section>
 
+    <!-- SHIPPING -->
+    <section class="panel" id="panel-shipping">
+      <h2>Shipping</h2>
+      <div class="ship-card">
+        <p class="ship-intro">Choose how you charge for shipping. Changes take effect on your live store as soon as you save.</p>
+
+        <div class="ship-modes">
+          <label class="ship-mode"><input type="radio" name="ship-mode" value="flat" /> <span><strong>Flat rate</strong><br/>One shipping price for every order.</span></label>
+          <label class="ship-mode"><input type="radio" name="ship-mode" value="tiers" /> <span><strong>Tiered by order total</strong><br/>Shipping changes based on how large the order is.</span></label>
+        </div>
+
+        <div id="ship-flat-section" class="ship-section">
+          <label class="ship-field">Shipping cost for every order
+            <span class="ship-input-wrap">$<input type="number" id="ship-flat" min="0" step="0.01" placeholder="9.95" /></span>
+          </label>
+        </div>
+
+        <div id="ship-tiers-section" class="ship-section" style="display:none;">
+          <div class="ship-tier-head"><span>Orders up to</span><span>Shipping charged</span><span></span></div>
+          <div id="ship-tier-rows"></div>
+          <button class="btn secondary btn-sm" id="ship-add-tier" type="button">+ Add a tier</button>
+          <div class="ship-final-row">
+            <span>All larger orders</span>
+            <span class="ship-input-wrap">$<input type="number" id="ship-final" min="0" step="0.01" placeholder="19.95" /></span>
+          </div>
+          <p class="ship-hint">Example: "up to $30 → $9.95", "up to $60 → $14.95", and all larger orders → $19.95.</p>
+        </div>
+
+        <div class="add-actions">
+          <button class="btn" id="ship-save">Save shipping</button>
+        </div>
+      </div>
+    </section>
+
   </div>
 </main>
 
@@ -292,6 +346,7 @@
     if (t.dataset.panel === 'orders') loadOrders();
     if (t.dataset.panel === 'inventory') loadInventory();
     if (t.dataset.panel === 'products') loadProducts();
+    if (t.dataset.panel === 'shipping') loadShipping();
   }));
 
   function dollars(cents) { return `$${((cents || 0) / 100).toFixed(2)}`; }
@@ -573,6 +628,65 @@
     ['np-name','np-price','np-unit','np-keywords','np-image'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('add-product-card').style.display = 'none';
     loadProducts();
+  });
+
+  // --- Shipping settings ---
+  function shipTierRowHtml(upToDollars, shipDollars) {
+    return `<div class="ship-tier-row">
+      <span class="ship-input-wrap">$<input type="number" class="tier-upto" min="0" step="0.01" value="${upToDollars}" /></span>
+      <span class="ship-input-wrap">$<input type="number" class="tier-ship" min="0" step="0.01" value="${shipDollars}" /></span>
+      <button class="ship-remove" type="button" title="Remove tier">×</button>
+    </div>`;
+  }
+  function wireTierRemoves() {
+    document.querySelectorAll('#ship-tier-rows .ship-remove').forEach(b => {
+      b.onclick = () => { b.closest('.ship-tier-row').remove(); };
+    });
+  }
+  function setShipMode(mode) {
+    document.getElementById('ship-flat-section').style.display = mode === 'flat' ? '' : 'none';
+    document.getElementById('ship-tiers-section').style.display = mode === 'tiers' ? '' : 'none';
+  }
+  async function loadShipping() {
+    const cfg = await (await fetch('/api/admin/shipping')).json();
+    const mode = cfg.mode === 'tiers' ? 'tiers' : 'flat';
+    document.querySelector(`input[name="ship-mode"][value="${mode}"]`).checked = true;
+    document.getElementById('ship-flat').value = ((cfg.flat_cents ?? 995) / 100).toFixed(2);
+    const tiers = Array.isArray(cfg.tiers) ? cfg.tiers : [];
+    const thresholds = tiers.filter(t => t.up_to_cents != null);
+    const final = tiers.find(t => t.up_to_cents == null);
+    document.getElementById('ship-tier-rows').innerHTML =
+      (thresholds.length ? thresholds : [{ up_to_cents: 3000, ship_cents: 995 }])
+        .map(t => shipTierRowHtml((t.up_to_cents / 100).toFixed(2), (t.ship_cents / 100).toFixed(2))).join('');
+    document.getElementById('ship-final').value = ((final ? final.ship_cents : 1995) / 100).toFixed(2);
+    wireTierRemoves();
+    setShipMode(mode);
+  }
+  document.querySelectorAll('input[name="ship-mode"]').forEach(r =>
+    r.addEventListener('change', () => setShipMode(r.value)));
+  document.getElementById('ship-add-tier').addEventListener('click', () => {
+    document.getElementById('ship-tier-rows').insertAdjacentHTML('beforeend', shipTierRowHtml('', ''));
+    wireTierRemoves();
+  });
+  document.getElementById('ship-save').addEventListener('click', async () => {
+    const mode = document.querySelector('input[name="ship-mode"]:checked')?.value || 'flat';
+    const toCents = v => Math.max(0, Math.round(parseFloat(v || '0') * 100));
+    const body = { mode, flat_cents: toCents(document.getElementById('ship-flat').value) };
+    if (mode === 'tiers') {
+      const tiers = [];
+      document.querySelectorAll('#ship-tier-rows .ship-tier-row').forEach(row => {
+        const upto = row.querySelector('.tier-upto').value;
+        const ship = row.querySelector('.tier-ship').value;
+        if (upto !== '') tiers.push({ up_to_cents: toCents(upto), ship_cents: toCents(ship) });
+      });
+      tiers.push({ up_to_cents: null, ship_cents: toCents(document.getElementById('ship-final').value) });
+      body.tiers = tiers;
+    }
+    const r = await fetch('/api/admin/shipping', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+    if (r.ok) { toast('Shipping saved'); loadShipping(); }
+    else { const e = await r.json(); toast(e.error || 'Could not save'); }
   });
 
   loadOverview();

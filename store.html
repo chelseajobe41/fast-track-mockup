@@ -278,7 +278,22 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const SHIPPING_FLAT = 9.95;
+  // Shipping is configurable by the store owner (flat rate or order-total tiers). We fetch the
+  // config and compute the display to match what checkout will charge.
+  let SHIPPING_CONFIG = { mode: 'flat', flat_cents: 995, tiers: [] };
+  function computeShipping(subtotalDollars) {
+    if (subtotalDollars <= 0) return 0;
+    const c = SHIPPING_CONFIG, cents = Math.round(subtotalDollars * 100);
+    if (c.mode === 'tiers' && Array.isArray(c.tiers) && c.tiers.length) {
+      for (const t of c.tiers) {
+        if (t.up_to_cents == null) return t.ship_cents / 100;
+        if (cents <= t.up_to_cents) return t.ship_cents / 100;
+      }
+      return c.tiers[c.tiers.length - 1].ship_cents / 100;
+    }
+    return (c.flat_cents ?? 995) / 100;
+  }
+  fetch('/api/shipping-config').then(r => r.json()).then(c => { SHIPPING_CONFIG = c; updateCartUI(); }).catch(() => {});
 
   // ---------- Category rules (keyword-based) ----------
   const CATEGORIES = [
@@ -493,7 +508,7 @@
     const rawSubtotal = cartRawSubtotal();
     const subtotal = cartSubtotal();
     const savings = rawSubtotal - subtotal;
-    const shipping = subtotal > 0 ? SHIPPING_FLAT : 0;
+    const shipping = computeShipping(subtotal);
     document.getElementById('cart-subtotal').textContent = `$${rawSubtotal.toFixed(2)}`;
     document.getElementById('cart-total').textContent = `$${(subtotal + shipping).toFixed(2)}`;
     document.getElementById('cart-shipping').innerHTML = `$${shipping.toFixed(2)}`;

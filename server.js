@@ -754,12 +754,15 @@ app.post('/api/checkout', async (req, res) => {
       return { price_data: priceData, quantity: item.quantity };
     });
 
+    // Shipping is computed from the store's shipping settings (flat rate, or order-total tiers
+    // the owner sets in the admin). Basis is the cart subtotal in cents.
+    const subtotalCents = line_items.reduce((s, li) => s + li.price_data.unit_amount * li.quantity, 0);
     const shipping_options = [{
       shipping_rate_data: {
         type: 'fixed_amount',
         display_name: 'Standard shipping',
         fixed_amount: {
-          amount: FLAT_SHIPPING_CENTS,
+          amount: shippingCentsFor(subtotalCents),
           currency: 'usd'
         },
         delivery_estimate: {
@@ -1042,6 +1045,36 @@ app.post('/api/admin/products/:id/image', requireAdmin, upload.single('image'), 
   reloadCatalog();
   res.json({ image: product.image });
 });
+
+// ---------- Admin: Shipping settings ----------
+app.get('/api/admin/shipping', requireAdmin, (_req, res) => {
+  res.json(readSettings().shipping);
+});
+app.post('/api/admin/shipping', requireAdmin, (req, res) => {
+  const body = req.body || {};
+  const toCents = v => Math.max(0, Math.round(Number(v) || 0));
+  const shipping = { mode: body.mode === 'tiers' ? 'tiers' : 'flat', flat_cents: toCents(body.flat_cents) };
+  if (Array.isArray(body.tiers)) {
+    shipping.tiers = body.tiers
+      .map(t => ({
+        up_to_cents: (t.up_to_cents === null || t.up_to_cents === '' || t.up_to_cents === undefined) ? null : toCents(t.up_to_cents),
+        ship_cents: toCents(t.ship_cents)
+      }))
+      .sort((a, b) => (a.up_to_cents === null ? Infinity : a.up_to_cents) - (b.up_to_cents === null ? Infinity : b.up_to_cents));
+  } else {
+    shipping.tiers = DEFAULT_SETTINGS.shipping.tiers.map(t => ({ ...t }));
+  }
+  if (shipping.mode === 'tiers' && !shipping.tiers.length) {
+    return res.status(400).json({ error: 'Add at least one shipping tier.' });
+  }
+  const settings = readSettings();
+  settings.shipping = shipping;
+  writeSettings(settings);
+  res.json(shipping);
+});
+
+// Public shipping config so cart pages can show accurate shipping before checkout.
+app.get('/api/shipping-config', (_req, res) => res.json(readSettings().shipping));
 
 // ---------- Boot ----------
 const PORT = process.env.PORT || 3001;
