@@ -55,6 +55,12 @@
   .cart-btn { background: var(--teal); color: var(--white); padding: 11px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; border: none; transition: background 0.15s; }
   .cart-btn:hover { background: var(--orange); }
   .cart-count { background: var(--yellow); color: var(--teal); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; min-width: 22px; text-align: center; }
+  /* Floating cart button — appears once the cart has items, stays visible while scrolling */
+  .cart-fab { position: fixed; bottom: 24px; right: 24px; z-index: 90; background: var(--teal); color: #fff; border: none; border-radius: 999px; padding: 14px 20px; display: inline-flex; align-items: center; gap: 10px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 14px 34px rgba(34,58,63,0.30); opacity: 0; transform: translateY(24px) scale(0.96); pointer-events: none; transition: opacity 0.25s, transform 0.25s, background 0.15s; }
+  .cart-fab.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+  .cart-fab:hover { background: var(--orange); }
+  .cart-fab-count { background: var(--yellow); color: var(--teal); font-size: 13px; font-weight: 800; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 999px; display: grid; place-items: center; }
+  @media (max-width: 480px) { .cart-fab { bottom: 16px; right: 16px; padding: 13px 18px; } .cart-fab-label { display: none; } }
 
   /* Hero */
   .store-hero { background: var(--cream); padding: 64px 0 40px; border-bottom: 1px solid var(--line); }
@@ -256,6 +262,13 @@
     <div class="grid" id="product-grid"></div>
   </div>
 </section>
+
+<!-- Floating cart button (follows the page so you can check out from anywhere) -->
+<button class="cart-fab" id="cart-fab" aria-label="View your cart">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6zM9 22a1 1 0 100-2 1 1 0 000 2zM15 22a1 1 0 100-2 1 1 0 000 2z"/></svg>
+  <span class="cart-fab-label">View cart</span>
+  <span class="cart-fab-count" id="cart-fab-count">0</span>
+</button>
 
 <!-- Cart drawer -->
 <div class="cart-overlay" id="cart-overlay"></div>
@@ -533,8 +546,16 @@
     render();
   }
 
+  // Floating cart button: show it once there are items AND the drawer isn't already open.
+  function updateCartFab() {
+    const n = cartCount();
+    const open = document.getElementById('cart-drawer').classList.contains('open');
+    document.getElementById('cart-fab-count').textContent = n;
+    document.getElementById('cart-fab').classList.toggle('show', n > 0 && !open);
+  }
   function updateCartUI() {
     document.getElementById('cart-count').textContent = cartCount();
+    updateCartFab();
     const rawSubtotal = cartRawSubtotal();
     const subtotal = cartSubtotal();
     const savings = rawSubtotal - subtotal;
@@ -662,11 +683,14 @@
   function openCart() {
     document.getElementById('cart-drawer').classList.add('open');
     document.getElementById('cart-overlay').classList.add('open');
+    updateCartFab();
   }
   function closeCart() {
     document.getElementById('cart-drawer').classList.remove('open');
     document.getElementById('cart-overlay').classList.remove('open');
+    updateCartFab();
   }
+  document.getElementById('cart-fab').addEventListener('click', openCart);
 
   async function goCheckout() {
     const btn = document.getElementById('checkout-btn');
