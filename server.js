@@ -26,6 +26,11 @@ function absolutize(url) {
   return url;
 }
 
+// A product is "on sale" when it has a sale_price that's a positive number below its regular price.
+// effectivePrice() is the price we actually charge/show; used at checkout, on the store, and in schema.
+function isOnSale(p) { const s = Number(p.sale_price); return Number.isFinite(s) && s > 0 && s < p.price; }
+function effectivePrice(p) { return isOnSale(p) ? +Number(p.sale_price).toFixed(2) : p.price; }
+
 // Live mutable data (products, inventory, orders, settings, uploaded images) lives in DATA_DIR so
 // it survives Render deploys — a git checkout would otherwise revert repo-tracked data files, wiping
 // admin edits and order history. Locally DATA_DIR defaults to the repo dir (today's behavior);
@@ -844,7 +849,7 @@ function renderStorePage(products = PRODUCTS, content = readContent()) {
         brand: { '@type': 'Brand', name: 'Fast Track School Supplies' },
         offers: {
           '@type': 'Offer',
-          price: p.price.toFixed(2),
+          price: effectivePrice(p).toFixed(2),
           priceCurrency: 'USD',
           availability: stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
           url: `${SITE_URL}/store`,
@@ -1037,7 +1042,9 @@ function normalizeCart(body) {
       let qty = parseInt(item.quantity, 10);
       if (!Number.isFinite(qty) || qty < 1) qty = 1;
       if (qty > MAX_QTY_PER_ITEM) qty = MAX_QTY_PER_ITEM;
-      const price = isKit ? +(p.price * (1 - KIT_DISCOUNT)).toFixed(2) : p.price;
+      // Kits are their own bundle deal (10% off base) and do NOT stack an item sale on top;
+      // individual store purchases honor the sale price.
+      const price = isKit ? +(p.price * (1 - KIT_DISCOUNT)).toFixed(2) : effectivePrice(p);
       return { name: p.name, unit: p.unit, price, image: p.image, quantity: qty };
     })
     .filter(Boolean);
@@ -1297,6 +1304,17 @@ function validateProductBody(body, { partial } = {}) {
     }
     out.price = +price.toFixed(2);
   }
+  if (body.sale_price !== undefined) {
+    // '' / null / 0 clears the sale; otherwise store a valid non-negative number (applied only when
+    // it's actually below the regular price — see isOnSale()).
+    if (body.sale_price === '' || body.sale_price === null) {
+      out.sale_price = null;
+    } else {
+      const sp = Number(body.sale_price);
+      if (!Number.isFinite(sp) || sp < 0 || sp > 100000) return { ok: false, error: 'Sale price must be a number.' };
+      out.sale_price = sp > 0 ? +sp.toFixed(2) : null;
+    }
+  }
   if (body.unit !== undefined) out.unit = sanitizeText(body.unit, 120);
   if (body.keywords !== undefined) {
     let kw = body.keywords;
@@ -1328,7 +1346,8 @@ app.post('/api/admin/products', requireAdmin, (req, res) => {
   const id = slugifyId(v.value.name, new Set([...products.map(p => p.id), ...PRODUCTS.map(p => p.id)]));
   const product = {
     id, name: v.value.name, price: v.value.price,
-    unit: v.value.unit || '', image: '/assets/photo-coming.svg', keywords: v.value.keywords || []
+    unit: v.value.unit || '', image: '/assets/photo-coming.svg', keywords: v.value.keywords || [],
+    ...(v.value.sale_price != null ? { sale_price: v.value.sale_price } : {})
   };
   products.push(product);
   products.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));

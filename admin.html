@@ -633,6 +633,7 @@
     </div>
     <label class="field">Product name <input type="text" id="ed-name" placeholder="e.g. Washable Markers, 8-pack" /></label>
     <label class="field">Price <span class="dollar-wrap">$<input type="number" id="ed-price" min="0" step="0.01" placeholder="0.00" /></span></label>
+    <label class="field">Sale price <span style="font-weight:500;color:var(--muted);">(optional)</span> <span class="dollar-wrap">$<input type="number" id="ed-sale" min="0" step="0.01" placeholder="Leave blank — not on sale" /></span><span class="field-hint" id="ed-sale-hint"></span></label>
     <label class="field">Short description <input type="text" id="ed-unit" placeholder="e.g. 8 ct, washable" /></label>
     <label class="field">Search keywords <textarea id="ed-keywords" placeholder="markers, washable markers, crayola"></textarea><span class="field-hint">Comma separated. Helps shoppers find this product on your store.</span></label>
     <div class="ed-inv">
@@ -1164,16 +1165,21 @@
         : stock <= thr ? `<span class="pill warn">${stock} low</span>`
         : `<span class="pill ok">${stock} in stock</span>`;
       const picked = selectedIds.has(p.id);
+      const sale = Number(p.sale_price);
+      const onSale = Number.isFinite(sale) && sale > 0 && sale < p.price;
+      const priceHtml = onSale
+        ? `<span style="text-decoration:line-through;color:var(--muted-2);font-size:12.5px;">$${Number(p.price).toFixed(2)}</span> <span style="color:var(--orange);">$${sale.toFixed(2)}</span>`
+        : `$${Number(p.price).toFixed(2)}`;
       return `
       <button class="prow ${selectMode ? 'selectable' : ''} ${picked ? 'picked' : ''}" data-id="${escapeHtml(p.id)}">
         ${selectMode ? `<span class="prow-check">${check}</span>` : ''}
         <img class="prow-img" src="${escapeHtml(p.image || PLACEHOLDER_IMG)}" alt="" onerror="this.src='${PLACEHOLDER_IMG}';this.style.opacity=0.4" />
         <div style="min-width:0;">
-          <div class="prow-name">${escapeHtml(p.name)}</div>
+          <div class="prow-name">${escapeHtml(p.name)}${onSale ? ' <span class="pill" style="background:rgba(220,61,45,0.12);color:var(--orange);vertical-align:middle;">Sale</span>' : ''}</div>
           <div class="prow-desc">${escapeHtml(p.unit || (p.keywords || []).slice(0,4).join(', ') || 'No description')}</div>
         </div>
         <div class="prow-stock">${stockPill}</div>
-        <div class="prow-price">$${Number(p.price).toFixed(2)}</div>
+        <div class="prow-price">${priceHtml}</div>
         <div class="prow-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="${selectMode ? 'M20 6 9 17l-5-5' : 'm9 6 6 6-6 6'}"/></svg></div>
       </button>`;
     };
@@ -1285,6 +1291,8 @@
     document.getElementById('drawer-title').textContent = product ? 'Edit product' : 'New product';
     document.getElementById('ed-name').value = product ? product.name : '';
     document.getElementById('ed-price').value = product ? product.price : '';
+    document.getElementById('ed-sale').value = (product && product.sale_price != null) ? product.sale_price : '';
+    updateSaleHint();
     document.getElementById('ed-unit').value = product ? (product.unit || '') : '';
     document.getElementById('ed-keywords').value = product ? (product.keywords || []).join(', ') : '';
     document.getElementById('ed-stock').value = product ? (product.stock ?? 0) : 0;
@@ -1318,6 +1326,21 @@
   document.getElementById('ed-stock-plus').addEventListener('click', () => {
     const i = document.getElementById('ed-stock'); i.value = (+i.value || 0) + 1; updateStockStatus();
   });
+
+  // Live "on sale" hint under the sale-price field
+  function updateSaleHint() {
+    const price = Number(document.getElementById('ed-price').value);
+    const raw = document.getElementById('ed-sale').value.trim();
+    const el = document.getElementById('ed-sale-hint');
+    if (raw === '') { el.innerHTML = 'Leave blank to sell at full price.'; return; }
+    const sale = Number(raw);
+    if (!isFinite(sale) || sale <= 0) { el.innerHTML = 'Enter a sale price, or clear it.'; return; }
+    if (isFinite(price) && price > 0 && sale >= price) { el.innerHTML = 'Sale price should be <strong>lower</strong> than the regular price to count as a sale.'; return; }
+    const pct = (isFinite(price) && price > 0) ? Math.round((1 - sale / price) * 100) : 0;
+    el.innerHTML = `<strong style="color:var(--orange);">On sale at $${sale.toFixed(2)}</strong>${pct ? ` (${pct}% off)` : ''} — shows a red “Sale” badge and the old price struck through.`;
+  }
+  document.getElementById('ed-sale').addEventListener('input', updateSaleHint);
+  document.getElementById('ed-price').addEventListener('input', updateSaleHint);
   function closeEditor() {
     document.getElementById('drawer-backdrop').classList.remove('open');
     document.getElementById('product-drawer').classList.remove('open');
@@ -1350,15 +1373,17 @@
     if (!name || price === '' || +price < 0) { toast('Name and a valid price are required'); return; }
     const stock = Math.max(0, +document.getElementById('ed-stock').value || 0);
     const low_stock_threshold = Math.max(0, +document.getElementById('ed-threshold').value || 0);
+    const saleRaw = document.getElementById('ed-sale').value.trim();
+    const sale_price = saleRaw === '' ? null : Number(saleRaw);
     const saveBtn = document.getElementById('ed-save');
     saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
     try {
       let id = editId;
       if (editId) {
-        const r = await fetch(`/api/admin/products/${editId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price, unit, keywords }) });
+        const r = await fetch(`/api/admin/products/${editId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price, unit, keywords, sale_price }) });
         if (!r.ok) { const e = await r.json(); toast(e.error || 'Could not save'); return; }
       } else {
-        const r = await fetch('/api/admin/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price, unit, keywords }) });
+        const r = await fetch('/api/admin/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price, unit, keywords, sale_price }) });
         if (!r.ok) { const e = await r.json(); toast(e.error || 'Could not add'); return; }
         id = (await r.json()).product.id;
       }

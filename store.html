@@ -65,6 +65,9 @@
   .announce-bar { background: var(--teal); color: #FAF6EF; text-align: center; padding: 11px 20px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.01em; }
   .announce-bar a { color: #FDCA06; text-decoration: underline; }
   .featured-badge { position: absolute; top: 12px; left: 12px; z-index: 3; background: #FDCA06; color: #223A3F; padding: 4px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .sale-badge { position: absolute; top: 12px; left: 12px; z-index: 3; background: #DC3D2D; color: #fff; padding: 4px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .product-price.sale { color: var(--orange); }
+  .product-price .price-was { text-decoration: line-through; color: var(--muted); font-weight: 500; font-size: 15px; margin-right: 6px; }
 
   /* Search & filters */
   .controls { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 72px; z-index: 40; padding: 20px 0; }
@@ -321,6 +324,9 @@
     { key: 'semiannual', label: 'Every 6 months' }
   ];
   const SUB_DISCOUNT = 0.10;
+  // Sale-aware pricing: priceOf() is what the customer pays; onSale() flags a real markdown.
+  const onSale = p => { const s = Number(p.sale_price); return Number.isFinite(s) && s > 0 && s < p.price; };
+  const priceOf = p => onSale(p) ? Number(p.sale_price) : p.price;
 
   let PRODUCTS = [];
   let INVENTORY = {};
@@ -346,7 +352,7 @@
   function cartRawSubtotal() {
     return Object.entries(cart).reduce((s, [id, qty]) => {
       const p = PRODUCTS.find(x => x.id === id);
-      return s + (p ? p.price * qty : 0);
+      return s + (p ? priceOf(p) * qty : 0);
     }, 0);
   }
   function cartSubtotal() {
@@ -394,8 +400,8 @@
         (p.unit || '').toLowerCase().includes(q)
       );
     }
-    if (sortMode === 'price-asc') filtered.sort((a, b) => a.price - b.price);
-    else if (sortMode === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+    if (sortMode === 'price-asc') filtered.sort((a, b) => priceOf(a) - priceOf(b));
+    else if (sortMode === 'price-desc') filtered.sort((a, b) => priceOf(b) - priceOf(a));
     else if (sortMode === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
     // Featured sort (the default): owner-picked products float to the front.
     else if (FEATURED.size) filtered.sort((a, b) => (FEATURED.has(b.id) ? 1 : 0) - (FEATURED.has(a.id) ? 1 : 0));
@@ -427,12 +433,12 @@
           : `<button class="add-btn" data-add="${p.id}" aria-label="Add ${escapeHtml(p.name)} to cart">
               <span class="plus">+</span> Add
             </button>`;
-      const subPrice = (p.price * (1 - SUB_DISCOUNT)).toFixed(2);
+      const subPrice = (priceOf(p) * (1 - SUB_DISCOUNT)).toFixed(2);
       const subscribeLink = isOut ? '' : `<button class="subscribe-link" data-subscribe="${p.id}">Subscribe & save 10% · $${subPrice}</button>`;
       return `
         <div class="product-card ${inCart ? 'in-cart' : ''}">
           <div class="product-img">
-            ${inCart ? `<span class="cart-indicator">${qtyInCart}</span>` : (FEATURED.has(p.id) ? '<span class="featured-badge">Featured</span>' : '')}
+            ${inCart ? `<span class="cart-indicator">${qtyInCart}</span>` : (onSale(p) ? '<span class="sale-badge">Sale</span>' : FEATURED.has(p.id) ? '<span class="featured-badge">Featured</span>' : '')}
             ${isOut ? '<span class="stock-badge out">Out</span>' : isLow ? `<span class="stock-badge low">Only ${stock} left</span>` : ''}
             <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" />
           </div>
@@ -441,7 +447,9 @@
             <div class="product-name">${escapeHtml(p.name)}</div>
             <div class="product-meta">${escapeHtml(p.unit || '')}</div>
             <div class="product-row">
-              <span class="product-price">$${p.price.toFixed(2)}</span>
+              ${onSale(p)
+                ? `<span class="product-price sale"><span class="price-was">$${p.price.toFixed(2)}</span>$${priceOf(p).toFixed(2)}</span>`
+                : `<span class="product-price">$${p.price.toFixed(2)}</span>`}
               ${control}
             </div>
             ${subscribeLink}
@@ -574,10 +582,11 @@
     body.innerHTML = Object.entries(cart).map(([id, qty]) => {
       const p = PRODUCTS.find(x => x.id === id);
       if (!p) return '';
-      const effectivePrice = cartMode === 'subscription' ? p.price * (1 - SUB_DISCOUNT) : p.price;
-      const priceLabel = cartMode === 'subscription'
-        ? `<span style="text-decoration:line-through;color:var(--muted);font-weight:400;">$${p.price.toFixed(2)}</span> <strong>$${effectivePrice.toFixed(2)}</strong> each`
-        : `$${p.price.toFixed(2)} each`;
+      const base = priceOf(p);
+      const charged = cartMode === 'subscription' ? base * (1 - SUB_DISCOUNT) : base;
+      const priceLabel = charged < p.price
+        ? `<span style="text-decoration:line-through;color:var(--muted);font-weight:400;">$${p.price.toFixed(2)}</span> <strong>$${charged.toFixed(2)}</strong> each`
+        : `$${charged.toFixed(2)} each`;
       return `<div class="cart-item">
         <div class="cart-item-img"><img src="${p.image}" alt="" /></div>
         <div class="cart-item-info">
