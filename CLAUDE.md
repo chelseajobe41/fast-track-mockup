@@ -237,9 +237,42 @@ the placeholder.
 ## 12. Product Manager / self-service admin (branch `product-manager` until live)
 
 Adds owner self-service to `/admin` (same Basic-Auth login). Redesigned as a Shopify-style app:
-left sidebar (Home / Orders / Products / Shipping), KPI dashboard, slide-over product editor.
+left sidebar (Home / Orders / Products / Shipping / Storefront), KPI dashboard, slide-over editors.
 Inventory is merged INTO Products (stock pill on each row; stock stepper + low-stock threshold
 inside the editor — one Save writes product + stock). No separate Inventory tab.
+
+### Premium features (dashboard, fulfillment, storefront, power tools)
+
+- **Living dashboard (Home)** — `GET /api/admin/overview` returns: week-vs-prior-week revenue/orders
+  trends + AOV, a 14-day `revenue_series` (rendered as an inline SVG sparkline), best sellers with
+  images + revenue, a "needs your attention" feed (out-of-stock / low / no-photo, kit-critical items
+  ranked first via `kitItemIds()`), and a "store readiness" score (share of catalog that's in stock +
+  has a photo + has a description, plus kits-ready count).
+- **Fulfillment cockpit (Orders)** — order list with search + status chips (pending/packed/shipped);
+  clicking an order opens a slide-over drawer with a status stepper (`POST /api/admin/orders/:id/
+  fulfillment`, states validated, sets `packed_at`/`shipped_at`), pick list, ship-to, org code, and a
+  **printable packing slip** at `GET /api/admin/orders/:id/packing-slip` (standalone print view).
+- **Storefront customizer (Storefront)** — announcement bar (toggle/text/link, `javascript:` links
+  stripped), editable hero title/subtitle, and up-to-8 featured products. Saved to
+  `settings.content_draft`; served into the store via SSR token replacement (`{{HERO_TITLE}}`,
+  `{{HERO_SUBTITLE}}`, `<!--ANNOUNCEMENT_BAR-->`) + a `window.__STORE_CONTENT__` script for featured
+  badges. Goes through the SAME Draft→Preview→Publish flow as the catalog (see below).
+- **Power tools** — multi-select mode in Products → bulk restock (`POST /api/admin/bulk/inventory`,
+  instant) and bulk price change (`POST /api/admin/bulk/price`, draft); one-click **Duplicate** in the
+  editor (`POST /api/admin/products/:id/duplicate`); and a **⌘K command palette** to jump to any
+  product/order/page. NB: bulk routes live under `/api/admin/bulk/*` to avoid being shadowed by
+  `/api/admin/products/:id` and `/api/admin/inventory/:skuId`.
+
+### Unified Draft → Preview → Publish (catalog + storefront)
+
+Catalog edits write `products-draft.json`; storefront edits write `settings.content_draft`. ONE global
+"unpublished changes" bar (`GET /api/admin/pending` → `draftSummary()` with `content_changed`) shows
+whenever either exists. `POST /api/admin/publish` promotes both atomically (guards kits, prunes
+inventory, `reloadCatalog()`); `POST /api/admin/discard-draft` clears both AND prunes inventory rows
+for never-published draft products. A store-preview token makes `/store`, `/kits/:id`, `/products.json`
+and `/api/store-content` render the drafts with a fixed "not live yet" banner (shown for ANY valid
+preview session — catalog OR content draft); checkout is blocked in preview. Stock + shipping stay
+instant (operational). Verified by a 97-check end-to-end suite run 10× (970/970).
 
 - **Products tab** — searchable, category-grouped list (same keyword rules as the storefront
   chips); add/edit/remove products (name, price, description, keywords) and upload photos from the

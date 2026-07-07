@@ -101,18 +101,21 @@ function saveWorking(list) {
 // Summary of draft vs published, for the admin's "unpublished changes" bar.
 function draftSummary() {
   const draft = readDraft();
-  if (!draft) return { unpublished: false, added: 0, changed: 0, removed: 0 };
-  const pub = readProducts();
-  const pubById = new Map(pub.map(p => [p.id, p]));
-  const draftIds = new Set(draft.map(p => p.id));
-  let added = 0, changed = 0;
-  for (const p of draft) {
-    const q = pubById.get(p.id);
-    if (!q) added++;
-    else if (JSON.stringify(p) !== JSON.stringify(q)) changed++;
+  const contentChanged = contentHasDraft();
+  if (!draft && !contentChanged) return { unpublished: false, added: 0, changed: 0, removed: 0, content_changed: false };
+  let added = 0, changed = 0, removed = 0;
+  if (draft) {
+    const pub = readProducts();
+    const pubById = new Map(pub.map(p => [p.id, p]));
+    const draftIds = new Set(draft.map(p => p.id));
+    for (const p of draft) {
+      const q = pubById.get(p.id);
+      if (!q) added++;
+      else if (JSON.stringify(p) !== JSON.stringify(q)) changed++;
+    }
+    removed = pub.filter(p => !draftIds.has(p.id)).length;
   }
-  const removed = pub.filter(p => !draftIds.has(p.id)).length;
-  return { unpublished: true, added, changed, removed };
+  return { unpublished: true, added, changed, removed, content_changed: contentChanged };
 }
 
 // ---------- Store preview sessions ----------
@@ -202,16 +205,57 @@ const DEFAULT_SETTINGS = {
       { up_to_cents: 6000, ship_cents: 1495 },
       { up_to_cents: null, ship_cents: 1995 }
     ]
+  },
+  // Storefront content the owner edits in the Storefront customizer (Draft -> Preview -> Publish).
+  content: {
+    announcement: { enabled: false, text: '', link: '' },
+    hero_title: 'Shop the store',
+    hero_subtitle: 'Build your own kit or pick up something for next semester.',
+    featured_ids: []
   }
 };
+function normContent(c = {}) {
+  const d = DEFAULT_SETTINGS.content;
+  return {
+    announcement: { ...d.announcement, ...(c.announcement || {}) },
+    hero_title: typeof c.hero_title === 'string' ? c.hero_title : d.hero_title,
+    hero_subtitle: typeof c.hero_subtitle === 'string' ? c.hero_subtitle : d.hero_subtitle,
+    featured_ids: Array.isArray(c.featured_ids) ? c.featured_ids : []
+  };
+}
 function readSettings() {
   if (!existsSync(SETTINGS_PATH)) return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   try {
     const s = JSON.parse(readFileSync(SETTINGS_PATH, 'utf8'));
-    return { shipping: { ...DEFAULT_SETTINGS.shipping, ...(s.shipping || {}) } };
+    return {
+      shipping: { ...DEFAULT_SETTINGS.shipping, ...(s.shipping || {}) },
+      content: normContent(s.content),
+      // content_draft is only present while there are unpublished storefront edits
+      ...(s.content_draft ? { content_draft: normContent(s.content_draft) } : {})
+    };
   } catch { return JSON.parse(JSON.stringify(DEFAULT_SETTINGS)); }
 }
 function writeSettings(s) { writeJsonAtomic(SETTINGS_PATH, s); }
+
+// ----- Storefront content: published vs draft -----
+function readContent() { return readSettings().content; }
+function readContentDraft() { const s = readSettings(); return s.content_draft || null; }
+function workingContent() { return readContentDraft() ?? readContent(); }
+function contentHasDraft() {
+  const s = readSettings();
+  return !!(s.content_draft && JSON.stringify(s.content_draft) !== JSON.stringify(s.content));
+}
+// Save edited content to the draft. If it matches what's published, clear the draft (no phantom state).
+function saveContentDraft(next) {
+  const s = readSettings();
+  const norm = normContent(next);
+  if (JSON.stringify(norm) === JSON.stringify(s.content)) { delete s.content_draft; writeSettings(s); return false; }
+  s.content_draft = norm; writeSettings(s); return true;
+}
+function publishContent() { const s = readSettings(); if (!s.content_draft) return false; s.content = s.content_draft; delete s.content_draft; writeSettings(s); return true; }
+function discardContentDraft() { const s = readSettings(); if (!s.content_draft) return false; delete s.content_draft; writeSettings(s); return true; }
+// The content a given request should see: draft in a valid preview session, else published.
+function contentFor(req) { return validPreviewToken(req) && readContentDraft() ? readContentDraft() : readContent(); }
 
 // Compute shipping (in cents) for a given order subtotal (in cents) from the current settings.
 function shippingCentsFor(subtotalCents) {
@@ -509,9 +553,10 @@ app.get('/store', (req, res) => {
   if (tok && req.query.preview) {
     res.setHeader('Set-Cookie', `ft_preview=${tok}; Path=/; Max-Age=${PREVIEW_TTL_MS / 1000}; SameSite=Lax; HttpOnly`);
   }
-  const { list, preview } = catalogFor(req);
-  let html = renderStorePage(list);
-  if (preview) html = injectPreviewBanner(html);
+  const { list } = catalogFor(req);
+  let html = renderStorePage(list, contentFor(req));
+  // Banner shows for ANY valid preview session (catalog draft, content draft, or just previewing).
+  if (validPreviewToken(req)) html = injectPreviewBanner(html);
   res.type('html').send(html);
 });
 app.get('/kits', (_req, res) => res.sendFile(join(__dirname, 'kits.html')));
@@ -519,11 +564,11 @@ app.get('/kits', (_req, res) => res.sendFile(join(__dirname, 'kits.html')));
 app.get('/kit', (req, res) => res.redirect(301, KITS[req.query.id] ? `/kits/${req.query.id}` : '/kits'));
 // Server-side-rendered kit detail page (clean URL). Fills SEO tokens + valid Product JSON-LD.
 app.get('/kits/:kitId', (req, res) => {
-  const { byId, preview } = catalogFor(req);
+  const { byId } = catalogFor(req);
   const detail = buildKitDetail(req.params.kitId, byId);
   if (!detail.found) return res.redirect(302, '/kits');
   let html = renderKitPage(detail);
-  if (preview) html = injectPreviewBanner(html);
+  if (validPreviewToken(req)) html = injectPreviewBanner(html);
   res.type('html').send(html);
 });
 app.get('/gift', (_req, res) => res.sendFile(join(__dirname, 'gift.html')));
@@ -784,7 +829,7 @@ function renderKitPage(detail) {
 
 // Server-side render of /store: injects an ItemList of Products (with offers) so the
 // collection page exposes price/availability schema in the initial HTML.
-function renderStorePage(products = PRODUCTS) {
+function renderStorePage(products = PRODUCTS, content = readContent()) {
   const inventory = readInventory();
   const elements = products.map((p, i) => {
     const stock = inventory[p.id]?.stock ?? 0;
@@ -815,8 +860,19 @@ function renderStorePage(products = PRODUCTS) {
     numberOfItems: elements.length,
     itemListElement: elements
   };
-  const jsonLd = `<script type="application/ld+json">\n${JSON.stringify(itemList, null, 2)}\n</script>\n</head>`;
-  return STORE_TEMPLATE.replace('</head>', jsonLd);
+  // Storefront content injection: featured ids for the client, hero copy, and the announcement bar.
+  const featured = (content.featured_ids || []).filter(id => products.some(p => p.id === id));
+  const contentScript = `<script>window.__STORE_CONTENT__=${JSON.stringify({ featured_ids: featured })};</script>`;
+  const jsonLd = `<script type="application/ld+json">\n${JSON.stringify(itemList, null, 2)}\n</script>\n${contentScript}\n</head>`;
+  const announce = content.announcement;
+  const announceHtml = (announce && announce.enabled && announce.text)
+    ? `<div class="announce-bar">${announce.link ? `<a href="${htmlEscape(announce.link)}">${htmlEscape(announce.text)}</a>` : htmlEscape(announce.text)}</div>`
+    : '';
+  return STORE_TEMPLATE
+    .replace('</head>', jsonLd)
+    .replace('<!--ANNOUNCEMENT_BAR-->', announceHtml)
+    .replace('{{HERO_TITLE}}', htmlEscape(content.hero_title || 'Shop the store'))
+    .replace('{{HERO_SUBTITLE}}', htmlEscape(content.hero_subtitle || ''));
 }
 
 // ---------- Stripe checkout (handles one-time AND subscription) ----------
@@ -995,36 +1051,109 @@ function sanitizeText(s, maxLen = 500) {
 }
 
 // ---------- Admin APIs ----------
+// Set of product ids that any grade kit depends on — used to flag "critical" stock problems
+// (a kit can't ship if one of its items is out).
+function kitItemIds() {
+  const s = new Set();
+  for (const kit of Object.values(KITS)) for (const i of kit.items) s.add(i.id);
+  return s;
+}
+function kitsUsing(id) {
+  return Object.values(KITS).filter(kit => kit.items.some(i => i.id === id)).map(k => k.name);
+}
+const PLACEHOLDER_IMAGE = '/assets/photo-coming.svg';
+
 app.get('/api/admin/overview', requireAdmin, (_req, res) => {
   const orders = readOrders();
   const inventory = readInventory();
   const now = Date.now();
-  const oneWeek = 7 * 24 * 60 * 60 * 1000;
-  const weekOrders = orders.filter(o => now - new Date(o.created_at).getTime() < oneWeek);
+  const DAY = 24 * 60 * 60 * 1000;
+  const weekOrders = orders.filter(o => now - new Date(o.created_at).getTime() < 7 * DAY);
+  const prevWeekOrders = orders.filter(o => {
+    const age = now - new Date(o.created_at).getTime();
+    return age >= 7 * DAY && age < 14 * DAY;
+  });
+  const sumCents = list => list.reduce((s, o) => s + (o.amount_total_cents || 0), 0);
 
+  // 14-day revenue series (oldest -> newest) for the dashboard sparkline. Bucket by UTC date.
+  const days = [];
+  for (let d = 13; d >= 0; d--) {
+    const dayStart = new Date(now - d * DAY);
+    const key = dayStart.toISOString().slice(0, 10);
+    const dayOrders = orders.filter(o => (o.created_at || '').slice(0, 10) === key);
+    days.push({ date: key, cents: sumCents(dayOrders), orders: dayOrders.length });
+  }
+
+  // Best sellers by units AND revenue
+  const skuUnits = {}, skuRev = {};
+  for (const o of orders) for (const i of o.items || []) if (i.sku_id) {
+    skuUnits[i.sku_id] = (skuUnits[i.sku_id] || 0) + i.quantity;
+    skuRev[i.sku_id] = (skuRev[i.sku_id] || 0) + (i.line_total_cents || 0);
+  }
+  const topProducts = Object.keys(skuUnits)
+    .map(id => ({ sku_id: id, name: PRODUCT_BY_ID[id]?.name || id, image: PRODUCT_BY_ID[id]?.image || PLACEHOLDER_IMAGE, units_sold: skuUnits[id], revenue_cents: skuRev[id] || 0 }))
+    .sort((a, b) => b.units_sold - a.units_sold)
+    .slice(0, 5);
+
+  // Low stock (all) + "needs attention" feed prioritizing kit-critical shortages
+  const kitIds = kitItemIds();
   const lowStock = Object.entries(inventory)
     .filter(([_id, v]) => v.stock <= (v.low_stock_threshold || 10))
-    .map(([id, v]) => ({ sku_id: id, name: PRODUCT_BY_ID[id]?.name || id, stock: v.stock, threshold: v.low_stock_threshold }));
+    .map(([id, v]) => ({ sku_id: id, name: PRODUCT_BY_ID[id]?.name || id, stock: v.stock, threshold: v.low_stock_threshold, in_kit: kitIds.has(id) }));
 
-  const skuCounts = {};
-  for (const o of orders) for (const i of o.items) if (i.sku_id) {
-    skuCounts[i.sku_id] = (skuCounts[i.sku_id] || 0) + i.quantity;
+  const attention = [];
+  for (const [id, v] of Object.entries(inventory)) {
+    if (!PRODUCT_BY_ID[id]) continue;
+    const inKit = kitIds.has(id);
+    if (v.stock === 0) attention.push({ sku_id: id, name: PRODUCT_BY_ID[id].name, kind: 'out', in_kit: inKit, kits: inKit ? kitsUsing(id) : [], severity: inKit ? 3 : 2 });
+    else if (v.stock <= (v.low_stock_threshold || 10)) attention.push({ sku_id: id, name: PRODUCT_BY_ID[id].name, kind: 'low', stock: v.stock, in_kit: inKit, kits: inKit ? kitsUsing(id) : [], severity: inKit ? 2 : 1 });
   }
-  const topProducts = Object.entries(skuCounts)
-    .map(([id, count]) => ({ sku_id: id, name: PRODUCT_BY_ID[id]?.name || id, units_sold: count }))
-    .sort((a, b) => b.units_sold - a.units_sold)
-    .slice(0, 10);
+  // Products missing a photo (still on the placeholder) are worth flagging too
+  for (const p of PRODUCTS) {
+    if (!p.image || p.image === PLACEHOLDER_IMAGE) attention.push({ sku_id: p.id, name: p.name, kind: 'no_photo', in_kit: kitIds.has(p.id), severity: 1 });
+  }
+  attention.sort((a, b) => b.severity - a.severity);
+
+  // Back-to-school readiness: share of the catalog that's actually sellable right now
+  // (in stock + has a real photo + has a description/keywords), plus the gaps behind the score.
+  let ready = 0, missingPhoto = 0, missingDesc = 0, outCount = 0;
+  for (const p of PRODUCTS) {
+    const stock = inventory[p.id]?.stock ?? 0;
+    const hasPhoto = p.image && p.image !== PLACEHOLDER_IMAGE;
+    const hasDesc = !!(p.unit || (p.keywords || []).length);
+    if (stock === 0) outCount++;
+    if (!hasPhoto) missingPhoto++;
+    if (!hasDesc) missingDesc++;
+    if (stock > 0 && hasPhoto && hasDesc) ready++;
+  }
+  const total = PRODUCTS.length || 1;
+  const kitsReady = Object.values(KITS).filter(kit => kit.items.every(i => (inventory[i.id]?.stock || 0) >= i.quantity)).length;
 
   res.json({
     totals: {
       orders_all_time: orders.length,
-      revenue_all_time_cents: orders.reduce((s, o) => s + (o.amount_total_cents || 0), 0),
+      revenue_all_time_cents: sumCents(orders),
       orders_this_week: weekOrders.length,
-      revenue_this_week_cents: weekOrders.reduce((s, o) => s + (o.amount_total_cents || 0), 0),
-      pending_fulfillment: orders.filter(o => o.fulfillment === 'pending').length
+      revenue_this_week_cents: sumCents(weekOrders),
+      revenue_prev_week_cents: sumCents(prevWeekOrders),
+      orders_prev_week: prevWeekOrders.length,
+      pending_fulfillment: orders.filter(o => o.fulfillment === 'pending').length,
+      aov_cents: orders.length ? Math.round(sumCents(orders) / orders.length) : 0
     },
+    revenue_series: days,
     low_stock: lowStock,
-    top_products: topProducts
+    attention: attention.slice(0, 8),
+    attention_total: attention.length,
+    top_products: topProducts,
+    readiness: {
+      pct: Math.round((ready / total) * 100),
+      ready, total,
+      out_of_stock: outCount,
+      missing_photo: missingPhoto,
+      missing_desc: missingDesc,
+      kits_ready: kitsReady,
+      kits_total: Object.keys(KITS).length
+    }
   });
 });
 
@@ -1032,13 +1161,90 @@ app.get('/api/admin/orders', requireAdmin, (_req, res) => {
   res.json({ orders: readOrders() });
 });
 
+const FULFILLMENT_STATES = ['pending', 'packed', 'shipped'];
 app.post('/api/admin/orders/:id/fulfillment', requireAdmin, (req, res) => {
+  const status = req.body.status;
+  if (!FULFILLMENT_STATES.includes(status)) {
+    return res.status(400).json({ error: `Status must be one of: ${FULFILLMENT_STATES.join(', ')}.` });
+  }
   const orders = readOrders();
   const order = orders.find(o => o.id === req.params.id || o.short_id === req.params.id);
   if (!order) return res.status(404).json({ error: 'Order not found.' });
-  order.fulfillment = req.body.status || order.fulfillment;
+  order.fulfillment = status;
+  const nowIso = new Date().toISOString();
+  if (status === 'packed') order.packed_at = order.packed_at || nowIso;
+  if (status === 'shipped') { order.packed_at = order.packed_at || nowIso; order.shipped_at = nowIso; }
   writeOrders(orders);
   res.json({ order });
+});
+
+// Printable packing slip / pick list for an order. Opened in a new tab and printed to fill the box.
+app.get('/api/admin/orders/:id/packing-slip', requireAdmin, (req, res) => {
+  const order = readOrders().find(o => o.id === req.params.id || o.short_id === req.params.id);
+  if (!order) return res.status(404).type('html').send('<h1>Order not found</h1>');
+  const money = c => `$${((c || 0) / 100).toFixed(2)}`;
+  const addr = order.shipping_address;
+  const shipTo = addr
+    ? [order.customer_name, addr.line1, addr.line2, `${addr.city || ''}, ${addr.state || ''} ${addr.postal_code || ''}`.trim(), addr.country]
+        .filter(Boolean).map(htmlEscape).join('<br>')
+    : htmlEscape(order.customer_name || order.customer_email || 'Customer');
+  const rows = (order.items || []).map(i => `
+    <tr>
+      <td class="qty">${i.quantity}</td>
+      <td>${htmlEscape(i.name)}${i.sku_id ? `<div class="sku">${htmlEscape(i.sku_id)}</div>` : ''}</td>
+      <td class="chk"></td>
+    </tr>`).join('');
+  const orderDate = order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+  const totalUnits = (order.items || []).reduce((s, i) => s + i.quantity, 0);
+  const orgLine = order.organization_code ? `<div class="org">Organization / fundraiser code: <strong>${htmlEscape(order.organization_code)}</strong></div>` : '';
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Packing slip ${htmlEscape(order.short_id || '')}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: #1a2b2e; margin: 0; padding: 40px; }
+    .head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #223A3F; padding-bottom: 16px; margin-bottom: 24px; }
+    .brand { font-size: 22px; font-weight: 800; color: #223A3F; }
+    .brand span { color: #DC3D2D; }
+    .brand small { display:block; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6A6F71; font-weight: 700; margin-top: 2px; }
+    .doc { text-align: right; }
+    .doc h1 { font-size: 16px; margin: 0 0 4px; letter-spacing: 0.04em; text-transform: uppercase; color: #6A6F71; }
+    .doc .no { font-size: 20px; font-weight: 800; }
+    .doc .date { font-size: 12px; color: #6A6F71; }
+    .meta { display: flex; gap: 48px; margin-bottom: 22px; }
+    .meta h2 { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #6A6F71; margin: 0 0 6px; }
+    .meta div { font-size: 14px; line-height: 1.5; }
+    .org { background: #FFF9E8; border: 1px solid #FDCA06; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6A6F71; border-bottom: 2px solid #223A3F; padding: 8px 10px; }
+    td { padding: 11px 10px; border-bottom: 1px solid #E8E4DC; font-size: 14px; vertical-align: top; }
+    td.qty { font-weight: 800; font-size: 16px; width: 56px; }
+    td.chk { width: 48px; }
+    td.chk::before { content: ''; display: inline-block; width: 20px; height: 20px; border: 2px solid #223A3F; border-radius: 5px; }
+    th.chk { text-align: center; }
+    .sku { font-size: 11px; color: #9aa0a2; margin-top: 2px; }
+    .foot { margin-top: 24px; display: flex; justify-content: space-between; font-size: 13px; color: #6A6F71; }
+    .foot strong { color: #223A3F; font-size: 15px; }
+    .print-btn { position: fixed; top: 16px; right: 16px; background: #223A3F; color: #fff; border: none; padding: 10px 18px; border-radius: 999px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    @media print { .print-btn { display: none; } body { padding: 24px; } }
+  </style></head>
+  <body>
+    <button class="print-btn" onclick="window.print()">Print</button>
+    <div class="head">
+      <div class="brand">Fast Track <span>School Supplies</span><small>Packing Slip</small></div>
+      <div class="doc"><h1>Order</h1><div class="no">#${htmlEscape(order.short_id || '')}</div><div class="date">${htmlEscape(orderDate)}</div></div>
+    </div>
+    <div class="meta">
+      <div><h2>Ship to</h2><div>${shipTo}</div></div>
+      <div><h2>Contact</h2><div>${htmlEscape(order.customer_email || '')}${order.customer_phone ? '<br>' + htmlEscape(order.customer_phone) : ''}</div></div>
+      <div><h2>Type</h2><div>${order.order_type === 'subscription' ? 'Subscription refill' : 'One-time order'}</div></div>
+    </div>
+    ${orgLine}
+    <table>
+      <thead><tr><th>Qty</th><th>Item</th><th class="chk">Pack</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="foot"><div>${totalUnits} item${totalUnits === 1 ? '' : 's'} to pack</div><div>Order total <strong>${money(order.amount_total_cents)}</strong></div></div>
+  </body></html>`;
+  res.type('html').send(html);
 });
 
 app.get('/api/admin/inventory', requireAdmin, (_req, res) => {
@@ -1177,30 +1383,103 @@ app.post('/api/admin/products/:id/image', requireAdmin, upload.single('image'), 
   res.json({ image: product.image, ...draftSummary() });
 });
 
+// Duplicate a product into the draft (new id, "(copy)" name, stock reset to 0). Fast way to add a
+// near-identical item (e.g. another marker color).
+app.post('/api/admin/products/:id/duplicate', requireAdmin, (req, res) => {
+  const products = workingProducts();
+  const src = products.find(p => p.id === req.params.id);
+  if (!src) return res.status(404).json({ error: 'Product not found.' });
+  const name = `${src.name} (copy)`;
+  const id = slugifyId(name, new Set([...products.map(p => p.id), ...PRODUCTS.map(p => p.id)]));
+  const product = { id, name, price: src.price, unit: src.unit || '', image: src.image || PLACEHOLDER_IMAGE, keywords: [...(src.keywords || [])] };
+  products.push(product);
+  products.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+  saveWorking(products);
+  const inv = readInventory();
+  if (!inv[id]) { inv[id] = { stock: 0, low_stock_threshold: inv[src.id]?.low_stock_threshold ?? 10 }; writeInventory(inv); }
+  res.json({ product, ...draftSummary() });
+});
+
+// Bulk price change across selected products (draft). mode: 'pct' (+/- %), 'add' (+/- $), 'set' ($).
+// Path is /api/admin/bulk/* so it can't be swallowed by /api/admin/products/:id.
+app.post('/api/admin/bulk/price', requireAdmin, (req, res) => {
+  const { ids, mode, value } = req.body;
+  if (!Array.isArray(ids) || !ids.length) return res.status(400).json({ error: 'Select at least one product.' });
+  if (!['pct', 'add', 'set'].includes(mode)) return res.status(400).json({ error: 'Invalid price change type.' });
+  const num = Number(value);
+  if (!isFinite(num)) return res.status(400).json({ error: 'Enter a valid number.' });
+  if (mode === 'set' && num < 0) return res.status(400).json({ error: 'Price cannot be negative.' });
+  const idSet = new Set(ids);
+  const products = workingProducts();
+  let changed = 0;
+  for (const p of products) {
+    if (!idSet.has(p.id)) continue;
+    let np = mode === 'pct' ? p.price * (1 + num / 100) : mode === 'add' ? p.price + num : num;
+    np = Math.max(0, Math.round(np * 100) / 100);
+    if (np !== p.price) { p.price = np; changed++; }
+  }
+  saveWorking(products);
+  // Note: `updated` (not `changed`) — draftSummary() also has a `changed` key; spread order matters.
+  res.json({ ...draftSummary(), updated: changed });
+});
+
+// Bulk stock update (instant — inventory is operational, not draft). Each item: {id, stock} or {id, adjust}.
+// Path is /api/admin/bulk/* so it can't be swallowed by /api/admin/inventory/:skuId.
+app.post('/api/admin/bulk/inventory', requireAdmin, (req, res) => {
+  const items = req.body.items;
+  if (!Array.isArray(items) || !items.length) return res.status(400).json({ error: 'No items to update.' });
+  const inv = readInventory();
+  // Accept any product in the working catalog (draft ∪ published) — stock is operational and a
+  // brand-new, not-yet-published product can still be stocked.
+  const validIds = new Set(workingProducts().map(p => p.id));
+  let updated = 0;
+  for (const it of items) {
+    if (!it || typeof it.id !== 'string' || !validIds.has(it.id)) continue;
+    if (!inv[it.id]) inv[it.id] = { stock: 0, low_stock_threshold: 10 };
+    if (typeof it.adjust === 'number') { inv[it.id].stock = Math.max(0, (inv[it.id].stock || 0) + it.adjust); updated++; }
+    else if (typeof it.stock === 'number') { inv[it.id].stock = Math.max(0, Math.round(it.stock)); updated++; }
+  }
+  writeInventory(inv);
+  res.json({ updated });
+});
+
 // ---------- Admin: publish / discard / preview ----------
 // Publish: the draft becomes the live catalog in one atomic step, then the in-memory catalog
 // (store SSR, checkout prices, AI prompt) reloads. Inventory rows for removed products are pruned.
 app.post('/api/admin/publish', requireAdmin, (_req, res) => {
   const draft = readDraft();
-  if (!draft) return res.status(400).json({ error: 'No unpublished changes to publish.' });
-  // Defensive: no kit may reference a product missing from the new catalog.
-  const ids = new Set(draft.map(p => p.id));
-  const brokenKits = Object.values(KITS).filter(kit => kit.items.some(i => !ids.has(i.id))).map(kit => kit.name);
-  if (brokenKits.length) return res.status(409).json({ error: 'in_kit', kits: brokenKits });
+  const hasContent = contentHasDraft();
+  if (!draft && !hasContent) return res.status(400).json({ error: 'No unpublished changes to publish.' });
   const summary = draftSummary();
-  writeProducts(draft);
-  discardDraftFile();
-  const inv = readInventory();
-  let pruned = false;
-  for (const key of Object.keys(inv)) if (!ids.has(key)) { delete inv[key]; pruned = true; }
-  if (pruned) writeInventory(inv);
-  reloadCatalog();
-  res.json({ ok: true, published: { added: summary.added, changed: summary.changed, removed: summary.removed } });
+  // Catalog draft (if any): guard kits, promote, prune inventory, reload memory.
+  if (draft) {
+    const ids = new Set(draft.map(p => p.id));
+    const brokenKits = Object.values(KITS).filter(kit => kit.items.some(i => !ids.has(i.id))).map(kit => kit.name);
+    if (brokenKits.length) return res.status(409).json({ error: 'in_kit', kits: brokenKits });
+    writeProducts(draft);
+    discardDraftFile();
+    const inv = readInventory();
+    let pruned = false;
+    for (const key of Object.keys(inv)) if (!ids.has(key)) { delete inv[key]; pruned = true; }
+    if (pruned) writeInventory(inv);
+    reloadCatalog();
+  }
+  // Storefront content draft (if any): promote.
+  if (hasContent) publishContent();
+  res.json({ ok: true, published: { added: summary.added, changed: summary.changed, removed: summary.removed, content_changed: summary.content_changed } });
 });
 
-// Discard: throw away all unpublished changes; the live catalog is untouched.
+// Discard: throw away all unpublished changes (catalog + storefront content); live is untouched.
+// Also prune inventory rows for products that only existed in the discarded draft (never published),
+// so a created-then-discarded product leaves nothing behind.
 app.post('/api/admin/discard-draft', requireAdmin, (_req, res) => {
   discardDraftFile();
+  discardContentDraft();
+  const publishedIds = new Set(readProducts().map(p => p.id));
+  const inv = readInventory();
+  let pruned = false;
+  for (const key of Object.keys(inv)) if (!publishedIds.has(key)) { delete inv[key]; pruned = true; }
+  if (pruned) writeInventory(inv);
   res.json({ ok: true });
 });
 
@@ -1241,6 +1520,32 @@ app.post('/api/admin/shipping', requireAdmin, (req, res) => {
 
 // Public shipping config so cart pages can show accurate shipping before checkout.
 app.get('/api/shipping-config', (_req, res) => res.json(readSettings().shipping));
+
+// ---------- Admin: Storefront content (announcement, hero, featured) ----------
+// Only http(s) or root-relative links are allowed on the announcement bar (blocks javascript: URLs).
+function safeLink(u) { u = String(u || '').trim(); return (/^https?:\/\//i.test(u) || u.startsWith('/')) ? u.slice(0, 300) : ''; }
+app.get('/api/admin/content', requireAdmin, (_req, res) => res.json(workingContent()));
+app.post('/api/admin/content', requireAdmin, (req, res) => {
+  const b = req.body || {};
+  const validIds = new Set(workingProducts().map(p => p.id));
+  const next = {
+    announcement: {
+      enabled: !!(b.announcement && b.announcement.enabled),
+      text: String(b.announcement?.text || '').slice(0, 160),
+      link: safeLink(b.announcement?.link)
+    },
+    hero_title: (String(b.hero_title ?? '').trim().slice(0, 80)) || DEFAULT_SETTINGS.content.hero_title,
+    hero_subtitle: String(b.hero_subtitle ?? '').trim().slice(0, 240),
+    featured_ids: Array.isArray(b.featured_ids) ? [...new Set(b.featured_ids)].filter(id => validIds.has(id)).slice(0, 8) : []
+  };
+  saveContentDraft(next);
+  res.json({ content: next, ...draftSummary() });
+});
+// Public storefront content (preview-aware) — the store JS reads this for featured badges.
+app.get('/api/store-content', (req, res) => res.json(contentFor(req)));
+
+// Lightweight unpublished-changes summary for the global publish bar (any admin panel).
+app.get('/api/admin/pending', requireAdmin, (_req, res) => res.json(draftSummary()));
 
 // ---------- Boot ----------
 const PORT = process.env.PORT || 3001;

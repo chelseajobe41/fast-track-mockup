@@ -61,6 +61,10 @@
   .store-hero h1 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: clamp(40px, 5vw, 64px); line-height: 1.05; letter-spacing: -0.025em; color: var(--teal); margin-bottom: 12px; }
   .store-hero h1 .dot { color: var(--orange); }
   .store-hero p { font-size: 18px; color: var(--teal-soft); max-width: 540px; margin-bottom: 28px; }
+  .store-hero p:empty { display: none; }
+  .announce-bar { background: var(--teal); color: #FAF6EF; text-align: center; padding: 11px 20px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.01em; }
+  .announce-bar a { color: #FDCA06; text-decoration: underline; }
+  .featured-badge { position: absolute; top: 12px; left: 12px; z-index: 3; background: #FDCA06; color: #223A3F; padding: 4px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
 
   /* Search & filters */
   .controls { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 72px; z-index: 40; padding: 20px 0; }
@@ -190,7 +194,7 @@
 <script defer src="/motion.js"></script>
 </head>
 <body>
-
+<!--ANNOUNCEMENT_BAR-->
 <header>
   <div class="container nav">
     <a href="/" class="wordmark">
@@ -214,8 +218,8 @@
 
 <section class="store-hero">
   <div class="container">
-    <h1>Shop the store<span class="dot">.</span></h1>
-    <p>Build your own kit or pick up something for next semester. Flat $9.95 shipping on every order.</p>
+    <h1>{{HERO_TITLE}}<span class="dot">.</span></h1>
+    <p>{{HERO_SUBTITLE}}</p>
   </div>
 </section>
 
@@ -320,6 +324,7 @@
 
   let PRODUCTS = [];
   let INVENTORY = {};
+  const FEATURED = new Set((window.__STORE_CONTENT__ && window.__STORE_CONTENT__.featured_ids) || []);
   let activeCategory = 'all';
   let searchQuery = '';
   let sortMode = 'featured';
@@ -392,6 +397,8 @@
     if (sortMode === 'price-asc') filtered.sort((a, b) => a.price - b.price);
     else if (sortMode === 'price-desc') filtered.sort((a, b) => b.price - a.price);
     else if (sortMode === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+    // Featured sort (the default): owner-picked products float to the front.
+    else if (FEATURED.size) filtered.sort((a, b) => (FEATURED.has(b.id) ? 1 : 0) - (FEATURED.has(a.id) ? 1 : 0));
 
     document.getElementById('result-count').textContent = `${filtered.length} of ${PRODUCTS.length} products`;
 
@@ -425,7 +432,7 @@
       return `
         <div class="product-card ${inCart ? 'in-cart' : ''}">
           <div class="product-img">
-            ${inCart ? `<span class="cart-indicator">${qtyInCart}</span>` : ''}
+            ${inCart ? `<span class="cart-indicator">${qtyInCart}</span>` : (FEATURED.has(p.id) ? '<span class="featured-badge">Featured</span>' : '')}
             ${isOut ? '<span class="stock-badge out">Out</span>' : isLow ? `<span class="stock-badge low">Only ${stock} left</span>` : ''}
             <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" />
           </div>

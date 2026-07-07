@@ -272,7 +272,107 @@
     .content { padding: 20px 20px 80px; }
     .mobile-only { display: inline-flex; }
   }
-  @media (max-width: 560px) { .kpis { grid-template-columns: 1fr; } .prow { grid-template-columns: 48px 1fr auto; } .prow-price, .prow-stock { display: none; } }
+  /* ===== Living dashboard ===== */
+  .kpi-trend { font-family: 'Parkinsans'; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 999px; }
+  .kpi-trend.up { background: var(--green-soft); color: var(--green); }
+  .kpi-trend.down { background: var(--red-soft); color: var(--red); }
+  .kpi-trend.flat { background: var(--cream); color: var(--muted); }
+  .kpi .value-row { display: flex; align-items: baseline; gap: 10px; }
+  .spark-wrap { margin-top: 6px; }
+  .spark-wrap svg { width: 100%; height: 44px; display: block; overflow: visible; }
+  .readiness-card .rd-num { font-family: 'Parkinsans'; font-weight: 800; font-size: 34px; color: var(--teal); letter-spacing: -0.02em; }
+  .rd-bar { height: 10px; border-radius: 999px; background: var(--cream); overflow: hidden; margin: 12px 0 14px; }
+  .rd-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--green), #4bbf82); transition: width 0.5s ease; }
+  .rd-gaps { display: flex; flex-direction: column; gap: 8px; }
+  .rd-gap { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--teal); }
+  .rd-gap .pill { cursor: default; }
+  .attn-item { display: flex; align-items: center; gap: 11px; padding: 10px 0; border-top: 1px solid var(--line-soft); }
+  .attn-item:first-child { border-top: none; }
+  .attn-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .attn-dot.s3 { background: var(--red); } .attn-dot.s2 { background: var(--orange); } .attn-dot.s1 { background: #B8A63A; }
+  .attn-item .txt { flex: 1; min-width: 0; }
+  .attn-item .txt .name { font-family: 'Parkinsans'; font-weight: 600; font-size: 13.5px; color: var(--teal); }
+  .attn-item .txt .why { font-size: 12px; color: var(--muted); }
+  .top-item { display: flex; align-items: center; gap: 11px; padding: 9px 0; border-top: 1px solid var(--line-soft); }
+  .top-item:first-child { border-top: none; }
+  .top-item img { width: 36px; height: 36px; border-radius: 8px; object-fit: contain; background: var(--cream); border: 1px solid var(--line); padding: 3px; flex: none; }
+  .top-item .ti-name { flex: 1; min-width: 0; font-family: 'Parkinsans'; font-weight: 600; font-size: 13.5px; color: var(--teal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .top-rank { font-family: 'Parkinsans'; font-weight: 800; color: var(--muted-2); width: 18px; text-align: center; flex: none; }
+
+  /* ===== Orders / fulfillment ===== */
+  .ord-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .ord-chips { display: flex; gap: 8px; }
+  .pill.packed { background: rgba(34,58,63,0.10); color: var(--teal); }
+  .status-steps { display: flex; gap: 8px; margin: 4px 0 8px; }
+  .step-btn { flex: 1; border: 1px solid var(--line); background: var(--white); border-radius: var(--r-sm); padding: 10px 8px; font-family: 'Parkinsans'; font-weight: 600; font-size: 12.5px; color: var(--muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: all 0.14s; }
+  .step-btn svg { width: 18px; height: 18px; }
+  .step-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .step-btn.done { background: var(--green-soft); border-color: transparent; color: var(--green); }
+  .step-btn.current { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .od-sec { border-top: 1px solid var(--line-soft); padding-top: 16px; }
+  .od-sec h4 { font-family: 'Parkinsans'; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 9px; }
+  .od-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; color: var(--teal); }
+  .od-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line-soft); }
+  .od-item:first-child { border-top: none; }
+  .od-qty { font-family: 'Parkinsans'; font-weight: 800; background: var(--cream); border-radius: 7px; min-width: 30px; text-align: center; padding: 4px 6px; color: var(--teal); }
+
+  /* ===== Power tools ===== */
+  .prow.selectable { grid-template-columns: 30px 60px 1fr 110px auto auto; }
+  .prow-check { width: 19px; height: 19px; border: 2px solid var(--line); border-radius: 5px; display: grid; place-items: center; color: transparent; transition: all 0.12s; }
+  .prow.picked .prow-check { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .prow-check svg { width: 12px; height: 12px; }
+  .bulk-bar { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(140px); background: var(--teal); color: #fff; border-radius: 999px; padding: 10px 12px 10px 22px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-lg); z-index: 45; transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); }
+  .bulk-bar.show { transform: translateX(-50%) translateY(0); }
+  .bulk-bar .bb-count { font-family: 'Parkinsans'; font-weight: 700; }
+  .bulk-bar .btn { padding: 8px 14px; }
+  .modal-back { position: fixed; inset: 0; background: rgba(21,37,40,0.42); z-index: 60; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal-back.open { opacity: 1; pointer-events: auto; }
+  .modal-card { background: var(--white); border-radius: var(--r-lg); box-shadow: var(--shadow-lg); width: 420px; max-width: 92vw; padding: 24px; transform: translateY(10px); transition: transform 0.2s; }
+  .modal-back.open .modal-card { transform: none; }
+  .modal-card h3 { font-family: 'Parkinsans'; font-size: 18px; font-weight: 700; color: var(--teal); margin-bottom: 6px; }
+  .modal-card .m-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+  .seg { display: flex; gap: 4px; background: var(--cream); border-radius: 999px; padding: 3px; margin-bottom: 14px; }
+  .seg button { flex: 1; border: none; background: none; padding: 8px; border-radius: 999px; font-family: 'Parkinsans'; font-weight: 600; font-size: 12.5px; color: var(--muted); cursor: pointer; }
+  .seg button.on { background: var(--white); color: var(--teal); box-shadow: var(--shadow-sm); }
+
+  /* ===== Command palette ===== */
+  .cmdk-back { position: fixed; inset: 0; background: rgba(21,37,40,0.4); z-index: 70; display: flex; align-items: flex-start; justify-content: center; padding-top: 12vh; opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+  .cmdk-back.open { opacity: 1; pointer-events: auto; }
+  .cmdk { width: 560px; max-width: 92vw; background: var(--white); border-radius: 16px; box-shadow: var(--shadow-lg); overflow: hidden; transform: translateY(-8px); transition: transform 0.15s; }
+  .cmdk-back.open .cmdk { transform: none; }
+  .cmdk-input { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+  .cmdk-input svg { width: 20px; height: 20px; color: var(--muted); flex: none; }
+  .cmdk-input input { border: none; outline: none; font-family: 'Barlow'; font-size: 16px; color: var(--teal); width: 100%; background: none; }
+  .cmdk-results { max-height: 340px; overflow-y: auto; padding: 6px; }
+  .cmdk-row { display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+  .cmdk-row.sel { background: var(--cream); }
+  .cmdk-row .ck-ico { width: 30px; height: 30px; border-radius: 8px; background: var(--cream); display: grid; place-items: center; color: var(--teal); flex: none; }
+  .cmdk-row.sel .ck-ico { background: var(--white); }
+  .cmdk-row img.ck-ico { object-fit: contain; padding: 3px; border: 1px solid var(--line); }
+  .cmdk-row .ck-txt { flex: 1; min-width: 0; }
+  .cmdk-row .ck-title { font-family: 'Parkinsans'; font-weight: 600; font-size: 14px; color: var(--teal); }
+  .cmdk-row .ck-kind { font-size: 11.5px; color: var(--muted); }
+  .cmdk-empty { padding: 30px; text-align: center; color: var(--muted); font-size: 14px; }
+  .cmdk-hint { padding: 9px 16px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted-2); display: flex; gap: 14px; }
+  kbd { font-family: 'Parkinsans'; font-size: 11px; background: var(--cream); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; color: var(--muted); }
+
+  /* ===== Storefront customizer ===== */
+  .sf-card { max-width: 720px; }
+  .switch { position: relative; width: 46px; height: 26px; border-radius: 999px; background: var(--line); cursor: pointer; transition: background 0.18s; flex: none; }
+  .switch.on { background: var(--green); }
+  .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: transform 0.18s; }
+  .switch.on::after { transform: translateX(20px); }
+  .sf-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .feat-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+  .feat-chip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px 5px 6px; font-family: 'Parkinsans'; font-size: 12.5px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.13s; }
+  .feat-chip img { width: 24px; height: 24px; border-radius: 50%; object-fit: contain; background: var(--cream); }
+  .feat-chip.on { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .ann-preview { border: 1px dashed var(--line); border-radius: var(--r-md); overflow: hidden; }
+  .ann-preview .bar { background: var(--teal); color: #FAF6EF; text-align: center; padding: 10px; font-family: 'Parkinsans'; font-weight: 600; font-size: 13.5px; }
+  .ann-preview .bar a { color: #FDCA06; text-decoration: underline; }
+  .ann-preview .off { padding: 12px; text-align: center; color: var(--muted); font-size: 13px; }
+
+  @media (max-width: 560px) { .kpis { grid-template-columns: 1fr; } .prow { grid-template-columns: 48px 1fr auto; } .prow.selectable { grid-template-columns: 30px 48px 1fr auto; } .prow-price, .prow-stock { display: none; } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 </style>
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
@@ -310,6 +410,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h11v9.5H3zM14 9.5h3.8l3.2 3.2v2.8H14z"/><circle cx="7" cy="18" r="1.7"/><circle cx="17.5" cy="18" r="1.7"/></svg>
         Shipping
       </button>
+      <button class="nav-item" data-panel="storefront">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9M3 9h18M8 20v-6h4v6"/></svg>
+        Storefront
+      </button>
     </nav>
     <div class="sb-foot">
       <a href="/" target="_blank">
@@ -331,20 +435,39 @@
 
     <div class="content">
 
+      <!-- Global unpublished-changes bar (catalog + storefront) -->
+      <div class="pub-bar" id="pub-bar" style="display:none;">
+        <div class="pub-info">
+          <span class="pub-dot"></span>
+          <div>
+            <strong>You have unpublished changes</strong>
+            <div class="pub-sum" id="pub-summary"></div>
+          </div>
+        </div>
+        <div class="pub-actions">
+          <button class="btn secondary" id="pub-preview">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview store
+          </button>
+          <button class="btn ghost-danger" id="pub-discard">Discard</button>
+          <button class="btn" id="pub-publish">Publish to store</button>
+        </div>
+      </div>
+
       <!-- HOME / OVERVIEW -->
       <section class="panel active" id="panel-overview">
         <div class="kpis">
           <div class="kpi">
-            <div class="kpi-top"><span class="label">Orders this week</span>
-              <span class="kpi-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></span>
-            </div>
-            <div class="value" id="stat-orders-week">—</div>
-          </div>
-          <div class="kpi">
             <div class="kpi-top"><span class="label">Revenue this week</span>
               <span class="kpi-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M8 7h5a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h6"/></svg></span>
             </div>
-            <div class="value" id="stat-revenue-week">—</div>
+            <div class="value-row"><span class="value" id="stat-revenue-week">—</span><span class="kpi-trend flat" id="trend-revenue"></span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">Orders this week</span>
+              <span class="kpi-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></span>
+            </div>
+            <div class="value-row"><span class="value" id="stat-orders-week">—</span><span class="kpi-trend flat" id="trend-orders"></span></div>
           </div>
           <div class="kpi">
             <div class="kpi-top"><span class="label">Pending fulfillment</span>
@@ -353,11 +476,16 @@
             <div class="value" id="stat-pending">—</div>
           </div>
           <div class="kpi">
-            <div class="kpi-top"><span class="label">Lifetime orders</span>
+            <div class="kpi-top"><span class="label">Avg order</span>
               <span class="kpi-ico yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18V9M10 18V5M16 18v-6M22 18H2"/></svg></span>
             </div>
-            <div class="value" id="stat-all-orders">—</div>
+            <div class="value" id="stat-aov">—</div>
           </div>
+        </div>
+
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-head"><h3>Sales · last 14 days</h3><span class="pill gray plain" id="spark-cap"></span></div>
+          <div class="card-body"><div class="spark-wrap" id="spark"></div></div>
         </div>
 
         <div class="grid-2 wide">
@@ -367,12 +495,16 @@
           </div>
           <div style="display:flex;flex-direction:column;gap:18px;">
             <div class="card">
-              <div class="card-head"><h3>Low stock</h3><span class="pill warn plain" id="low-stock-count">0</span></div>
-              <div class="card-body" id="low-stock-body"><div class="empty"><h3>All good</h3>Stock levels are healthy.</div></div>
+              <div class="card-head"><h3>Needs your attention</h3><span class="pill warn plain" id="attention-count">0</span></div>
+              <div class="card-body" id="attention-body"><div class="empty"><h3>All good</h3>Nothing needs attention.</div></div>
             </div>
             <div class="card">
-              <div class="card-head"><h3>Top sellers</h3><span class="pill gray plain">All time</span></div>
+              <div class="card-head"><h3>Best sellers</h3><span class="pill gray plain">All time</span></div>
               <div class="card-body" id="top-products-body"><div class="empty"><h3>No sales yet</h3>Best sellers appear once you have orders.</div></div>
+            </div>
+            <div class="card readiness-card">
+              <div class="card-head"><h3>Store readiness</h3><button class="btn secondary sm" data-goto="products">Fix up</button></div>
+              <div class="card-body" id="readiness-body"></div>
             </div>
           </div>
         </div>
@@ -384,6 +516,13 @@
           <div class="card-head"><h3>Organization &amp; fundraiser codes</h3><span class="pill teal plain">For rebates</span></div>
           <div class="card-body" id="org-summary-body"></div>
         </div>
+        <div class="ord-toolbar" id="ord-toolbar" style="display:none;">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+            <input type="text" id="ord-search" placeholder="Search orders, names, emails…" />
+          </div>
+          <div class="ord-chips" id="ord-chips"></div>
+        </div>
         <div class="table-wrap">
           <table>
             <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Placed</th><th></th></tr></thead>
@@ -394,28 +533,15 @@
 
       <!-- PRODUCTS -->
       <section class="panel" id="panel-products">
-        <div class="pub-bar" id="pub-bar" style="display:none;">
-          <div class="pub-info">
-            <span class="pub-dot"></span>
-            <div>
-              <strong>You have unpublished changes</strong>
-              <div class="pub-sum" id="pub-summary"></div>
-            </div>
-          </div>
-          <div class="pub-actions">
-            <button class="btn secondary" id="pub-preview">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              Preview store
-            </button>
-            <button class="btn ghost-danger" id="pub-discard">Discard</button>
-            <button class="btn" id="pub-publish">Publish to store</button>
-          </div>
-        </div>
         <div class="prod-toolbar">
           <div class="search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
             <input type="text" id="prod-search" placeholder="Search products…" />
           </div>
+          <button class="btn secondary" id="select-toggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
+            Select
+          </button>
         </div>
         <div class="chips" id="cat-chips"></div>
         <div class="prod-list" id="products-list"></div>
@@ -442,6 +568,41 @@
             <p class="ship-hint">Example: up to $30 → $9.95, up to $60 → $14.95, and everything larger → $19.95.</p>
           </div>
           <div class="drawer-foot" style="border:none;padding:20px 0 0;"><div class="spacer"></div><button class="btn" id="ship-save">Save shipping</button></div>
+        </div>
+      </section>
+
+      <!-- STOREFRONT CUSTOMIZER -->
+      <section class="panel" id="panel-storefront">
+        <div class="card sf-card" style="margin-bottom:18px;">
+          <div class="card-head"><h3>Announcement bar</h3><div class="switch" id="ann-switch" role="switch" tabindex="0" aria-label="Show announcement bar"></div></div>
+          <div class="card-body">
+            <div class="field-hint" style="margin-bottom:14px;">A ribbon across the very top of your store. Great for "Free shipping this week!" or a back-to-school sale.</div>
+            <label class="field" style="margin-bottom:14px;">Message <input type="text" id="ann-text" maxlength="160" placeholder="Free shipping on orders over $50 this week!" /></label>
+            <label class="field" style="margin-bottom:16px;">Link when clicked <span style="font-weight:500;color:var(--muted);">(optional)</span> <input type="text" id="ann-link" maxlength="300" placeholder="/store or https://…" /></label>
+            <div class="ann-preview" id="ann-preview"></div>
+          </div>
+        </div>
+
+        <div class="card sf-card" style="margin-bottom:18px;">
+          <div class="card-head"><h3>Store headline</h3></div>
+          <div class="card-body">
+            <label class="field" style="margin-bottom:14px;">Big headline <input type="text" id="sf-hero-title" maxlength="80" placeholder="Shop the store" /></label>
+            <label class="field">Subtitle <input type="text" id="sf-hero-sub" maxlength="240" placeholder="Build your own kit or pick up something for next semester." /></label>
+          </div>
+        </div>
+
+        <div class="card sf-card">
+          <div class="card-head"><h3>Featured products</h3><span class="pill gray plain" id="feat-count">0 of 8</span></div>
+          <div class="card-body">
+            <div class="field-hint" style="margin-bottom:14px;">Pick up to 8 products to spotlight with a "Featured" badge and float to the front of your store.</div>
+            <div class="feat-picker" id="feat-picker"></div>
+          </div>
+        </div>
+
+        <div class="drawer-foot" style="border:none;padding:22px 0 0;max-width:720px;">
+          <div class="spacer"></div>
+          <button class="btn secondary" id="sf-reset">Reset changes</button>
+          <button class="btn" id="sf-save">Save changes</button>
         </div>
       </section>
 
@@ -493,11 +654,82 @@
   </div>
   <div class="drawer-foot">
     <button class="btn ghost-danger" id="ed-delete">Delete</button>
+    <button class="btn secondary" id="ed-duplicate" title="Make a copy of this product">Duplicate</button>
     <div class="spacer"></div>
     <button class="btn secondary" id="ed-cancel">Cancel</button>
     <button class="btn" id="ed-save">Save</button>
   </div>
 </aside>
+
+<!-- Order detail slide-over -->
+<aside class="drawer" id="order-drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <h3 id="od-title">Order</h3>
+    <button class="icon-btn" id="od-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="od-body"></div>
+  <div class="drawer-foot">
+    <button class="btn secondary" id="od-print">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-2M6 14h12v7H6z"/></svg>
+      Print packing slip
+    </button>
+    <div class="spacer"></div>
+    <button class="btn" id="od-done">Done</button>
+  </div>
+</aside>
+
+<!-- Bulk action bar (products select mode) -->
+<div class="bulk-bar" id="bulk-bar">
+  <span class="bb-count" id="bb-count">0 selected</span>
+  <button class="btn secondary sm" id="bb-restock">Restock…</button>
+  <button class="btn secondary sm" id="bb-price">Change price…</button>
+  <button class="icon-btn" id="bb-clear" aria-label="Clear selection" style="color:#fff;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+  </button>
+</div>
+
+<!-- Bulk restock modal -->
+<div class="modal-back" id="restock-modal">
+  <div class="modal-card">
+    <h3>Restock selected</h3>
+    <div class="m-sub" id="restock-sub">Update stock for the products you picked.</div>
+    <div class="seg" id="restock-mode">
+      <button class="on" data-mode="add">Add to stock</button>
+      <button data-mode="set">Set each to</button>
+    </div>
+    <label class="field" style="margin-bottom:18px;">Amount <input type="number" id="restock-val" min="0" value="10" /></label>
+    <div class="drawer-foot" style="border:none;padding:0;"><div class="spacer"></div><button class="btn secondary" data-close-modal="restock-modal">Cancel</button><button class="btn" id="restock-apply">Apply</button></div>
+  </div>
+</div>
+
+<!-- Bulk price modal -->
+<div class="modal-back" id="price-modal">
+  <div class="modal-card">
+    <h3>Change price</h3>
+    <div class="m-sub" id="price-sub">This saves as a draft — preview and publish when ready.</div>
+    <div class="seg" id="price-mode">
+      <button class="on" data-mode="pct">By percent</button>
+      <button data-mode="add">By dollars</button>
+      <button data-mode="set">Set price</button>
+    </div>
+    <label class="field" style="margin-bottom:18px;"><span id="price-label">Percent change (e.g. 5 for +5%, -10 for −10%)</span><span class="dollar-wrap" id="price-dollar-wrap" style="display:none;">$<input type="number" id="price-val-d" step="0.01" /></span><input type="number" id="price-val" step="0.01" value="5" /></label>
+    <div class="drawer-foot" style="border:none;padding:0;"><div class="spacer"></div><button class="btn secondary" data-close-modal="price-modal">Cancel</button><button class="btn" id="price-apply">Apply</button></div>
+  </div>
+</div>
+
+<!-- Command palette (⌘K) -->
+<div class="cmdk-back" id="cmdk-back">
+  <div class="cmdk" role="dialog" aria-label="Command palette">
+    <div class="cmdk-input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      <input type="text" id="cmdk-q" placeholder="Search products, orders, or jump to a page…" autocomplete="off" />
+    </div>
+    <div class="cmdk-results" id="cmdk-results"></div>
+    <div class="cmdk-hint"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>↵</kbd> open</span><span><kbd>esc</kbd> close</span></div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -506,10 +738,11 @@
   const PLACEHOLDER_IMG = '/assets/photo-coming.svg';
 
   const PAGE_META = {
-    overview:  { title: 'Home',      sub: 'A quick look at how your store is doing.' },
-    orders:    { title: 'Orders',    sub: 'Every order that comes through your store.' },
-    products:  { title: 'Products',  sub: 'Everything you sell — prices, photos, and stock in one place.' },
-    shipping:  { title: 'Shipping',  sub: 'Set how much you charge customers to ship.' },
+    overview:   { title: 'Home',       sub: 'A quick look at how your store is doing.' },
+    orders:     { title: 'Orders',     sub: 'Pack, ship, and track every order.' },
+    products:   { title: 'Products',   sub: 'Everything you sell — prices, photos, and stock in one place.' },
+    shipping:   { title: 'Shipping',   sub: 'Set how much you charge customers to ship.' },
+    storefront: { title: 'Storefront', sub: 'Announcements, headline, and featured products.' },
   };
 
   // ---------- Navigation ----------
@@ -519,6 +752,7 @@
     const meta = PAGE_META[name];
     document.getElementById('page-title').textContent = meta.title;
     document.getElementById('page-sub').textContent = meta.sub;
+    if (name !== 'products') exitSelectMode();
     // Contextual top-bar action
     const action = document.getElementById('page-action');
     action.innerHTML = name === 'products'
@@ -529,6 +763,8 @@
     if (name === 'orders') loadOrders();
     if (name === 'products') loadProducts();
     if (name === 'shipping') loadShipping();
+    if (name === 'storefront') loadStorefront();
+    refreshPublishBar();
   }
   document.querySelectorAll('.nav-item').forEach(t => t.addEventListener('click', () => switchPanel(t.dataset.panel)));
   document.addEventListener('click', e => {
@@ -575,39 +811,87 @@
   const ICO_BOX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>';
   const ICO_BAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>';
 
-  // ---------- Home / Overview ----------
+  // ---------- Home / Overview (living dashboard) ----------
+  function setTrend(id, cur, prev) {
+    const el = document.getElementById(id);
+    if (!prev) { el.className = 'kpi-trend flat'; el.textContent = cur ? 'new' : '—'; return; }
+    const pct = Math.round(((cur - prev) / prev) * 100);
+    const dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat';
+    el.className = `kpi-trend ${dir}`;
+    el.textContent = `${pct > 0 ? '↑' : pct < 0 ? '↓' : '→'} ${Math.abs(pct)}%`;
+  }
+  function statusPillClass(f) { return f === 'shipped' ? 'ok' : f === 'packed' ? 'packed' : 'warn'; }
+  function renderSparkline(series) {
+    const vals = (series || []).map(d => d.cents);
+    const max = Math.max(1, ...vals), W = 100, H = 40, n = vals.length;
+    const x = i => n <= 1 ? 0 : (i / (n - 1)) * W;
+    const y = v => H - (v / max) * (H - 3) - 1.5;
+    const line = vals.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+    const barW = (W / n) * 0.5;
+    const bars = vals.map((v, i) => v > 0 ? `<rect x="${x(i) - barW / 2}" y="${y(v)}" width="${barW}" height="${H - y(v)}" rx="0.5" fill="rgba(45,134,89,0.16)"/>` : '').join('');
+    document.getElementById('spark').innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <polygon points="0,${H} ${line} ${W},${H}" fill="rgba(45,134,89,0.07)"/>${bars}
+      <polyline points="${line}" fill="none" stroke="#2d8659" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
+  }
+
   async function loadOverview() {
     let data;
     try { data = await (await fetch('/api/admin/overview')).json(); } catch { return; }
-    document.getElementById('stat-orders-week').textContent = data.totals.orders_this_week;
-    document.getElementById('stat-revenue-week').textContent = dollars(data.totals.revenue_this_week_cents);
-    document.getElementById('stat-pending').textContent = data.totals.pending_fulfillment;
-    document.getElementById('stat-all-orders').textContent = data.totals.orders_all_time;
+    const t = data.totals;
+    document.getElementById('stat-revenue-week').textContent = dollars(t.revenue_this_week_cents);
+    document.getElementById('stat-orders-week').textContent = t.orders_this_week;
+    document.getElementById('stat-pending').textContent = t.pending_fulfillment;
+    document.getElementById('stat-aov').textContent = t.orders_all_time ? dollars(t.aov_cents) : '—';
+    setTrend('trend-revenue', t.revenue_this_week_cents, t.revenue_prev_week_cents);
+    setTrend('trend-orders', t.orders_this_week, t.orders_prev_week);
 
-    // low stock
-    document.getElementById('low-stock-count').textContent = data.low_stock.length;
-    const lowBody = document.getElementById('low-stock-body');
-    lowBody.innerHTML = data.low_stock.length === 0
-      ? emptyState(ICO_BOX, 'All good', 'Stock levels are healthy.')
-      : `<div class="list">${data.low_stock.map(item => `
-        <div class="list-item" data-goto="products" style="cursor:pointer;" title="Open Products to restock">
-          <div><div class="name">${escapeHtml(item.name)}</div><div class="meta">Warns at ${item.threshold}</div></div>
-          <span class="pill ${item.stock === 0 ? 'danger' : 'warn'}">${item.stock === 0 ? 'Out' : item.stock + ' left'}</span>
-        </div>`).join('')}</div>`;
+    renderSparkline(data.revenue_series);
+    document.getElementById('spark-cap').textContent = `This week ${dollars(t.revenue_this_week_cents)} · last week ${dollars(t.revenue_prev_week_cents)}`;
 
-    // top products
+    // Needs your attention
+    document.getElementById('attention-count').textContent = data.attention_total;
+    const attnBody = document.getElementById('attention-body');
+    attnBody.innerHTML = !data.attention.length
+      ? emptyState(ICO_BOX, 'All good', 'Nothing needs attention right now.')
+      : data.attention.map(a => {
+          const kits = (a.kits || []).length ? ` · in ${a.kits.join(', ')}` : '';
+          const why = a.kind === 'out' ? `Out of stock${kits}` : a.kind === 'low' ? `Only ${a.stock} left${kits}` : 'No photo yet';
+          const tag = a.kind === 'out' ? '<span class="pill danger">Out</span>' : a.kind === 'low' ? `<span class="pill warn">${a.stock}</span>` : '<span class="pill gray plain">Photo</span>';
+          return `<div class="attn-item" data-goto="products" style="cursor:pointer;">
+            <span class="attn-dot s${a.severity}"></span>
+            <div class="txt"><div class="name">${escapeHtml(a.name)}</div><div class="why">${escapeHtml(why)}</div></div>${tag}
+          </div>`;
+        }).join('');
+
+    // Best sellers
     const topBody = document.getElementById('top-products-body');
-    topBody.innerHTML = data.top_products.length === 0
+    topBody.innerHTML = !data.top_products.length
       ? emptyState(ICO_BAG, 'No sales yet', 'Best sellers appear once you have orders.')
-      : `<div class="list">${data.top_products.map(item => `
-        <div class="list-item"><div class="name">${escapeHtml(item.name)}</div><span class="pill teal plain">${item.units_sold} sold</span></div>`).join('')}</div>`;
+      : data.top_products.map((p, i) => `
+        <div class="top-item">
+          <span class="top-rank">${i + 1}</span>
+          <img src="${escapeHtml(p.image || PLACEHOLDER_IMG)}" onerror="this.src='${PLACEHOLDER_IMG}'" alt="" />
+          <span class="ti-name">${escapeHtml(p.name)}</span>
+          <div style="text-align:right;"><strong style="font-family:Parkinsans;">${dollars(p.revenue_cents)}</strong><div style="font-size:11.5px;color:var(--muted);">${p.units_sold} sold</div></div>
+        </div>`).join('');
 
-    // inventory badge
+    // Store readiness
+    const rd = data.readiness, gaps = [];
+    if (rd.out_of_stock) gaps.push(['Out of stock', rd.out_of_stock, 'danger']);
+    if (rd.missing_photo) gaps.push(['Missing a photo', rd.missing_photo, 'warn']);
+    if (rd.missing_desc) gaps.push(['No description', rd.missing_desc, 'warn']);
+    document.getElementById('readiness-body').innerHTML = `
+      <div style="display:flex;align-items:baseline;gap:9px;"><span class="rd-num">${rd.pct}%</span><span style="color:var(--muted);font-size:13px;">of your ${rd.total} products are ready to sell</span></div>
+      <div class="rd-bar"><div class="rd-fill" style="width:${rd.pct}%;"></div></div>
+      <div class="rd-gaps">
+        ${gaps.length ? gaps.map(([label, n, cls]) => `<div class="rd-gap"><span>${label}</span><span class="pill ${cls}">${n}</span></div>`).join('') : '<div class="rd-gap"><span>Everything looks great.</span><span class="pill ok">Ready</span></div>'}
+        <div class="rd-gap"><span>Grade kits ready to ship</span><span class="pill ${rd.kits_ready === rd.kits_total ? 'ok' : 'warn'}">${rd.kits_ready} of ${rd.kits_total}</span></div>
+      </div>`;
+
     const invBadge = document.getElementById('nav-inv-badge');
-    if (data.low_stock.length) { invBadge.textContent = data.low_stock.length; invBadge.style.display = ''; }
-    else invBadge.style.display = 'none';
+    if (data.low_stock.length) { invBadge.textContent = data.low_stock.length; invBadge.style.display = ''; } else invBadge.style.display = 'none';
 
-    // recent orders (from the orders endpoint)
+    // Recent orders + orders badge
     try {
       const od = await (await fetch('/api/admin/orders')).json();
       const orders = od.orders || [];
@@ -615,50 +899,71 @@
       const ob = document.getElementById('nav-orders-badge');
       if (pending) { ob.textContent = pending; ob.style.display = ''; } else ob.style.display = 'none';
       const rb = document.getElementById('recent-orders-body');
-      rb.innerHTML = orders.length === 0
+      rb.innerHTML = !orders.length
         ? emptyState(ICO_BAG, 'No orders yet', 'New orders will show up here.')
         : `<div class="list">${orders.slice(0, 6).map(o => {
             const f = o.fulfillment || 'pending';
-            const cls = f === 'shipped' ? 'ok' : f === 'fulfilled' ? 'teal' : 'warn';
-            return `<div class="list-item">
+            return `<div class="list-item" data-order-open="${escapeHtml(o.id)}" style="cursor:pointer;">
               <div><div class="name">${escapeHtml(o.customer_name || 'Guest')} <span style="color:var(--muted-2);font-weight:500;">· ${escapeHtml(o.short_id)}</span></div><div class="meta">${fmt(o.created_at)}</div></div>
-              <div style="display:flex;align-items:center;gap:10px;"><span class="pill ${cls}">${f}</span><strong style="font-family:Parkinsans;">${dollars(o.amount_total_cents)}</strong></div>
+              <div style="display:flex;align-items:center;gap:10px;"><span class="pill ${statusPillClass(f)}">${f}</span><strong style="font-family:Parkinsans;">${dollars(o.amount_total_cents)}</strong></div>
             </div>`; }).join('')}</div>`;
+      rb.querySelectorAll('[data-order-open]').forEach(el => el.addEventListener('click', () => { cachedOrders = orders; openOrderDrawer(orders.find(o => o.id === el.dataset.orderOpen)); }));
     } catch {}
   }
 
-  // ---------- Orders ----------
+  // ---------- Orders / fulfillment cockpit ----------
   let cachedOrders = [];
+  let orderSearch = '', orderStatus = 'all';
+  const ORDER_STATES = [
+    { id: 'all', label: 'All' }, { id: 'pending', label: 'To pack' }, { id: 'packed', label: 'Packed' }, { id: 'shipped', label: 'Shipped' }
+  ];
   async function loadOrders() {
     const tbody = document.getElementById('orders-table');
     tbody.innerHTML = `<tr><td colspan="6" style="padding:0;"><div class="skeleton" style="height:56px;margin:12px 20px;"></div></td></tr>`;
     const data = await (await fetch('/api/admin/orders')).json();
     cachedOrders = data.orders || [];
+    document.getElementById('ord-toolbar').style.display = cachedOrders.length ? '' : 'none';
+    renderOrderChips();
+    renderOrders();
+    renderOrgSummary();
+  }
+  function renderOrderChips() {
+    const counts = { all: cachedOrders.length };
+    for (const o of cachedOrders) { const f = o.fulfillment || 'pending'; counts[f] = (counts[f] || 0) + 1; }
+    document.getElementById('ord-chips').innerHTML = ORDER_STATES.map(s =>
+      `<button class="chip ${orderStatus === s.id ? 'active' : ''}" data-ostatus="${s.id}">${s.label} <span class="n">${counts[s.id] || 0}</span></button>`).join('');
+    document.querySelectorAll('#ord-chips .chip').forEach(c => c.addEventListener('click', () => { orderStatus = c.dataset.ostatus; renderOrderChips(); renderOrders(); }));
+  }
+  function renderOrders() {
+    const tbody = document.getElementById('orders-table');
+    const q = orderSearch.toLowerCase().trim();
+    const rows = cachedOrders.filter(o => {
+      if (orderStatus !== 'all' && (o.fulfillment || 'pending') !== orderStatus) return false;
+      if (!q) return true;
+      return [o.short_id, o.customer_name, o.customer_email, o.organization_code].some(v => (v || '').toLowerCase().includes(q));
+    });
     if (!cachedOrders.length) {
       tbody.innerHTML = `<tr><td colspan="6">${emptyState(ICO_BAG, 'No orders yet', 'Orders appear here once customers check out.')}</td></tr>`;
-      document.getElementById('org-summary').style.display = 'none';
       return;
     }
-    tbody.innerHTML = cachedOrders.map((o, idx) => {
+    if (!rows.length) { tbody.innerHTML = `<tr><td colspan="6">${emptyState(ICO_BAG, 'No matches', 'Try a different search or status.')}</td></tr>`; return; }
+    tbody.innerHTML = rows.map(o => {
       const f = o.fulfillment || 'pending';
-      const cls = f === 'shipped' ? 'ok' : f === 'fulfilled' ? 'teal' : 'warn';
       const codeTag = o.organization_code ? `<div style="margin-top:5px;"><span class="pill teal">${escapeHtml(o.organization_code)}</span></div>` : '';
+      const units = (o.items || []).reduce((s, i) => s + i.quantity, 0);
       return `
-        <tr class="data-row" data-order-id="${o.id}">
-          <td><strong style="font-family:Parkinsans;">${escapeHtml(o.short_id)}</strong></td>
+        <tr class="data-row" data-open-order="${escapeHtml(o.id)}" style="cursor:pointer;">
+          <td><strong style="font-family:Parkinsans;">${escapeHtml(o.short_id)}</strong><div class="sub">${units} item${units === 1 ? '' : 's'}</div></td>
           <td><div style="font-weight:600;">${escapeHtml(o.customer_name || 'Guest')}</div><div class="sub">${escapeHtml(o.customer_email || '')}</div>${codeTag}</td>
           <td><strong style="font-family:Parkinsans;">${dollars(o.amount_total_cents)}</strong></td>
-          <td><span class="pill ${cls}">${f}</span></td>
+          <td><span class="pill ${statusPillClass(f)}">${f}</span></td>
           <td><span style="color:var(--muted);">${fmt(o.created_at)}</span></td>
-          <td style="text-align:right;"><button class="btn secondary sm" data-action="toggle-details" data-idx="${idx}">Details</button></td>
-        </tr>
-        <tr><td colspan="6" style="padding:0;border:none;"><div class="order-expand" id="order-expand-${idx}" style="display:none;"></div></td></tr>`;
+          <td class="prow-chev" style="text-align:right;padding-right:20px;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></td>
+        </tr>`;
     }).join('');
-
-    tbody.querySelectorAll('[data-action="toggle-details"]').forEach(btn =>
-      btn.addEventListener('click', () => toggleOrderDetails(+btn.dataset.idx)));
-
-    // Organization-code summary
+    tbody.querySelectorAll('[data-open-order]').forEach(tr => tr.addEventListener('click', () => openOrderDrawer(cachedOrders.find(o => o.id === tr.dataset.openOrder))));
+  }
+  function renderOrgSummary() {
     const byCode = {};
     for (const o of cachedOrders) {
       if (!o.organization_code) continue;
@@ -676,33 +981,76 @@
       summaryEl.style.display = '';
     } else summaryEl.style.display = 'none';
   }
+  document.getElementById('ord-search').addEventListener('input', e => { orderSearch = e.target.value; renderOrders(); });
 
-  function toggleOrderDetails(idx) {
-    const o = cachedOrders[idx];
-    const el = document.getElementById(`order-expand-${idx}`);
-    const open = el.style.display !== 'none' && el.dataset.open === '1';
-    if (open) { el.style.display = 'none'; el.dataset.open = '0'; return; }
-    el.style.display = 'block'; el.dataset.open = '1';
+  // ----- Order detail drawer -----
+  let openOrderId = null;
+  const STEP_ICONS = {
+    pending: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>',
+    packed: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>',
+    shipped: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h11v9.5H3zM14 9.5h3.8l3.2 3.2v2.8H14z"/><circle cx="7" cy="18" r="1.7"/><circle cx="17.5" cy="18" r="1.7"/></svg>'
+  };
+  function openOrderDrawer(o) {
+    if (!o) return;
+    openOrderId = o.id;
+    document.getElementById('od-title').textContent = `Order #${o.short_id}`;
+    renderOrderDrawer(o);
+    document.getElementById('drawer-backdrop').classList.add('open');
+    document.getElementById('order-drawer').classList.add('open');
+    document.getElementById('order-drawer').setAttribute('aria-hidden', 'false');
+  }
+  function renderOrderDrawer(o) {
+    const f = o.fulfillment || 'pending';
+    const order = ['pending', 'packed', 'shipped'];
+    const curIdx = order.indexOf(f);
     const addr = o.shipping_address;
-    el.innerHTML = `<div class="order-expand-inner">
-      <h4>Items</h4>
-      <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${escapeHtml(i.name)}</span><span style="color:var(--muted);">×${i.quantity}</span><span><strong style="font-family:Parkinsans;">${dollars(i.line_total_cents)}</strong></span></div>`).join('')}</div>
-      ${o.organization_code ? `<h4>Organization code</h4><p style="margin-bottom:16px;"><span class="pill teal">${escapeHtml(o.organization_code)}</span></p>` : ''}
-      <h4>Ship to</h4>
-      <p style="font-size:13.5px;color:var(--teal);">${escapeHtml(o.customer_name || '')}${o.customer_phone ? ' · ' + escapeHtml(o.customer_phone) : ''}<br/>
-      ${addr ? `${escapeHtml(addr.line1 || '')}${addr.line2 ? ', ' + escapeHtml(addr.line2) : ''}, ${escapeHtml(addr.city || '')}, ${escapeHtml(addr.state || '')} ${escapeHtml(addr.postal_code || '')}` : 'No address on file'}</p>
-      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
-        ${o.fulfillment !== 'fulfilled' ? `<button class="btn sm" data-mark="${o.id}" data-status="fulfilled">Mark fulfilled</button>` : ''}
-        ${o.fulfillment !== 'shipped' ? `<button class="btn sm" data-mark="${o.id}" data-status="shipped">Mark shipped</button>` : ''}
-        <a class="btn sm secondary" target="_blank" href="https://dashboard.stripe.com/payments/${o.id}">Open in Stripe ↗</a>
-      </div></div>`;
-    el.querySelectorAll('[data-mark]').forEach(btn => btn.addEventListener('click', async () => {
-      const res = await fetch(`/api/admin/orders/${btn.dataset.mark}/fulfillment`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: btn.dataset.status })
-      });
-      if (res.ok) { toast(`Order marked ${btn.dataset.status}`); loadOrders(); }
+    const shipTo = addr
+      ? `${escapeHtml(addr.line1 || '')}${addr.line2 ? ', ' + escapeHtml(addr.line2) : ''}<br>${escapeHtml(addr.city || '')}, ${escapeHtml(addr.state || '')} ${escapeHtml(addr.postal_code || '')}`
+      : 'No address on file';
+    const steps = order.map((s, i) => {
+      const cls = i < curIdx ? 'done' : i === curIdx ? 'current' : '';
+      const label = s === 'pending' ? 'To pack' : s === 'packed' ? 'Packed' : 'Shipped';
+      return `<button class="step-btn ${cls}" data-set-status="${s}">${STEP_ICONS[s]}${label}</button>`;
+    }).join('');
+    document.getElementById('od-body').innerHTML = `
+      <div>
+        <div class="ed-inv-head" style="margin-bottom:10px;">Fulfillment</div>
+        <div class="status-steps">${steps}</div>
+        <div class="field-hint">${f === 'shipped' ? 'This order has shipped.' : f === 'packed' ? 'Packed and ready to ship.' : 'Tap a step as you pack and ship.'}</div>
+      </div>
+      <div class="od-sec"><h4>Items · ${(o.items || []).reduce((s, i) => s + i.quantity, 0)} to pack</h4>
+        ${(o.items || []).map(i => `<div class="od-item"><span class="od-qty">${i.quantity}</span><span style="flex:1;font-weight:600;color:var(--teal);">${escapeHtml(i.name)}</span><strong style="font-family:Parkinsans;">${dollars(i.line_total_cents)}</strong></div>`).join('')}
+      </div>
+      <div class="od-sec"><h4>Ship to</h4>
+        <div style="font-size:14px;color:var(--teal);line-height:1.5;"><strong>${escapeHtml(o.customer_name || 'Guest')}</strong><br>${shipTo}</div>
+        <div style="margin-top:8px;font-size:13px;color:var(--muted);">${escapeHtml(o.customer_email || '')}${o.customer_phone ? ' · ' + escapeHtml(o.customer_phone) : ''}</div>
+      </div>
+      ${o.organization_code ? `<div class="od-sec"><h4>Organization / fundraiser code</h4><span class="pill teal">${escapeHtml(o.organization_code)}</span></div>` : ''}
+      <div class="od-sec">
+        <div class="od-row"><span>Order type</span><span>${o.order_type === 'subscription' ? 'Subscription refill' : 'One-time'}</span></div>
+        <div class="od-row"><span>Placed</span><span>${fmt(o.created_at)}</span></div>
+        <div class="od-row" style="font-size:16px;font-weight:700;color:var(--teal);"><span>Total</span><strong style="font-family:Parkinsans;">${dollars(o.amount_total_cents)}</strong></div>
+      </div>`;
+    document.querySelectorAll('#od-body [data-set-status]').forEach(b => b.addEventListener('click', async () => {
+      const status = b.dataset.setStatus;
+      const r = await fetch(`/api/admin/orders/${o.id}/fulfillment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+      if (!r.ok) { toast('Could not update status'); return; }
+      const updated = (await r.json()).order;
+      const idx = cachedOrders.findIndex(x => x.id === o.id);
+      if (idx >= 0) cachedOrders[idx] = updated;
+      toast(status === 'shipped' ? 'Marked shipped 🎉' : status === 'packed' ? 'Marked packed' : 'Moved back to “to pack”');
+      renderOrderDrawer(updated); renderOrderChips(); renderOrders(); loadOverview();
     }));
   }
+  function closeOrderDrawer() {
+    document.getElementById('drawer-backdrop').classList.remove('open');
+    document.getElementById('order-drawer').classList.remove('open');
+    document.getElementById('order-drawer').setAttribute('aria-hidden', 'true');
+    openOrderId = null;
+  }
+  document.getElementById('od-close').addEventListener('click', closeOrderDrawer);
+  document.getElementById('od-done').addEventListener('click', closeOrderDrawer);
+  document.getElementById('od-print').addEventListener('click', () => { if (openOrderId) window.open(`/api/admin/orders/${openOrderId}/packing-slip`, '_blank'); });
 
   // ---------- Products (list + slide-over editor; stock lives here too) ----------
   // Categories mirror the storefront's rules exactly (first match wins) so the admin
@@ -724,6 +1072,8 @@
 
   let cachedProducts = [];
   let activeCat = 'all';
+  let selectMode = false;
+  const selectedIds = new Set();
 
   async function loadProducts() {
     const list = document.getElementById('products-list');
@@ -734,17 +1084,27 @@
     renderProducts();
   }
 
-  // ----- Unpublished-changes bar -----
+  // ----- Global unpublished-changes bar (catalog + storefront) -----
   function updatePublishBar(d) {
     const bar = document.getElementById('pub-bar');
-    if (!d.unpublished) { bar.style.display = 'none'; return; }
+    if (!d || !d.unpublished) { bar.style.display = 'none'; return; }
     const bits = [];
-    if (d.changed) bits.push(`${d.changed} edited`);
+    if (d.changed) bits.push(`${d.changed} product${d.changed === 1 ? '' : 's'} edited`);
     if (d.added) bits.push(`${d.added} new`);
     if (d.removed) bits.push(`${d.removed} removed`);
+    if (d.content_changed) bits.push('storefront edited');
     document.getElementById('pub-summary').textContent =
       (bits.join(' · ') || 'Pending changes') + ' — preview them, then publish when you’re happy.';
     bar.style.display = '';
+  }
+  async function refreshPublishBar() {
+    try { updatePublishBar(await (await fetch('/api/admin/pending')).json()); } catch {}
+  }
+  function reloadActivePanel() {
+    const active = document.querySelector('.nav-item.active')?.dataset.panel;
+    if (active === 'products') loadProducts();
+    if (active === 'storefront') loadStorefront();
+    loadOverview();
   }
   document.getElementById('pub-preview').addEventListener('click', async () => {
     const r = await fetch('/api/admin/preview', { method: 'POST' });
@@ -757,7 +1117,7 @@
     btn.disabled = true; btn.textContent = 'Publishing…';
     try {
       const r = await fetch('/api/admin/publish', { method: 'POST' });
-      if (r.ok) { toast('Published — your store is up to date'); loadProducts(); loadOverview(); }
+      if (r.ok) { toast('Published — your store is up to date'); refreshPublishBar(); reloadActivePanel(); }
       else if (r.status === 409) {
         const e = await r.json();
         toast(`Can’t publish — a kit would lose an item (${(e.kits || []).join(', ')})`, 5200);
@@ -766,7 +1126,7 @@
   });
   armConfirm(document.getElementById('pub-discard'), 'Yes, throw them away', async () => {
     const r = await fetch('/api/admin/discard-draft', { method: 'POST' });
-    if (r.ok) { toast('Changes discarded'); loadProducts(); }
+    if (r.ok) { toast('Changes discarded'); refreshPublishBar(); reloadActivePanel(); }
   });
 
   // ----- Grouped, filterable product list -----
@@ -797,13 +1157,16 @@
       return;
     }
 
+    const check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
     const rowHtml = ({ p }) => {
       const stock = p.stock ?? 0, thr = p.low_stock_threshold ?? 10;
       const stockPill = stock === 0 ? '<span class="pill danger">Out of stock</span>'
         : stock <= thr ? `<span class="pill warn">${stock} low</span>`
         : `<span class="pill ok">${stock} in stock</span>`;
+      const picked = selectedIds.has(p.id);
       return `
-      <button class="prow" data-id="${escapeHtml(p.id)}">
+      <button class="prow ${selectMode ? 'selectable' : ''} ${picked ? 'picked' : ''}" data-id="${escapeHtml(p.id)}">
+        ${selectMode ? `<span class="prow-check">${check}</span>` : ''}
         <img class="prow-img" src="${escapeHtml(p.image || PLACEHOLDER_IMG)}" alt="" onerror="this.src='${PLACEHOLDER_IMG}';this.style.opacity=0.4" />
         <div style="min-width:0;">
           <div class="prow-name">${escapeHtml(p.name)}</div>
@@ -811,7 +1174,7 @@
         </div>
         <div class="prow-stock">${stockPill}</div>
         <div class="prow-price">$${Number(p.price).toFixed(2)}</div>
-        <div class="prow-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></div>
+        <div class="prow-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="${selectMode ? 'M20 6 9 17l-5-5' : 'm9 6 6 6-6 6'}"/></svg></div>
       </button>`;
     };
 
@@ -824,10 +1187,95 @@
     }).join('');
 
     list.querySelectorAll('.prow').forEach(r => r.addEventListener('click', () => {
-      openEditor(cachedProducts.find(p => p.id === r.dataset.id));
+      const id = r.dataset.id;
+      if (selectMode) {
+        if (selectedIds.has(id)) { selectedIds.delete(id); r.classList.remove('picked'); }
+        else { selectedIds.add(id); r.classList.add('picked'); }
+        updateBulkBar();
+      } else {
+        openEditor(cachedProducts.find(p => p.id === id));
+      }
     }));
   }
   document.getElementById('prod-search').addEventListener('input', renderProducts);
+
+  // ----- Multi-select + bulk actions -----
+  function updateBulkBar() {
+    const bar = document.getElementById('bulk-bar');
+    document.getElementById('bb-count').textContent = `${selectedIds.size} selected`;
+    bar.classList.toggle('show', selectMode && selectedIds.size > 0);
+  }
+  const ICO_SELECT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>';
+  const ICO_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  function setSelectToggle(on) {
+    const t = document.getElementById('select-toggle');
+    t.classList.toggle('secondary', !on);
+    t.innerHTML = (on ? ICO_X + 'Done' : ICO_SELECT + 'Select');
+  }
+  function exitSelectMode() {
+    if (!selectMode) return;
+    selectMode = false; selectedIds.clear();
+    setSelectToggle(false);
+    updateBulkBar();
+    if (document.getElementById('panel-products').classList.contains('active')) renderProducts();
+  }
+  document.getElementById('select-toggle').addEventListener('click', () => {
+    selectMode = !selectMode;
+    if (!selectMode) selectedIds.clear();
+    setSelectToggle(selectMode);
+    updateBulkBar();
+    renderProducts();
+  });
+  document.getElementById('bb-clear').addEventListener('click', exitSelectMode);
+
+  // Restock modal
+  let restockMode = 'add';
+  document.querySelectorAll('#restock-mode button').forEach(b => b.addEventListener('click', () => {
+    restockMode = b.dataset.mode;
+    document.querySelectorAll('#restock-mode button').forEach(x => x.classList.toggle('on', x === b));
+  }));
+  document.getElementById('bb-restock').addEventListener('click', () => {
+    document.getElementById('restock-sub').textContent = `Update stock for ${selectedIds.size} selected product${selectedIds.size === 1 ? '' : 's'}.`;
+    openModal('restock-modal');
+  });
+  document.getElementById('restock-apply').addEventListener('click', async () => {
+    const val = Math.max(0, Math.round(+document.getElementById('restock-val').value || 0));
+    const items = [...selectedIds].map(id => restockMode === 'add' ? { id, adjust: val } : { id, stock: val });
+    const r = await fetch('/api/admin/bulk/inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }) });
+    if (r.ok) { const { updated } = await r.json(); toast(`Stock updated on ${updated} product${updated === 1 ? '' : 's'}`); closeModal('restock-modal'); exitSelectMode(); loadProducts(); loadOverview(); }
+    else toast('Could not update stock');
+  });
+
+  // Bulk price modal
+  let priceMode = 'pct';
+  function syncPriceUI() {
+    const label = document.getElementById('price-label');
+    label.textContent = priceMode === 'pct' ? 'Percent change (e.g. 5 for +5%, -10 for −10%)'
+      : priceMode === 'add' ? 'Dollar change (e.g. 0.50 to add 50¢, -1 to take $1 off)'
+      : 'New price for every selected product';
+  }
+  document.querySelectorAll('#price-mode button').forEach(b => b.addEventListener('click', () => {
+    priceMode = b.dataset.mode;
+    document.querySelectorAll('#price-mode button').forEach(x => x.classList.toggle('on', x === b));
+    syncPriceUI();
+  }));
+  document.getElementById('bb-price').addEventListener('click', () => {
+    document.getElementById('price-sub').textContent = `Change the price on ${selectedIds.size} product${selectedIds.size === 1 ? '' : 's'} — saves as a draft to preview first.`;
+    syncPriceUI(); openModal('price-modal');
+  });
+  document.getElementById('price-apply').addEventListener('click', async () => {
+    const value = +document.getElementById('price-val').value;
+    if (!isFinite(value)) { toast('Enter a number'); return; }
+    const r = await fetch('/api/admin/bulk/price', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [...selectedIds], mode: priceMode, value }) });
+    if (r.ok) { const { updated } = await r.json(); toast(`Price changed on ${updated} product${updated === 1 ? '' : 's'} — preview & publish`); closeModal('price-modal'); exitSelectMode(); loadProducts(); refreshPublishBar(); }
+    else { const e = await r.json(); toast(e.error || 'Could not change prices'); }
+  });
+
+  // Generic modal open/close
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  document.querySelectorAll('[data-close-modal]').forEach(b => b.addEventListener('click', () => closeModal(b.dataset.closeModal)));
+  document.querySelectorAll('.modal-back').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); }));
 
   // ----- Editor drawer -----
   let editId = null, pendingFile = null;
@@ -846,6 +1294,7 @@
     document.getElementById('ed-img').style.opacity = 1;
     document.getElementById('ed-file').value = '';
     document.getElementById('ed-delete').style.display = product ? '' : 'none';
+    document.getElementById('ed-duplicate').style.display = product ? '' : 'none';
     document.getElementById('drawer-backdrop').classList.add('open');
     document.getElementById('product-drawer').classList.add('open');
     document.getElementById('product-drawer').setAttribute('aria-hidden', 'false');
@@ -876,8 +1325,8 @@
   }
   document.getElementById('drawer-close').addEventListener('click', closeEditor);
   document.getElementById('ed-cancel').addEventListener('click', closeEditor);
-  document.getElementById('drawer-backdrop').addEventListener('click', closeEditor);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditor(); });
+  document.getElementById('drawer-backdrop').addEventListener('click', () => { closeEditor(); closeOrderDrawer(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeEditor(); closeOrderDrawer(); } });
 
   document.getElementById('ed-file').addEventListener('change', e => {
     const f = e.target.files && e.target.files[0];
@@ -925,11 +1374,22 @@
   armConfirm(document.getElementById('ed-delete'), 'Really remove?', async () => {
     if (!editId) return;
     const r = await fetch(`/api/admin/products/${editId}`, { method: 'DELETE' });
-    if (r.ok) { toast('Removed — publish to make it final'); closeEditor(); loadProducts(); loadOverview(); }
+    if (r.ok) { toast('Removed — publish to make it final'); closeEditor(); loadProducts(); loadOverview(); refreshPublishBar(); }
     else if (r.status === 409) {
       const e = await r.json();
       toast(`Can’t remove — it’s inside: ${(e.kits || []).join(', ')}. Kit changes go through Chelsea.`, 6000);
     } else { const e = await r.json(); toast(e.error || 'Could not delete'); }
+  });
+  document.getElementById('ed-duplicate').addEventListener('click', async () => {
+    if (!editId) return;
+    const r = await fetch(`/api/admin/products/${editId}/duplicate`, { method: 'POST' });
+    if (r.ok) {
+      const { product } = await r.json();
+      toast('Duplicated — here’s the copy'); closeEditor();
+      await loadProducts(); refreshPublishBar();
+      const copy = cachedProducts.find(p => p.id === product.id);
+      if (copy) openEditor(copy);
+    } else { const e = await r.json(); toast(e.error || 'Could not duplicate'); }
   });
 
   // ---------- Shipping ----------
@@ -984,8 +1444,132 @@
     else { const e = await r.json(); toast(e.error || 'Could not save'); }
   });
 
+  // ---------- Storefront customizer ----------
+  function renderAnnPreview() {
+    const on = document.getElementById('ann-switch').classList.contains('on');
+    const text = document.getElementById('ann-text').value.trim();
+    const link = document.getElementById('ann-link').value.trim();
+    const el = document.getElementById('ann-preview');
+    if (on && text) el.innerHTML = `<div class="bar">${link ? `<a href="#" onclick="return false;">${escapeHtml(text)}</a>` : escapeHtml(text)}</div>`;
+    else el.innerHTML = `<div class="off">${on ? 'Type a message to show your announcement bar.' : 'Announcement bar is off — flip the switch to turn it on.'}</div>`;
+  }
+  function updateFeatCount() {
+    document.getElementById('feat-count').textContent = `${document.querySelectorAll('#feat-picker .feat-chip.on').length} of 8`;
+  }
+  async function renderFeaturedPicker(selected) {
+    let prods = cachedProducts;
+    if (!prods.length) { try { prods = (await (await fetch('/api/admin/products')).json()).products || []; } catch { prods = []; } }
+    const picker = document.getElementById('feat-picker');
+    picker.innerHTML = prods.map(p => `
+      <button class="feat-chip ${selected.has(p.id) ? 'on' : ''}" data-fid="${escapeHtml(p.id)}">
+        <img src="${escapeHtml(p.image || PLACEHOLDER_IMG)}" onerror="this.src='${PLACEHOLDER_IMG}'" alt=""/>${escapeHtml(p.name)}
+      </button>`).join('');
+    picker.querySelectorAll('.feat-chip').forEach(ch => ch.addEventListener('click', () => {
+      if (!ch.classList.contains('on') && document.querySelectorAll('#feat-picker .feat-chip.on').length >= 8) { toast('You can feature up to 8 products'); return; }
+      ch.classList.toggle('on'); updateFeatCount();
+    }));
+    updateFeatCount();
+  }
+  async function loadStorefront() {
+    const c = await (await fetch('/api/admin/content')).json();
+    document.getElementById('ann-switch').classList.toggle('on', !!c.announcement.enabled);
+    document.getElementById('ann-text').value = c.announcement.text || '';
+    document.getElementById('ann-link').value = c.announcement.link || '';
+    document.getElementById('sf-hero-title').value = c.hero_title || '';
+    document.getElementById('sf-hero-sub').value = c.hero_subtitle || '';
+    renderAnnPreview();
+    await renderFeaturedPicker(new Set(c.featured_ids || []));
+  }
+  document.getElementById('ann-switch').addEventListener('click', () => { document.getElementById('ann-switch').classList.toggle('on'); renderAnnPreview(); });
+  document.getElementById('ann-switch').addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); document.getElementById('ann-switch').click(); } });
+  document.getElementById('ann-text').addEventListener('input', renderAnnPreview);
+  document.getElementById('ann-link').addEventListener('input', renderAnnPreview);
+  document.getElementById('sf-reset').addEventListener('click', () => loadStorefront());
+  document.getElementById('sf-save').addEventListener('click', async () => {
+    const body = {
+      announcement: {
+        enabled: document.getElementById('ann-switch').classList.contains('on'),
+        text: document.getElementById('ann-text').value.trim(),
+        link: document.getElementById('ann-link').value.trim()
+      },
+      hero_title: document.getElementById('sf-hero-title').value.trim(),
+      hero_subtitle: document.getElementById('sf-hero-sub').value.trim(),
+      featured_ids: [...document.querySelectorAll('#feat-picker .feat-chip.on')].map(c => c.dataset.fid)
+    };
+    const r = await fetch('/api/admin/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (r.ok) { toast('Saved — preview & publish when ready'); refreshPublishBar(); }
+    else toast('Could not save');
+  });
+
+  // ---------- Command palette (⌘K) ----------
+  const ICO_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  const CMDK_ACTIONS = [
+    { title: 'Go to Home', kind: 'Page', run: () => switchPanel('overview') },
+    { title: 'Go to Orders', kind: 'Page', run: () => switchPanel('orders') },
+    { title: 'Go to Products', kind: 'Page', run: () => switchPanel('products') },
+    { title: 'Go to Shipping', kind: 'Page', run: () => switchPanel('shipping') },
+    { title: 'Go to Storefront', kind: 'Page', run: () => switchPanel('storefront') },
+    { title: 'Add a new product', kind: 'Action', run: () => { switchPanel('products'); setTimeout(() => openEditor(null), 60); } },
+    { title: 'Preview store', kind: 'Action', run: async () => { const r = await fetch('/api/admin/preview', { method: 'POST' }); if (r.ok) window.open((await r.json()).url, '_blank'); } },
+  ];
+  let cmdkIndex = 0, cmdkItems = [];
+  async function ensureCmdkData() {
+    if (!cachedProducts.length) { try { cachedProducts = (await (await fetch('/api/admin/products')).json()).products || []; } catch {} }
+    if (!cachedOrders.length) { try { cachedOrders = (await (await fetch('/api/admin/orders')).json()).orders || []; } catch {} }
+  }
+  function cmdkSearch(q) {
+    q = q.toLowerCase().trim();
+    const items = [];
+    for (const a of CMDK_ACTIONS) if (!q || a.title.toLowerCase().includes(q)) items.push({ ...a, ico: ICO_ARROW });
+    if (q) {
+      for (const p of cachedProducts) if (p.name.toLowerCase().includes(q) || (p.keywords || []).join(' ').toLowerCase().includes(q))
+        items.push({ title: p.name, kind: 'Product', img: p.image || PLACEHOLDER_IMG, run: () => { switchPanel('products'); setTimeout(() => openEditor(cachedProducts.find(x => x.id === p.id)), 60); } });
+      for (const o of cachedOrders) if ([o.short_id, o.customer_name, o.customer_email].some(v => (v || '').toLowerCase().includes(q)))
+        items.push({ title: `#${o.short_id} · ${o.customer_name || 'Guest'}`, kind: 'Order', ico: ICO_BAG, run: () => { switchPanel('orders'); setTimeout(() => openOrderDrawer(cachedOrders.find(x => x.id === o.id)), 60); } });
+    }
+    return items.slice(0, 24);
+  }
+  function highlightCmdk() {
+    document.querySelectorAll('.cmdk-row').forEach((r, i) => r.classList.toggle('sel', i === cmdkIndex));
+    document.querySelector('.cmdk-row.sel')?.scrollIntoView({ block: 'nearest' });
+  }
+  function renderCmdk() {
+    cmdkItems = cmdkSearch(document.getElementById('cmdk-q').value);
+    cmdkIndex = 0;
+    const res = document.getElementById('cmdk-results');
+    if (!cmdkItems.length) { res.innerHTML = `<div class="cmdk-empty">No matches. Try a product name or order number.</div>`; return; }
+    res.innerHTML = cmdkItems.map((it, i) => `
+      <div class="cmdk-row ${i === 0 ? 'sel' : ''}" data-i="${i}">
+        ${it.img ? `<img class="ck-ico" src="${escapeHtml(it.img)}" onerror="this.src='${PLACEHOLDER_IMG}'" alt=""/>` : `<span class="ck-ico">${it.ico || ICO_ARROW}</span>`}
+        <div class="ck-txt"><div class="ck-title">${escapeHtml(it.title)}</div><div class="ck-kind">${it.kind}</div></div>
+      </div>`).join('');
+    res.querySelectorAll('.cmdk-row').forEach(r => {
+      r.addEventListener('click', () => runCmdk(+r.dataset.i));
+      r.addEventListener('mousemove', () => { if (cmdkIndex !== +r.dataset.i) { cmdkIndex = +r.dataset.i; highlightCmdk(); } });
+    });
+  }
+  function runCmdk(i) { const it = cmdkItems[i]; if (!it) return; closeCmdk(); it.run(); }
+  async function openCmdk() {
+    await ensureCmdkData();
+    document.getElementById('cmdk-back').classList.add('open');
+    const q = document.getElementById('cmdk-q'); q.value = ''; renderCmdk();
+    setTimeout(() => q.focus(), 40);
+  }
+  function closeCmdk() { document.getElementById('cmdk-back').classList.remove('open'); }
+  document.getElementById('cmdk-q').addEventListener('input', renderCmdk);
+  document.getElementById('cmdk-back').addEventListener('click', e => { if (e.target.id === 'cmdk-back') closeCmdk(); });
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCmdk(); return; }
+    if (!document.getElementById('cmdk-back').classList.contains('open')) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeCmdk(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); cmdkIndex = Math.min(cmdkItems.length - 1, cmdkIndex + 1); highlightCmdk(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); cmdkIndex = Math.max(0, cmdkIndex - 1); highlightCmdk(); }
+    else if (e.key === 'Enter') { e.preventDefault(); runCmdk(cmdkIndex); }
+  });
+
   // ---------- Boot ----------
   loadOverview();
+  refreshPublishBar();
 </script>
 
 </body>
