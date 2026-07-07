@@ -13,8 +13,9 @@ operating from a Las Vegas mailing address). It sells school supplies, pre-built
 kits, gift kits, and subscriptions. It was built as an agency deliverable for the client
 ("Houa Moua", email mouah07@gmail.com). Live at **https://fasttrackschoolsupplies.com**.
 
-It is NOT a CMS (not Shopify/WordPress/Squarespace). It is a hand-built Node.js app. There is
-no admin UI for editing products — product data lives in JSON files edited through code.
+It is NOT a CMS (not Shopify/WordPress/Squarespace). It is a hand-built Node.js app. It DOES now
+have a self-service admin "Product Manager" (see section 12) so the client can edit products,
+prices, photos, and shipping himself — but the app itself is custom code, not a CMS.
 
 ---
 
@@ -221,10 +222,53 @@ the placeholder.
 
 ## 11. Quick status (update this as things change)
 
-- Catalog: 56 products, alphabetized, all with real photos (one was last to land:
-  construction-12x18).
-- Shipping: flat $9.95 every order.
+- Catalog: 55 products, alphabetized, real photos.
+- Shipping: configurable in admin (flat or order-total tiers) — see section 12.
 - Tax: Stripe Tax enabled in code; Houa registered Minnesota (collecting tax confirmed).
 - Business entity: Fast Track School Supplies Inc (MN corp), mailing 3225 McLeod Dr, Suite 100,
   Las Vegas, NV 89121, contact Main@fasttrackschoolsupplies.com.
 - Repo visibility: public (so Render auto-deploys). Not yet transferred to Houa.
+- **Product Manager build ($1,400: products $750 + shipping $150 + org codes $500)**: built and
+  fully tested on branch `product-manager`. NOT merged to main / not live yet — pending final
+  payment. Requires the Render persistent-disk setup below before/at go-live.
+
+---
+
+## 12. Product Manager / self-service admin (branch `product-manager` until live)
+
+Adds owner self-service to `/admin` (same Basic-Auth login). Three features:
+
+- **Products tab** — add/edit/remove products (name, price, description, keywords) and upload photos
+  from the computer. Product ids are immutable (kits + order logs reference them). Deleting a product
+  that's in a kit is blocked (409 + names the kits).
+- **Shipping tab** — flat rate OR order-total tiers ("up to $30 → $9.95", … , "all larger → $19.95").
+  Checkout computes shipping via `shippingCentsFor(subtotalCents)` from `settings.json`; cart pages
+  fetch `/api/shipping-config` to show a matching amount.
+- **Organization codes** — an optional Stripe Checkout `custom_field` captured onto each order
+  (`organization_code`); the Orders tab shows the code per order + a summary card (orders + total per
+  code) for rebates. Tracking only, no customer discount.
+
+### Data now lives on a persistent disk, NOT the repo (critical)
+
+Live `products.json`, `inventory.json`, `orders.json`, `settings.json`, and uploaded images live in
+`DATA_DIR` (`process.env.DATA_DIR`, resolved absolute). Reads/writes go there; `writeJsonAtomic`
+(temp+rename) is crash-safe. Every product write calls `reloadCatalog()` which refreshes the
+in-memory `PRODUCTS`/`PRODUCT_BY_ID`/`SYSTEM_PROMPT` (now `let`) so checkout/kits/store/AI use fresh
+data with no restart. On first boot `DATA_DIR` is seeded from the repo copies. `/products.json` is
+served from memory; uploaded images serve via `GET /uploads/:file` (path-traversal guarded).
+
+**Why:** without this, a git deploy would revert the client's admin edits AND wipe order history
+(the repo files overwrite on checkout). The disk keeps live data durable across deploys.
+
+### Required Render setup at go-live (one-time, on Houa's Render — he owns it)
+
+1. Render → the service → add a **Persistent Disk** (1 GB, mounted at `/var/data`).
+2. Add env var `DATA_DIR=/var/data`.
+3. Deploy the merged `main`. First boot seeds `/var/data` from the repo copies.
+If `DATA_DIR`/disk is ever missing, the app safely falls back to repo files (pre-build behavior).
+
+### Local review / testing
+
+Run with a scratch data dir so admin edits don't churn the repo:
+`DATA_DIR=./.localdata ADMIN_USERNAME=admin ADMIN_PASSWORD=<pw> node server.js`
+(`.localdata/` is gitignored; it seeds from the repo copies on first boot.)
