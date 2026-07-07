@@ -132,7 +132,7 @@
   /* ---------- Products list ---------- */
   .prod-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
   .prod-list { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
-  .prow { display: grid; grid-template-columns: 60px 1fr auto auto; align-items: center; gap: 16px; width: 100%; padding: 12px 20px; border: none; border-top: 1px solid var(--line-soft); background: none; cursor: pointer; text-align: left; transition: background 0.12s; }
+  .prow { display: grid; grid-template-columns: 60px 1fr 110px auto auto; align-items: center; gap: 16px; width: 100%; padding: 12px 20px; border: none; border-top: 1px solid var(--line-soft); background: none; cursor: pointer; text-align: left; transition: background 0.12s; }
   .prow:first-child { border-top: none; }
   .prow:hover { background: var(--cream); }
   .prow-img { width: 54px; height: 54px; object-fit: contain; background: var(--cream); border: 1px solid var(--line); border-radius: 11px; padding: 4px; }
@@ -169,15 +169,20 @@
   .drawer-foot .spacer { flex: 1; }
 
   /* ---------- Stock stepper ---------- */
-  .stock-cell { display: inline-flex; align-items: center; gap: 6px; }
   .stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--white); }
   .adj-btn { background: none; border: none; width: 30px; height: 32px; cursor: pointer; font-weight: 700; color: var(--teal); font-size: 15px; transition: background 0.12s; }
   .adj-btn:hover { background: var(--cream); }
   .stock-input { border: none; width: 46px; padding: 6px 0; font-family: 'Parkinsans'; font-weight: 700; font-size: 14px; color: var(--teal); text-align: center; background: none; }
-  .stock-input.danger { color: var(--red); }
-  .stock-input.warn { color: var(--orange); }
-  .thr-input { background: var(--cream); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 7px 10px; width: 72px; font-family: 'Parkinsans'; font-weight: 600; font-size: 14px; color: var(--teal); text-align: center; }
-  .thr-input:focus, .stock-input:focus { outline: none; }
+  .stock-input:focus { outline: none; }
+
+  /* Editor inventory section */
+  .ed-inv { border-top: 1px solid var(--line-soft); padding-top: 18px; }
+  .ed-inv-head { font-family: 'Parkinsans'; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+  .ed-inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  .stepper.big { width: fit-content; }
+  .stepper.big .adj-btn { width: 38px; height: 42px; font-size: 17px; }
+  .stepper.big .stock-input { width: 58px; font-size: 16px; }
+  .ed-inv-grid .field input[type=number]:not(.stock-input) { text-align: center; font-family: 'Parkinsans'; font-weight: 600; }
 
   /* ---------- Order details ---------- */
   .order-expand { background: var(--cream); padding: 4px 20px; }
@@ -240,7 +245,7 @@
     .content { padding: 20px 20px 80px; }
     .mobile-only { display: inline-flex; }
   }
-  @media (max-width: 560px) { .kpis { grid-template-columns: 1fr; } .prow { grid-template-columns: 48px 1fr auto; } .prow-price { display: none; } }
+  @media (max-width: 560px) { .kpis { grid-template-columns: 1fr; } .prow { grid-template-columns: 48px 1fr auto; } .prow-price, .prow-stock { display: none; } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 </style>
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
@@ -272,10 +277,6 @@
       <button class="nav-item" data-panel="products">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13V5a1 1 0 0 1 1-1h8l7 7-9 9-7-7Z"/><circle cx="8" cy="8" r="1.4"/></svg>
         Products
-      </button>
-      <button class="nav-item" data-panel="inventory">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>
-        Inventory
         <span class="nav-badge" id="nav-inv-badge" style="display:none;">0</span>
       </button>
       <button class="nav-item" data-panel="shipping">
@@ -375,16 +376,6 @@
         <div class="prod-list" id="products-list"></div>
       </section>
 
-      <!-- INVENTORY -->
-      <section class="panel" id="panel-inventory">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Product</th><th>Price</th><th>In stock</th><th>Low-stock at</th><th>Status</th><th></th></tr></thead>
-            <tbody id="inventory-table"></tbody>
-          </table>
-        </div>
-      </section>
-
       <!-- SHIPPING -->
       <section class="panel" id="panel-shipping">
         <div class="ship-card">
@@ -438,6 +429,22 @@
     <label class="field">Price <span class="dollar-wrap">$<input type="number" id="ed-price" min="0" step="0.01" placeholder="0.00" /></span></label>
     <label class="field">Short description <input type="text" id="ed-unit" placeholder="e.g. 8 ct, washable" /></label>
     <label class="field">Search keywords <textarea id="ed-keywords" placeholder="markers, washable markers, crayola"></textarea><span class="field-hint">Comma separated. Helps shoppers find this product on your store.</span></label>
+    <div class="ed-inv">
+      <div class="ed-inv-head">Inventory</div>
+      <div class="ed-inv-grid">
+        <label class="field">In stock
+          <span class="stepper big">
+            <button class="adj-btn" type="button" id="ed-stock-minus">−</button>
+            <input class="stock-input" type="number" min="0" id="ed-stock" value="0" />
+            <button class="adj-btn" type="button" id="ed-stock-plus">+</button>
+          </span>
+        </label>
+        <label class="field">Warn me when it drops to
+          <input type="number" min="0" id="ed-threshold" placeholder="10" style="max-width:110px;" />
+        </label>
+      </div>
+      <div class="field-hint" id="ed-stock-status" style="margin-top:10px;"></div>
+    </div>
   </div>
   <div class="drawer-foot">
     <button class="btn ghost-danger" id="ed-delete">Delete</button>
@@ -456,8 +463,7 @@
   const PAGE_META = {
     overview:  { title: 'Home',      sub: 'A quick look at how your store is doing.' },
     orders:    { title: 'Orders',    sub: 'Every order that comes through your store.' },
-    products:  { title: 'Products',  sub: 'Add, edit, and price the items in your store.' },
-    inventory: { title: 'Inventory', sub: 'Track stock and get low-stock warnings.' },
+    products:  { title: 'Products',  sub: 'Everything you sell — prices, photos, and stock in one place.' },
     shipping:  { title: 'Shipping',  sub: 'Set how much you charge customers to ship.' },
   };
 
@@ -476,7 +482,6 @@
     if (name === 'products') document.getElementById('add-product-btn').addEventListener('click', () => openEditor(null));
     if (name === 'overview') loadOverview();
     if (name === 'orders') loadOrders();
-    if (name === 'inventory') loadInventory();
     if (name === 'products') loadProducts();
     if (name === 'shipping') loadShipping();
   }
@@ -516,7 +521,7 @@
     lowBody.innerHTML = data.low_stock.length === 0
       ? emptyState(ICO_BOX, 'All good', 'Stock levels are healthy.')
       : `<div class="list">${data.low_stock.map(item => `
-        <div class="list-item">
+        <div class="list-item" data-goto="products" style="cursor:pointer;" title="Open Products to restock">
           <div><div class="name">${escapeHtml(item.name)}</div><div class="meta">Warns at ${item.threshold}</div></div>
           <span class="pill ${item.stock === 0 ? 'danger' : 'warn'}">${item.stock === 0 ? 'Out' : item.stock + ' left'}</span>
         </div>`).join('')}</div>`;
@@ -630,47 +635,7 @@
     }));
   }
 
-  // ---------- Inventory ----------
-  async function loadInventory() {
-    const tbody = document.getElementById('inventory-table');
-    tbody.innerHTML = `<tr><td colspan="6" style="padding:0;"><div class="skeleton" style="height:56px;margin:12px 20px;"></div></td></tr>`;
-    const data = await (await fetch('/api/admin/inventory')).json();
-    tbody.innerHTML = data.inventory.map(row => {
-      const sc = row.stock === 0 ? 'danger' : row.stock <= row.low_stock_threshold ? 'warn' : '';
-      const status = row.stock === 0 ? `<span class="pill danger">Out of stock</span>`
-        : row.stock <= row.low_stock_threshold ? `<span class="pill warn">Low</span>`
-        : `<span class="pill ok">In stock</span>`;
-      return `<tr class="data-row">
-        <td><strong style="font-family:Parkinsans;">${escapeHtml(row.name)}</strong><div class="sub">${escapeHtml(row.unit || '')}</div></td>
-        <td>$${row.price.toFixed(2)}</td>
-        <td><div class="stock-cell"><div class="stepper">
-          <button class="adj-btn" data-adj="-1" data-sku="${row.sku_id}">−</button>
-          <input class="stock-input ${sc}" type="number" min="0" value="${row.stock}" data-stock="${row.sku_id}" />
-          <button class="adj-btn" data-adj="1" data-sku="${row.sku_id}">+</button>
-        </div></div></td>
-        <td><input class="thr-input" type="number" min="0" value="${row.low_stock_threshold}" data-threshold="${row.sku_id}" /></td>
-        <td>${status}</td>
-        <td style="text-align:right;"><button class="btn sm" data-save="${row.sku_id}">Save</button></td>
-      </tr>`;
-    }).join('');
-
-    tbody.querySelectorAll('[data-adj]').forEach(btn => btn.addEventListener('click', async () => {
-      const sku = btn.dataset.sku;
-      const res = await fetch(`/api/admin/inventory/${sku}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adjust: +btn.dataset.adj }) });
-      const updated = await res.json();
-      document.querySelector(`[data-stock="${sku}"]`).value = updated.stock;
-      loadOverview();
-    }));
-    tbody.querySelectorAll('[data-save]').forEach(btn => btn.addEventListener('click', async () => {
-      const sku = btn.dataset.save;
-      const stock = +document.querySelector(`[data-stock="${sku}"]`).value;
-      const low_stock_threshold = +document.querySelector(`[data-threshold="${sku}"]`).value;
-      const res = await fetch(`/api/admin/inventory/${sku}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stock, low_stock_threshold }) });
-      if (res.ok) { toast('Stock saved'); loadInventory(); loadOverview(); }
-    }));
-  }
-
-  // ---------- Products (list + slide-over editor) ----------
+  // ---------- Products (list + slide-over editor; stock lives here too) ----------
   let cachedProducts = [];
   async function loadProducts() {
     const list = document.getElementById('products-list');
@@ -688,16 +653,22 @@
       list.innerHTML = emptyState('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>', 'No matches', q ? 'Try a different search.' : 'Add your first product to get started.');
       return;
     }
-    list.innerHTML = rows.map(p => `
+    list.innerHTML = rows.map(p => {
+      const stock = p.stock ?? 0, thr = p.low_stock_threshold ?? 10;
+      const stockPill = stock === 0 ? '<span class="pill danger">Out of stock</span>'
+        : stock <= thr ? `<span class="pill warn">${stock} low</span>`
+        : `<span class="pill ok">${stock} in stock</span>`;
+      return `
       <button class="prow" data-id="${escapeHtml(p.id)}">
         <img class="prow-img" src="${escapeHtml(p.image || PLACEHOLDER_IMG)}" alt="" onerror="this.src='${PLACEHOLDER_IMG}';this.style.opacity=0.4" />
         <div style="min-width:0;">
           <div class="prow-name">${escapeHtml(p.name)}</div>
           <div class="prow-desc">${escapeHtml(p.unit || (p.keywords || []).slice(0,4).join(', ') || 'No description')}</div>
         </div>
+        <div class="prow-stock">${stockPill}</div>
         <div class="prow-price">$${Number(p.price).toFixed(2)}</div>
         <div class="prow-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></div>
-      </button>`).join('');
+      </button>`; }).join('');
     list.querySelectorAll('.prow').forEach(r => r.addEventListener('click', () => {
       openEditor(cachedProducts.find(p => p.id === r.dataset.id));
     }));
@@ -714,6 +685,9 @@
     document.getElementById('ed-price').value = product ? product.price : '';
     document.getElementById('ed-unit').value = product ? (product.unit || '') : '';
     document.getElementById('ed-keywords').value = product ? (product.keywords || []).join(', ') : '';
+    document.getElementById('ed-stock').value = product ? (product.stock ?? 0) : 0;
+    document.getElementById('ed-threshold').value = product ? (product.low_stock_threshold ?? 10) : 10;
+    updateStockStatus();
     document.getElementById('ed-img').src = (product && product.image) ? product.image : PLACEHOLDER_IMG;
     document.getElementById('ed-img').style.opacity = 1;
     document.getElementById('ed-file').value = '';
@@ -723,6 +697,24 @@
     document.getElementById('product-drawer').setAttribute('aria-hidden', 'false');
     setTimeout(() => document.getElementById('ed-name').focus(), 280);
   }
+
+  // Live "in stock / low / out" hint inside the editor
+  function updateStockStatus() {
+    const stock = Math.max(0, +document.getElementById('ed-stock').value || 0);
+    const thr = Math.max(0, +document.getElementById('ed-threshold').value || 0);
+    const el = document.getElementById('ed-stock-status');
+    if (stock === 0) { el.innerHTML = 'This product shows as <strong style="color:var(--red);">out of stock</strong> on your store.'; }
+    else if (stock <= thr) { el.innerHTML = `<strong style="color:var(--orange);">Running low</strong> — it's at or below your warning level of ${thr}.`; }
+    else { el.innerHTML = `<strong style="color:var(--green);">In stock</strong> — you'll get a low-stock warning at ${thr}.`; }
+  }
+  document.getElementById('ed-stock').addEventListener('input', updateStockStatus);
+  document.getElementById('ed-threshold').addEventListener('input', updateStockStatus);
+  document.getElementById('ed-stock-minus').addEventListener('click', () => {
+    const i = document.getElementById('ed-stock'); i.value = Math.max(0, (+i.value || 0) - 1); updateStockStatus();
+  });
+  document.getElementById('ed-stock-plus').addEventListener('click', () => {
+    const i = document.getElementById('ed-stock'); i.value = (+i.value || 0) + 1; updateStockStatus();
+  });
   function closeEditor() {
     document.getElementById('drawer-backdrop').classList.remove('open');
     document.getElementById('product-drawer').classList.remove('open');
@@ -753,21 +745,25 @@
     const unit = document.getElementById('ed-unit').value.trim();
     const keywords = document.getElementById('ed-keywords').value.trim();
     if (!name || price === '' || +price < 0) { toast('Name and a valid price are required'); return; }
+    const stock = Math.max(0, +document.getElementById('ed-stock').value || 0);
+    const low_stock_threshold = Math.max(0, +document.getElementById('ed-threshold').value || 0);
     const saveBtn = document.getElementById('ed-save');
     saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
     try {
+      let id = editId;
       if (editId) {
         const r = await fetch(`/api/admin/products/${editId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price, unit, keywords }) });
         if (!r.ok) { const e = await r.json(); toast(e.error || 'Could not save'); return; }
-        await uploadPhoto(editId);
-        toast('Product saved');
       } else {
         const r = await fetch('/api/admin/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price, unit, keywords }) });
         if (!r.ok) { const e = await r.json(); toast(e.error || 'Could not add'); return; }
-        const { product } = await r.json();
-        await uploadPhoto(product.id);
-        toast('Product added');
+        id = (await r.json()).product.id;
       }
+      // Stock lives with the product — save it in the same action.
+      const invRes = await fetch(`/api/admin/inventory/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stock, low_stock_threshold }) });
+      if (!invRes.ok) { toast('Saved, but stock could not be updated'); return; }
+      await uploadPhoto(id);
+      toast(editId ? 'Product saved' : 'Product added');
       closeEditor(); loadProducts(); loadOverview();
     } finally { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
   });
