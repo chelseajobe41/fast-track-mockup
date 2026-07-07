@@ -6,678 +6,799 @@
 <title>Admin | Fast Track School Supplies</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --teal:#223A3F; --teal-soft:rgba(34,58,63,0.75); --orange:#DC3D2D; --yellow:#FDCA06;
-    --cream:#FAF6EF; --line:#E8E4DC; --muted:#6A6F71; --green:#2d8659; --red:#c03434;
-    --bg:#f7f5f0;
+    --teal:#223A3F; --teal-700:#1B2E33; --teal-900:#152528; --orange:#DC3D2D; --yellow:#FDCA06;
+    --cream:#FAF6EF; --line:#E9E5DD; --line-soft:#F1EDE5; --muted:#6A6F71; --muted-2:#8A8F90;
+    --green:#2d8659; --green-soft:#E7F1EB; --red:#c03434; --red-soft:#FBECEC;
+    --bg:#F6F3ED; --white:#fff;
+    --shadow-sm:0 1px 2px rgba(21,37,40,0.05);
+    --shadow-md:0 2px 6px rgba(21,37,40,0.05), 0 8px 24px rgba(21,37,40,0.05);
+    --shadow-lg:0 24px 60px rgba(21,37,40,0.22);
+    --r-lg:18px; --r-md:12px; --r-sm:10px; --sidebar:248px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
   body { font-family: 'Barlow', system-ui, sans-serif; background: var(--bg); color: var(--teal); line-height: 1.5; -webkit-font-smoothing: antialiased; }
-  .container { max-width: 1320px; margin: 0 auto; padding: 0 32px; }
   a { color: inherit; text-decoration: none; }
-  button { font-family: inherit; }
+  button, input, textarea { font-family: inherit; }
+  ::selection { background: var(--yellow); color: var(--teal); }
+  h1,h2,h3,h4 { font-family: 'Parkinsans', sans-serif; letter-spacing: -0.01em; }
 
-  /* Header */
-  header { background: var(--teal); color: var(--cream); padding: 18px 0; }
-  .nav { display: flex; align-items: center; justify-content: space-between; }
-  .brand { display: flex; align-items: center; gap: 16px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 20px; }
-  .brand .badge { background: var(--orange); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-  .nav-actions { display: flex; align-items: center; gap: 16px; font-size: 13px; }
-  .nav-actions a { opacity: 0.7; }
-  .nav-actions a:hover { opacity: 1; color: var(--yellow); }
+  /* ---------- App shell ---------- */
+  .app { display: grid; grid-template-columns: var(--sidebar) 1fr; min-height: 100vh; }
 
-  /* Tabs */
-  .tabs { background: #fff; border-bottom: 1px solid var(--line); }
-  .tabs-row { display: flex; gap: 4px; }
-  .tab { background: none; border: none; padding: 18px 24px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; transition: color 0.15s, border-color 0.15s; }
-  .tab:hover { color: var(--teal); }
-  .tab.active { color: var(--teal); border-bottom-color: var(--orange); }
+  .sidebar { background: linear-gradient(185deg, var(--teal) 0%, var(--teal-900) 100%); color: rgba(255,255,255,0.72); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+  .sb-brand { padding: 22px 20px 18px; display: flex; align-items: center; gap: 12px; }
+  .sb-brand img { height: 40px; width: auto; background: rgba(255,255,255,0.97); padding: 6px 9px; border-radius: 10px; }
+  .sb-brand .tag { font-family: 'Parkinsans'; font-weight: 700; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yellow); }
+  .sb-brand .store { font-family: 'Parkinsans'; font-weight: 700; font-size: 14px; color: #fff; line-height: 1.2; }
+  .sb-nav { padding: 8px 12px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .sb-sec { font-size: 10.5px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: rgba(255,255,255,0.38); padding: 16px 12px 8px; font-family: 'Parkinsans'; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--r-sm); color: rgba(255,255,255,0.72); font-family: 'Parkinsans'; font-weight: 600; font-size: 14px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; position: relative; transition: background 0.15s, color 0.15s; }
+  .nav-item svg { width: 19px; height: 19px; opacity: 0.9; flex: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+  .nav-item.active::before { content: ''; position: absolute; left: -12px; top: 8px; bottom: 8px; width: 4px; border-radius: 0 4px 4px 0; background: var(--orange); }
+  .nav-badge { margin-left: auto; background: var(--orange); color: #fff; font-size: 10.5px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; }
+  .sb-foot { padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .sb-foot a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; font-family: 'Parkinsans'; color: rgba(255,255,255,0.72); transition: background 0.15s, color 0.15s; }
+  .sb-foot a:hover { background: rgba(255,255,255,0.07); color: var(--yellow); }
+  .sb-foot svg { width: 16px; height: 16px; }
 
-  /* Main */
-  main { padding: 32px 0 80px; }
-  .panel { display: none; }
+  /* ---------- Main ---------- */
+  .main { min-width: 0; display: flex; flex-direction: column; }
+  .topbar { position: sticky; top: 0; z-index: 20; background: rgba(246,243,237,0.86); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); padding: 18px 36px; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 74px; }
+  .topbar h1 { font-size: 22px; font-weight: 700; color: var(--teal); }
+  .topbar .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .content { padding: 28px 36px 96px; max-width: 1240px; width: 100%; }
+  .panel { display: none; animation: fade 0.25s ease; }
   .panel.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-  h2 { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.01em; color: var(--teal); margin-bottom: 20px; }
-  h3 { font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 16px; color: var(--teal); }
+  /* ---------- KPI tiles ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px; box-shadow: var(--shadow-sm); }
+  .kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .kpi-ico { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; }
+  .kpi-ico svg { width: 20px; height: 20px; }
+  .kpi-ico.teal { background: rgba(34,58,63,0.09); color: var(--teal); }
+  .kpi-ico.green { background: var(--green-soft); color: var(--green); }
+  .kpi-ico.orange { background: rgba(220,61,45,0.10); color: var(--orange); }
+  .kpi-ico.yellow { background: rgba(253,202,6,0.18); color: #A9820A; }
+  .kpi .label { font-size: 12px; font-weight: 600; color: var(--muted); font-family: 'Parkinsans'; }
+  .kpi .value { font-family: 'Parkinsans'; font-size: 30px; font-weight: 700; color: var(--teal); letter-spacing: -0.02em; line-height: 1.1; margin-top: 2px; }
 
-  /* Stats grid */
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-  .stat { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
-  .stat .label { font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
-  .stat .value { font-family: 'Parkinsans', sans-serif; font-size: 32px; font-weight: 700; color: var(--teal); letter-spacing: -0.02em; }
-  .stat .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
-  .stat.warning .value { color: var(--orange); }
-  .stat.success .value { color: var(--green); }
+  /* ---------- Cards ---------- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-2.wide { grid-template-columns: 1.3fr 1fr; }
+  .card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .card-head { padding: 16px 22px; border-bottom: 1px solid var(--line-soft); display: flex; justify-content: space-between; align-items: center; }
+  .card-head h3 { font-size: 15px; font-weight: 700; color: var(--teal); }
+  .card-body { padding: 8px 22px 14px; }
+  .card-body.pad { padding: 18px 22px; }
 
-  /* Cards */
-  .cards-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-  .card-head { padding: 18px 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
-  .card-body { padding: 12px 24px 18px; }
-
-  /* Lists */
+  /* ---------- Lists ---------- */
   .list { display: flex; flex-direction: column; }
-  .list-item { padding: 12px 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 14px; }
+  .list-item { padding: 13px 0; border-top: 1px solid var(--line-soft); display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 14px; }
   .list-item:first-child { border-top: none; }
-  .list-item .name { font-family: 'Parkinsans', sans-serif; font-weight: 500; }
-  .list-item .meta { font-size: 12px; color: var(--muted); }
-  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
-  .pill.danger { background: rgba(192,52,52,0.1); color: var(--red); }
-  .pill.warn { background: rgba(220,61,45,0.1); color: var(--orange); }
-  .pill.ok { background: rgba(45,134,89,0.1); color: var(--green); }
+  .list-item .name { font-family: 'Parkinsans'; font-weight: 600; font-size: 14px; }
+  .list-item .meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .li-thumb { width: 40px; height: 40px; object-fit: contain; background: var(--cream); border: 1px solid var(--line); border-radius: 9px; padding: 3px; flex: none; }
+  .li-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+  /* ---------- Pills ---------- */
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-family: 'Parkinsans'; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+  .pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.9; }
+  .pill.plain::before { display: none; }
+  .pill.danger { background: var(--red-soft); color: var(--red); }
+  .pill.warn { background: rgba(220,61,45,0.10); color: var(--orange); }
+  .pill.ok { background: var(--green-soft); color: var(--green); }
   .pill.gray { background: var(--cream); color: var(--muted); }
   .pill.teal { background: rgba(34,58,63,0.08); color: var(--teal); }
 
-  /* Tables */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th { background: var(--cream); padding: 12px 16px; text-align: left; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1px solid var(--line); }
-  tbody td { padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
-  tbody tr:hover { background: var(--cream); cursor: default; }
-  .table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  /* ---------- Tables ---------- */
+  .table-wrap { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th { background: var(--cream); padding: 12px 20px; text-align: left; font-family: 'Parkinsans'; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; border-bottom: 1px solid var(--line); }
+  tbody td { padding: 15px 20px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr.data-row { transition: background 0.12s; }
+  tbody tr.data-row:hover { background: var(--cream); }
+  td .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
-  /* Buttons */
-  .btn { background: var(--teal); color: #fff; padding: 8px 16px; border-radius: 999px; border: none; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-  .btn:hover { background: var(--orange); }
-  .btn.secondary { background: #fff; color: var(--teal); border: 1px solid var(--line); }
-  .btn.secondary:hover { background: var(--cream); border-color: var(--teal); }
-  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  /* ---------- Buttons ---------- */
+  .btn { background: var(--teal); color: #fff; padding: 9px 17px; border-radius: 999px; border: 1px solid var(--teal); font-family: 'Parkinsans'; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background 0.15s, border-color 0.15s, transform 0.05s; white-space: nowrap; }
+  .btn:hover { background: var(--orange); border-color: var(--orange); }
+  .btn:active { transform: translateY(1px); }
+  .btn svg { width: 16px; height: 16px; }
+  .btn.secondary { background: var(--white); color: var(--teal); border-color: var(--line); }
+  .btn.secondary:hover { background: var(--cream); border-color: var(--teal); color: var(--teal); }
+  .btn.sm { padding: 6px 13px; font-size: 12.5px; }
+  .btn.ghost-danger { background: none; color: var(--red); border-color: transparent; }
+  .btn.ghost-danger:hover { background: var(--red-soft); border-color: transparent; color: var(--red); }
+  .icon-btn { background: none; border: 1px solid transparent; border-radius: 9px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); transition: background 0.15s, color 0.15s; }
+  .icon-btn:hover { background: var(--cream); color: var(--teal); }
+  .icon-btn svg { width: 18px; height: 18px; }
 
-  /* Stock input */
-  .stock-input { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; width: 70px; font-family: 'Parkinsans', sans-serif; font-weight: 600; font-size: 14px; color: var(--teal); text-align: center; }
-  .stock-input.danger { background: rgba(192,52,52,0.06); border-color: rgba(192,52,52,0.3); color: var(--red); }
-  .stock-input.warn { background: rgba(220,61,45,0.06); border-color: rgba(220,61,45,0.3); color: var(--orange); }
-  .stock-cell { display: flex; align-items: center; gap: 6px; }
-  .adj-btn { background: #fff; border: 1px solid var(--line); border-radius: 6px; width: 26px; height: 26px; cursor: pointer; font-weight: 700; color: var(--teal); font-size: 14px; }
-  .adj-btn:hover { background: var(--teal); color: #fff; }
+  /* ---------- Search ---------- */
+  .search { position: relative; flex: 1; max-width: 340px; }
+  .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: var(--muted-2); pointer-events: none; }
+  .search input { width: 100%; background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px 9px 38px; font-size: 13.5px; color: var(--teal); box-shadow: var(--shadow-sm); }
+  .search input:focus { outline: none; border-color: var(--teal); }
+  .search input::placeholder { color: var(--muted-2); }
 
-  /* Order details */
-  .order-expand { background: var(--cream); padding: 16px 24px; border-top: 1px solid var(--line); font-size: 13px; display: none; }
-  .order-expand.open { display: block; }
-  .order-expand h4 { font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .order-items { display: grid; gap: 4px; margin-bottom: 12px; }
-  .order-item { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; font-size: 13px; padding: 4px 0; }
+  /* ---------- Products list ---------- */
+  .prod-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .prod-list { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .prow { display: grid; grid-template-columns: 60px 1fr auto auto; align-items: center; gap: 16px; width: 100%; padding: 12px 20px; border: none; border-top: 1px solid var(--line-soft); background: none; cursor: pointer; text-align: left; transition: background 0.12s; }
+  .prow:first-child { border-top: none; }
+  .prow:hover { background: var(--cream); }
+  .prow-img { width: 54px; height: 54px; object-fit: contain; background: var(--cream); border: 1px solid var(--line); border-radius: 11px; padding: 4px; }
+  .prow-name { font-family: 'Parkinsans'; font-weight: 600; font-size: 14.5px; color: var(--teal); }
+  .prow-desc { font-size: 12.5px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 42ch; }
+  .prow-price { font-family: 'Parkinsans'; font-weight: 700; font-size: 15px; color: var(--teal); }
+  .prow-chev { color: var(--muted-2); display: flex; }
+  .prow-chev svg { width: 20px; height: 20px; }
 
-  /* Empty state */
-  .empty { padding: 64px 32px; text-align: center; color: var(--muted); font-size: 14px; }
-  .empty h3 { color: var(--teal); margin-bottom: 8px; font-size: 18px; }
+  /* ---------- Drawer / slide-over editor ---------- */
+  .drawer-backdrop { position: fixed; inset: 0; background: rgba(21,37,40,0.42); opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 40; }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+  .drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 460px; max-width: 94vw; background: var(--white); box-shadow: var(--shadow-lg); z-index: 50; transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; }
+  .drawer.open { transform: none; }
+  .drawer-head { padding: 20px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+  .drawer-head h3 { font-size: 18px; font-weight: 700; color: var(--teal); }
+  .drawer-body { padding: 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 18px; }
+  .photo-uploader { display: flex; align-items: center; gap: 18px; }
+  .photo-frame { width: 104px; height: 104px; border-radius: var(--r-md); background: var(--cream); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; }
+  .photo-frame img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+  .photo-meta { min-width: 0; }
+  .photo-label { position: relative; overflow: hidden; }
+  .photo-label input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .photo-hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .field { display: flex; flex-direction: column; gap: 7px; font-family: 'Parkinsans'; font-size: 12.5px; font-weight: 600; color: var(--teal); }
+  .field input, .field textarea { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 11px 13px; font-family: 'Barlow'; font-size: 14px; font-weight: 400; color: var(--teal); width: 100%; transition: border-color 0.15s, box-shadow 0.15s; }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(34,58,63,0.08); }
+  .field textarea { resize: vertical; min-height: 62px; line-height: 1.45; }
+  .field-hint { font-size: 11.5px; font-weight: 500; color: var(--muted); font-family: 'Barlow'; }
+  .dollar-wrap { display: flex; align-items: center; gap: 2px; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-sm); padding-left: 13px; font-family: 'Parkinsans'; font-weight: 700; color: var(--muted); transition: border-color 0.15s, box-shadow 0.15s; }
+  .dollar-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(34,58,63,0.08); }
+  .dollar-wrap input { border: none !important; box-shadow: none !important; padding-left: 4px; }
+  .drawer-foot { padding: 16px 24px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+  .drawer-foot .spacer { flex: 1; }
 
-  /* Products manager */
-  .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .panel-head h2 { margin: 0; }
-  .add-product-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; }
-  .add-product-card h3 { font-family: 'Parkinsans', sans-serif; font-size: 15px; color: var(--teal); margin-bottom: 16px; }
-  .add-grid { display: grid; grid-template-columns: 1fr 140px 1fr; gap: 14px 18px; }
-  .add-grid label { display: flex; flex-direction: column; gap: 6px; font-family: 'Parkinsans', sans-serif; font-size: 12px; font-weight: 600; color: var(--muted); }
-  .add-grid .add-wide { grid-column: 1 / -1; }
-  .add-grid input { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--teal); }
-  .add-grid input:focus { outline: 2px solid var(--teal); background: #fff; }
-  .add-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
-  .prod-thumb { width: 52px; height: 52px; object-fit: contain; background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 4px; display: block; }
-  .prod-input { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-family: 'Barlow', sans-serif; font-size: 13px; color: var(--teal); width: 100%; }
-  .prod-input:focus { outline: 2px solid var(--teal); background: #fff; }
-  .prod-input.price { width: 84px; text-align: right; }
-  td.prod-actions { white-space: nowrap; }
-  td.prod-actions .btn-sm { margin-left: 4px; }
-  .btn.danger-btn { background: #fff; color: var(--red); border: 1px solid rgba(192,52,52,0.35); }
-  .btn.danger-btn:hover { background: var(--red); color: #fff; }
-  .photo-btn { position: relative; overflow: hidden; }
-  .photo-btn input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  /* ---------- Stock stepper ---------- */
+  .stock-cell { display: inline-flex; align-items: center; gap: 6px; }
+  .stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--white); }
+  .adj-btn { background: none; border: none; width: 30px; height: 32px; cursor: pointer; font-weight: 700; color: var(--teal); font-size: 15px; transition: background 0.12s; }
+  .adj-btn:hover { background: var(--cream); }
+  .stock-input { border: none; width: 46px; padding: 6px 0; font-family: 'Parkinsans'; font-weight: 700; font-size: 14px; color: var(--teal); text-align: center; background: none; }
+  .stock-input.danger { color: var(--red); }
+  .stock-input.warn { color: var(--orange); }
+  .thr-input { background: var(--cream); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 7px 10px; width: 72px; font-family: 'Parkinsans'; font-weight: 600; font-size: 14px; color: var(--teal); text-align: center; }
+  .thr-input:focus, .stock-input:focus { outline: none; }
 
-  /* Shipping settings */
-  .ship-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px; max-width: 620px; }
-  .ship-intro { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-  .ship-modes { display: grid; gap: 12px; margin-bottom: 22px; }
-  .ship-mode { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; font-size: 13px; color: var(--muted); }
-  .ship-mode strong { color: var(--teal); font-family: 'Parkinsans', sans-serif; font-size: 14px; }
-  .ship-mode input { margin-top: 3px; }
-  .ship-section { border-top: 1px solid var(--line); padding-top: 20px; }
-  .ship-field { display: flex; flex-direction: column; gap: 8px; font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); }
-  .ship-input-wrap { display: inline-flex; align-items: center; gap: 4px; font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); }
-  .ship-input-wrap input { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--teal); text-align: right; }
-  .ship-tier-head, .ship-tier-row, .ship-final-row { display: grid; grid-template-columns: 1fr 1fr 40px; gap: 12px; align-items: center; margin-bottom: 10px; }
-  .ship-tier-head { font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-  .ship-final-row { border-top: 1px dashed var(--line); padding-top: 12px; margin-top: 4px; font-family: 'Parkinsans', sans-serif; font-weight: 600; color: var(--teal); font-size: 13px; }
-  .ship-remove { background: #fff; border: 1px solid rgba(192,52,52,0.35); color: var(--red); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-weight: 700; }
-  .ship-remove:hover { background: var(--red); color: #fff; }
-  .ship-hint { color: var(--muted); font-size: 12px; margin-top: 12px; font-style: italic; }
-  #ship-add-tier { margin: 6px 0 4px; }
+  /* ---------- Order details ---------- */
+  .order-expand { background: var(--cream); padding: 4px 20px; }
+  .order-expand-inner { padding: 16px 0; }
+  .order-expand h4 { font-family: 'Parkinsans'; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .order-items { display: grid; gap: 5px; margin-bottom: 16px; }
+  .order-item { display: grid; grid-template-columns: 1fr auto auto; gap: 14px; font-size: 13.5px; padding: 5px 0; border-bottom: 1px dashed var(--line); }
 
-  /* Organization-code summary */
-  .org-summary { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin-bottom: 18px; }
-  .org-summary .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .org-summary .card-head h3 { font-family: 'Parkinsans', sans-serif; font-size: 15px; color: var(--teal); }
+  /* ---------- Shipping ---------- */
+  .ship-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); padding: 28px 30px; max-width: 660px; }
+  .ship-intro { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
+  .ship-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .ship-mode { display: flex; gap: 11px; align-items: flex-start; padding: 15px 16px; border: 1.5px solid var(--line); border-radius: var(--r-md); cursor: pointer; font-size: 12.5px; color: var(--muted); transition: border-color 0.15s, background 0.15s; }
+  .ship-mode:hover { border-color: var(--muted-2); }
+  .ship-mode.sel { border-color: var(--teal); background: rgba(34,58,63,0.03); }
+  .ship-mode strong { display: block; color: var(--teal); font-family: 'Parkinsans'; font-size: 14px; margin-bottom: 2px; }
+  .ship-mode input { margin-top: 2px; accent-color: var(--teal); }
+  .ship-section { border-top: 1px solid var(--line-soft); padding-top: 22px; }
+  .ship-field { display: flex; flex-direction: column; gap: 9px; font-family: 'Parkinsans'; font-size: 13px; font-weight: 600; color: var(--teal); }
+  .ship-input-wrap { display: inline-flex; align-items: center; gap: 3px; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-sm); padding-left: 11px; font-family: 'Parkinsans'; font-weight: 700; color: var(--muted); width: fit-content; }
+  .ship-input-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(34,58,63,0.08); }
+  .ship-input-wrap input { border: none; background: none; padding: 9px 11px 9px 3px; width: 92px; font-family: 'Barlow'; font-size: 14px; color: var(--teal); text-align: right; }
+  .ship-input-wrap input:focus { outline: none; }
+  .ship-tier-head, .ship-tier-row, .ship-final-row { display: grid; grid-template-columns: 1fr 1fr 44px; gap: 14px; align-items: center; margin-bottom: 12px; }
+  .ship-tier-head { font-family: 'Parkinsans'; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .ship-tier-head span:last-child, .ship-final-row span:last-child { }
+  .ship-final-row { border-top: 1px dashed var(--line); padding-top: 16px; margin-top: 6px; font-family: 'Parkinsans'; font-weight: 600; color: var(--teal); font-size: 13px; }
+  .ship-remove { background: var(--white); border: 1px solid var(--line); color: var(--muted); border-radius: 9px; width: 36px; height: 36px; cursor: pointer; font-weight: 700; font-size: 16px; transition: background 0.12s, color 0.12s, border-color 0.12s; }
+  .ship-remove:hover { background: var(--red-soft); color: var(--red); border-color: transparent; }
+  .ship-hint { color: var(--muted); font-size: 12.5px; margin-top: 14px; background: var(--cream); border-radius: var(--r-sm); padding: 11px 14px; }
+  #ship-add-tier { margin: 4px 0 6px; }
 
-  /* Toast */
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--teal); color: #fff; padding: 14px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(120px); opacity: 0; transition: transform 0.2s, opacity 0.2s; pointer-events: none; }
-  .toast.show { transform: translateY(0); opacity: 1; }
+  /* ---------- Empty / loading ---------- */
+  .empty { padding: 56px 32px; text-align: center; color: var(--muted); font-size: 14px; }
+  .empty .empty-ico { width: 46px; height: 46px; margin: 0 auto 14px; border-radius: 14px; background: var(--cream); display: flex; align-items: center; justify-content: center; color: var(--muted-2); }
+  .empty .empty-ico svg { width: 24px; height: 24px; }
+  .empty h3 { color: var(--teal); margin-bottom: 6px; font-size: 17px; font-weight: 700; }
+  .skeleton { background: linear-gradient(90deg, var(--line-soft) 25%, var(--cream) 37%, var(--line-soft) 63%); background-size: 400% 100%; animation: sk 1.3s ease infinite; border-radius: 8px; }
+  @keyframes sk { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
-  @media (max-width: 900px) {
-    .stats { grid-template-columns: 1fr 1fr; }
-    .cards-2 { grid-template-columns: 1fr; }
+  /* ---------- Toast ---------- */
+  .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(140px); background: var(--teal); color: #fff; padding: 13px 22px; border-radius: 999px; font-family: 'Parkinsans'; font-size: 14px; font-weight: 600; box-shadow: var(--shadow-lg); opacity: 0; transition: transform 0.22s cubic-bezier(0.34,1.4,0.6,1), opacity 0.22s; pointer-events: none; z-index: 60; display: flex; align-items: center; gap: 9px; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast svg { width: 17px; height: 17px; color: var(--yellow); }
+
+  .mobile-only { display: none; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1040px) { .kpis { grid-template-columns: 1fr 1fr; } .grid-2, .grid-2.wide { grid-template-columns: 1fr; } }
+  @media (max-width: 820px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { position: sticky; top: 0; height: auto; flex-direction: column; z-index: 30; }
+    .sb-nav { flex-direction: row; overflow-x: auto; padding: 6px 10px; gap: 4px; }
+    .sb-sec { display: none; }
+    .nav-item { flex-direction: column; gap: 4px; font-size: 11px; padding: 8px 12px; white-space: nowrap; }
+    .nav-item.active::before { left: 8px; right: 8px; top: auto; bottom: -6px; width: auto; height: 3px; border-radius: 3px 3px 0 0; }
+    .nav-badge { position: absolute; top: 4px; right: 6px; margin: 0; }
+    .sb-foot { display: none; }
+    .topbar { padding: 16px 20px; }
+    .content { padding: 20px 20px 80px; }
+    .mobile-only { display: inline-flex; }
   }
-  @media (max-width: 600px) {
-    .stats { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 560px) { .kpis { grid-template-columns: 1fr; } .prow { grid-template-columns: 48px 1fr auto; } .prow-price { display: none; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 </style>
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-<link rel="stylesheet" href="/motion.css" />
-<script defer src="/motion.js"></script>
 </head>
 <body>
 
-<header>
-  <div class="container nav">
-    <div class="brand">
-      <img src="/assets/logo.png" alt="Fast Track" style="height: 44px; width: auto; background: rgba(255,255,255,0.96); padding: 6px 10px; border-radius: 10px;" />
-      <span class="badge">Admin</span>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <img src="/assets/logo.png" alt="Fast Track" />
+      <div>
+        <div class="tag">Admin</div>
+        <div class="store">Fast Track</div>
+      </div>
     </div>
-    <div class="nav-actions">
-      <a href="/" target="_blank">View public site ↗</a>
+    <nav class="sb-nav" id="sb-nav">
+      <div class="sb-sec">Store</div>
+      <button class="nav-item active" data-panel="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20a1 1 0 0 0 1 1H17.5a1 1 0 0 0 1-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+        Home
+      </button>
+      <button class="nav-item" data-panel="orders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+        Orders
+        <span class="nav-badge" id="nav-orders-badge" style="display:none;">0</span>
+      </button>
+      <div class="sb-sec">Catalog</div>
+      <button class="nav-item" data-panel="products">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13V5a1 1 0 0 1 1-1h8l7 7-9 9-7-7Z"/><circle cx="8" cy="8" r="1.4"/></svg>
+        Products
+      </button>
+      <button class="nav-item" data-panel="inventory">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>
+        Inventory
+        <span class="nav-badge" id="nav-inv-badge" style="display:none;">0</span>
+      </button>
+      <button class="nav-item" data-panel="shipping">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h11v9.5H3zM14 9.5h3.8l3.2 3.2v2.8H14z"/><circle cx="7" cy="18" r="1.7"/><circle cx="17.5" cy="18" r="1.7"/></svg>
+        Shipping
+      </button>
+    </nav>
+    <div class="sb-foot">
+      <a href="/" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        View your store
+      </a>
     </div>
-  </div>
-</header>
+  </aside>
 
-<div class="tabs">
-  <div class="container tabs-row">
-    <button class="tab active" data-panel="overview">Overview</button>
-    <button class="tab" data-panel="orders">Orders</button>
-    <button class="tab" data-panel="products">Products</button>
-    <button class="tab" data-panel="inventory">Inventory</button>
-    <button class="tab" data-panel="shipping">Shipping</button>
+  <!-- Main -->
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="page-title">Home</h1>
+        <div class="sub" id="page-sub">A quick look at how your store is doing.</div>
+      </div>
+      <div id="page-action"></div>
+    </header>
+
+    <div class="content">
+
+      <!-- HOME / OVERVIEW -->
+      <section class="panel active" id="panel-overview">
+        <div class="kpis">
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">Orders this week</span>
+              <span class="kpi-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></span>
+            </div>
+            <div class="value" id="stat-orders-week">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">Revenue this week</span>
+              <span class="kpi-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M8 7h5a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h6"/></svg></span>
+            </div>
+            <div class="value" id="stat-revenue-week">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">Pending fulfillment</span>
+              <span class="kpi-ico orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            </div>
+            <div class="value" id="stat-pending">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">Lifetime orders</span>
+              <span class="kpi-ico yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18V9M10 18V5M16 18v-6M22 18H2"/></svg></span>
+            </div>
+            <div class="value" id="stat-all-orders">—</div>
+          </div>
+        </div>
+
+        <div class="grid-2 wide">
+          <div class="card">
+            <div class="card-head"><h3>Recent orders</h3><button class="btn secondary sm" data-goto="orders">View all</button></div>
+            <div class="card-body" id="recent-orders-body"><div class="empty"><h3>No orders yet</h3>New orders will show up here.</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div class="card">
+              <div class="card-head"><h3>Low stock</h3><span class="pill warn plain" id="low-stock-count">0</span></div>
+              <div class="card-body" id="low-stock-body"><div class="empty"><h3>All good</h3>Stock levels are healthy.</div></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Top sellers</h3><span class="pill gray plain">All time</span></div>
+              <div class="card-body" id="top-products-body"><div class="empty"><h3>No sales yet</h3>Best sellers appear once you have orders.</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ORDERS -->
+      <section class="panel" id="panel-orders">
+        <div class="card org-summary" id="org-summary" style="display:none;margin-bottom:18px;">
+          <div class="card-head"><h3>Organization &amp; fundraiser codes</h3><span class="pill teal plain">For rebates</span></div>
+          <div class="card-body" id="org-summary-body"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Placed</th><th></th></tr></thead>
+            <tbody id="orders-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PRODUCTS -->
+      <section class="panel" id="panel-products">
+        <div class="prod-toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+            <input type="text" id="prod-search" placeholder="Search products…" />
+          </div>
+        </div>
+        <div class="prod-list" id="products-list"></div>
+      </section>
+
+      <!-- INVENTORY -->
+      <section class="panel" id="panel-inventory">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Product</th><th>Price</th><th>In stock</th><th>Low-stock at</th><th>Status</th><th></th></tr></thead>
+            <tbody id="inventory-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SHIPPING -->
+      <section class="panel" id="panel-shipping">
+        <div class="ship-card">
+          <p class="ship-intro">Choose how you charge for shipping. Changes take effect on your live store the moment you save.</p>
+          <div class="ship-modes">
+            <label class="ship-mode" data-mode="flat"><input type="radio" name="ship-mode" value="flat" /> <span><strong>Flat rate</strong>One shipping price for every order.</span></label>
+            <label class="ship-mode" data-mode="tiers"><input type="radio" name="ship-mode" value="tiers" /> <span><strong>Tiered by order total</strong>Shipping changes with the order size.</span></label>
+          </div>
+          <div id="ship-flat-section" class="ship-section">
+            <label class="ship-field">Shipping cost for every order
+              <span class="ship-input-wrap">$<input type="number" id="ship-flat" min="0" step="0.01" placeholder="9.95" /></span>
+            </label>
+          </div>
+          <div id="ship-tiers-section" class="ship-section" style="display:none;">
+            <div class="ship-tier-head"><span>Order total up to</span><span>Shipping charged</span><span></span></div>
+            <div id="ship-tier-rows"></div>
+            <button class="btn secondary sm" id="ship-add-tier" type="button">+ Add a tier</button>
+            <div class="ship-final-row"><span>All larger orders</span><span class="ship-input-wrap">$<input type="number" id="ship-final" min="0" step="0.01" placeholder="19.95" /></span><span></span></div>
+            <p class="ship-hint">Example: up to $30 → $9.95, up to $60 → $14.95, and everything larger → $19.95.</p>
+          </div>
+          <div class="drawer-foot" style="border:none;padding:20px 0 0;"><div class="spacer"></div><button class="btn" id="ship-save">Save shipping</button></div>
+        </div>
+      </section>
+
+    </div>
   </div>
 </div>
 
-<main>
-  <div class="container">
-
-    <!-- OVERVIEW -->
-    <section class="panel active" id="panel-overview">
-      <h2>Overview</h2>
-      <div class="stats" id="stats">
-        <div class="stat"><div class="label">Orders this week</div><div class="value" id="stat-orders-week">—</div></div>
-        <div class="stat success"><div class="label">Revenue this week</div><div class="value" id="stat-revenue-week">—</div></div>
-        <div class="stat warning"><div class="label">Pending fulfillment</div><div class="value" id="stat-pending">—</div></div>
-        <div class="stat"><div class="label">Lifetime orders</div><div class="value" id="stat-all-orders">—</div></div>
-      </div>
-
-      <div class="cards-2">
-        <div class="card">
-          <div class="card-head">
-            <h3>Low stock alerts</h3>
-            <span class="pill warn" id="low-stock-count">0</span>
-          </div>
-          <div class="card-body" id="low-stock-body">
-            <div class="empty"><h3>Nothing low</h3>Stock levels are healthy.</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head">
-            <h3>Top selling products</h3>
-            <span class="pill gray">All time</span>
-          </div>
-          <div class="card-body" id="top-products-body">
-            <div class="empty"><h3>No orders yet</h3>Top products will show once you have sales.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ORDERS -->
-    <section class="panel" id="panel-orders">
-      <h2>Orders</h2>
-      <div class="org-summary" id="org-summary" style="display:none;">
-        <div class="card-head"><h3>Organization codes</h3><span class="pill teal">For rebates</span></div>
-        <div class="card-body" id="org-summary-body"></div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Order</th>
-              <th>Customer</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="orders-table"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- PRODUCTS -->
-    <section class="panel" id="panel-products">
-      <div class="panel-head">
-        <h2>Products</h2>
-        <button class="btn" id="add-product-toggle">+ Add product</button>
-      </div>
-
-      <div class="add-product-card" id="add-product-card" style="display:none;">
-        <h3>New product</h3>
-        <div class="add-grid">
-          <label>Name<input type="text" id="np-name" placeholder="e.g. Washable Markers, 8-pack" /></label>
-          <label>Price<input type="number" id="np-price" min="0" step="0.01" placeholder="0.00" /></label>
-          <label>Description<input type="text" id="np-unit" placeholder="e.g. 8 ct, washable" /></label>
-          <label>Photo<input type="file" id="np-image" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
-          <label class="add-wide">Search keywords (comma separated, optional)<input type="text" id="np-keywords" placeholder="markers, washable markers, crayola" /></label>
-        </div>
-        <div class="add-actions">
-          <button class="btn secondary" id="np-cancel">Cancel</button>
-          <button class="btn" id="np-save">Add to store</button>
-        </div>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Photo</th>
-              <th>Name</th>
-              <th>Price</th>
-              <th>Description</th>
-              <th>Keywords</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="products-table"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- INVENTORY -->
-    <section class="panel" id="panel-inventory">
-      <h2>Inventory</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Low-stock threshold</th>
-              <th>Status</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="inventory-table"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- SHIPPING -->
-    <section class="panel" id="panel-shipping">
-      <h2>Shipping</h2>
-      <div class="ship-card">
-        <p class="ship-intro">Choose how you charge for shipping. Changes take effect on your live store as soon as you save.</p>
-
-        <div class="ship-modes">
-          <label class="ship-mode"><input type="radio" name="ship-mode" value="flat" /> <span><strong>Flat rate</strong><br/>One shipping price for every order.</span></label>
-          <label class="ship-mode"><input type="radio" name="ship-mode" value="tiers" /> <span><strong>Tiered by order total</strong><br/>Shipping changes based on how large the order is.</span></label>
-        </div>
-
-        <div id="ship-flat-section" class="ship-section">
-          <label class="ship-field">Shipping cost for every order
-            <span class="ship-input-wrap">$<input type="number" id="ship-flat" min="0" step="0.01" placeholder="9.95" /></span>
-          </label>
-        </div>
-
-        <div id="ship-tiers-section" class="ship-section" style="display:none;">
-          <div class="ship-tier-head"><span>Orders up to</span><span>Shipping charged</span><span></span></div>
-          <div id="ship-tier-rows"></div>
-          <button class="btn secondary btn-sm" id="ship-add-tier" type="button">+ Add a tier</button>
-          <div class="ship-final-row">
-            <span>All larger orders</span>
-            <span class="ship-input-wrap">$<input type="number" id="ship-final" min="0" step="0.01" placeholder="19.95" /></span>
-          </div>
-          <p class="ship-hint">Example: "up to $30 → $9.95", "up to $60 → $14.95", and all larger orders → $19.95.</p>
-        </div>
-
-        <div class="add-actions">
-          <button class="btn" id="ship-save">Save shipping</button>
-        </div>
-      </div>
-    </section>
-
+<!-- Product editor slide-over -->
+<div class="drawer-backdrop" id="drawer-backdrop"></div>
+<aside class="drawer" id="product-drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <h3 id="drawer-title">Edit product</h3>
+    <button class="icon-btn" id="drawer-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
   </div>
-</main>
+  <div class="drawer-body">
+    <div class="photo-uploader">
+      <div class="photo-frame"><img id="ed-img" src="/assets/photo-coming.svg" alt="" onerror="this.style.opacity=0.3" /></div>
+      <div class="photo-meta">
+        <label class="btn secondary sm photo-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.5V19a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.5"/><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/></svg>
+          Upload photo
+          <input type="file" id="ed-file" accept="image/jpeg,image/png,image/webp,image/gif" />
+        </label>
+        <div class="photo-hint">JPG, PNG, WebP or GIF. Shown on the store and at checkout.</div>
+      </div>
+    </div>
+    <label class="field">Product name <input type="text" id="ed-name" placeholder="e.g. Washable Markers, 8-pack" /></label>
+    <label class="field">Price <span class="dollar-wrap">$<input type="number" id="ed-price" min="0" step="0.01" placeholder="0.00" /></span></label>
+    <label class="field">Short description <input type="text" id="ed-unit" placeholder="e.g. 8 ct, washable" /></label>
+    <label class="field">Search keywords <textarea id="ed-keywords" placeholder="markers, washable markers, crayola"></textarea><span class="field-hint">Comma separated. Helps shoppers find this product on your store.</span></label>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn ghost-danger" id="ed-delete">Delete</button>
+    <div class="spacer"></div>
+    <button class="btn secondary" id="ed-cancel">Cancel</button>
+    <button class="btn" id="ed-save">Save</button>
+  </div>
+</aside>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  // Tab switching
-  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === t));
-    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${t.dataset.panel}`));
-    if (t.dataset.panel === 'orders') loadOrders();
-    if (t.dataset.panel === 'inventory') loadInventory();
-    if (t.dataset.panel === 'products') loadProducts();
-    if (t.dataset.panel === 'shipping') loadShipping();
-  }));
+  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const PLACEHOLDER_IMG = '/assets/photo-coming.svg';
 
+  const PAGE_META = {
+    overview:  { title: 'Home',      sub: 'A quick look at how your store is doing.' },
+    orders:    { title: 'Orders',    sub: 'Every order that comes through your store.' },
+    products:  { title: 'Products',  sub: 'Add, edit, and price the items in your store.' },
+    inventory: { title: 'Inventory', sub: 'Track stock and get low-stock warnings.' },
+    shipping:  { title: 'Shipping',  sub: 'Set how much you charge customers to ship.' },
+  };
+
+  // ---------- Navigation ----------
+  function switchPanel(name) {
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.toggle('active', x.dataset.panel === name));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${name}`));
+    const meta = PAGE_META[name];
+    document.getElementById('page-title').textContent = meta.title;
+    document.getElementById('page-sub').textContent = meta.sub;
+    // Contextual top-bar action
+    const action = document.getElementById('page-action');
+    action.innerHTML = name === 'products'
+      ? '<button class="btn" id="add-product-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add product</button>'
+      : '';
+    if (name === 'products') document.getElementById('add-product-btn').addEventListener('click', () => openEditor(null));
+    if (name === 'overview') loadOverview();
+    if (name === 'orders') loadOrders();
+    if (name === 'inventory') loadInventory();
+    if (name === 'products') loadProducts();
+    if (name === 'shipping') loadShipping();
+  }
+  document.querySelectorAll('.nav-item').forEach(t => t.addEventListener('click', () => switchPanel(t.dataset.panel)));
+  document.addEventListener('click', e => {
+    const g = e.target.closest('[data-goto]'); if (g) switchPanel(g.dataset.goto);
+  });
+
+  // ---------- Helpers ----------
   function dollars(cents) { return `$${((cents || 0) / 100).toFixed(2)}`; }
-  function fmt(date) {
-    const d = new Date(date);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-  }
-  function escapeHtml(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  }
+  function fmt(date) { return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
   function toast(msg) {
     const el = document.getElementById('toast');
-    el.textContent = msg;
+    el.innerHTML = ICON_CHECK + `<span>${escapeHtml(msg)}</span>`;
     el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 2200);
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2300);
   }
+  function emptyState(icon, title, sub) {
+    return `<div class="empty"><div class="empty-ico">${icon}</div><h3>${title}</h3>${sub}</div>`;
+  }
+  const ICO_BOX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>';
+  const ICO_BAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>';
 
-  // --- Overview ---
+  // ---------- Home / Overview ----------
   async function loadOverview() {
-    const res = await fetch('/api/admin/overview');
-    const data = await res.json();
+    let data;
+    try { data = await (await fetch('/api/admin/overview')).json(); } catch { return; }
     document.getElementById('stat-orders-week').textContent = data.totals.orders_this_week;
     document.getElementById('stat-revenue-week').textContent = dollars(data.totals.revenue_this_week_cents);
     document.getElementById('stat-pending').textContent = data.totals.pending_fulfillment;
     document.getElementById('stat-all-orders').textContent = data.totals.orders_all_time;
 
+    // low stock
     document.getElementById('low-stock-count').textContent = data.low_stock.length;
     const lowBody = document.getElementById('low-stock-body');
-    if (data.low_stock.length === 0) {
-      lowBody.innerHTML = `<div class="empty"><h3>Nothing low</h3>Stock levels are healthy.</div>`;
-    } else {
-      lowBody.innerHTML = `<div class="list">${data.low_stock.map(item => `
+    lowBody.innerHTML = data.low_stock.length === 0
+      ? emptyState(ICO_BOX, 'All good', 'Stock levels are healthy.')
+      : `<div class="list">${data.low_stock.map(item => `
         <div class="list-item">
-          <div>
-            <div class="name">${escapeHtml(item.name)}</div>
-            <div class="meta">Threshold: ${item.threshold}</div>
-          </div>
-          <span class="pill ${item.stock === 0 ? 'danger' : 'warn'}">${item.stock === 0 ? 'OUT' : item.stock + ' left'}</span>
+          <div><div class="name">${escapeHtml(item.name)}</div><div class="meta">Warns at ${item.threshold}</div></div>
+          <span class="pill ${item.stock === 0 ? 'danger' : 'warn'}">${item.stock === 0 ? 'Out' : item.stock + ' left'}</span>
         </div>`).join('')}</div>`;
-    }
 
+    // top products
     const topBody = document.getElementById('top-products-body');
-    if (data.top_products.length === 0) {
-      topBody.innerHTML = `<div class="empty"><h3>No orders yet</h3>Top products will show once you have sales.</div>`;
-    } else {
-      topBody.innerHTML = `<div class="list">${data.top_products.map(item => `
-        <div class="list-item">
-          <div class="name">${escapeHtml(item.name)}</div>
-          <span class="pill teal">${item.units_sold} sold</span>
-        </div>`).join('')}</div>`;
-    }
+    topBody.innerHTML = data.top_products.length === 0
+      ? emptyState(ICO_BAG, 'No sales yet', 'Best sellers appear once you have orders.')
+      : `<div class="list">${data.top_products.map(item => `
+        <div class="list-item"><div class="name">${escapeHtml(item.name)}</div><span class="pill teal plain">${item.units_sold} sold</span></div>`).join('')}</div>`;
+
+    // inventory badge
+    const invBadge = document.getElementById('nav-inv-badge');
+    if (data.low_stock.length) { invBadge.textContent = data.low_stock.length; invBadge.style.display = ''; }
+    else invBadge.style.display = 'none';
+
+    // recent orders (from the orders endpoint)
+    try {
+      const od = await (await fetch('/api/admin/orders')).json();
+      const orders = od.orders || [];
+      const pending = orders.filter(o => (o.fulfillment || 'pending') === 'pending').length;
+      const ob = document.getElementById('nav-orders-badge');
+      if (pending) { ob.textContent = pending; ob.style.display = ''; } else ob.style.display = 'none';
+      const rb = document.getElementById('recent-orders-body');
+      rb.innerHTML = orders.length === 0
+        ? emptyState(ICO_BAG, 'No orders yet', 'New orders will show up here.')
+        : `<div class="list">${orders.slice(0, 6).map(o => {
+            const f = o.fulfillment || 'pending';
+            const cls = f === 'shipped' ? 'ok' : f === 'fulfilled' ? 'teal' : 'warn';
+            return `<div class="list-item">
+              <div><div class="name">${escapeHtml(o.customer_name || 'Guest')} <span style="color:var(--muted-2);font-weight:500;">· ${escapeHtml(o.short_id)}</span></div><div class="meta">${fmt(o.created_at)}</div></div>
+              <div style="display:flex;align-items:center;gap:10px;"><span class="pill ${cls}">${f}</span><strong style="font-family:Parkinsans;">${dollars(o.amount_total_cents)}</strong></div>
+            </div>`; }).join('')}</div>`;
+    } catch {}
   }
 
-  // --- Orders ---
+  // ---------- Orders ----------
   let cachedOrders = [];
   async function loadOrders() {
-    const res = await fetch('/api/admin/orders');
-    const data = await res.json();
-    cachedOrders = data.orders;
     const tbody = document.getElementById('orders-table');
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:0;"><div class="skeleton" style="height:56px;margin:12px 20px;"></div></td></tr>`;
+    const data = await (await fetch('/api/admin/orders')).json();
+    cachedOrders = data.orders || [];
     if (!cachedOrders.length) {
-      tbody.innerHTML = `<tr><td colspan="6" class="empty"><h3>No orders yet</h3>Orders will appear here once customers check out.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6">${emptyState(ICO_BAG, 'No orders yet', 'Orders appear here once customers check out.')}</td></tr>`;
+      document.getElementById('org-summary').style.display = 'none';
       return;
     }
     tbody.innerHTML = cachedOrders.map((o, idx) => {
-      const fStatus = o.fulfillment || 'pending';
-      const fPill = fStatus === 'shipped' ? 'ok' : fStatus === 'fulfilled' ? 'teal' : 'warn';
-      const codeTag = o.organization_code ? `<br/><span class="pill teal" style="margin-top:4px;">code: ${escapeHtml(o.organization_code)}</span>` : '';
+      const f = o.fulfillment || 'pending';
+      const cls = f === 'shipped' ? 'ok' : f === 'fulfilled' ? 'teal' : 'warn';
+      const codeTag = o.organization_code ? `<div style="margin-top:5px;"><span class="pill teal">${escapeHtml(o.organization_code)}</span></div>` : '';
       return `
-        <tr data-order-id="${o.id}">
-          <td><strong>${o.short_id}</strong></td>
-          <td>${escapeHtml(o.customer_name || '—')}<br/><span class="meta" style="color:var(--muted);font-size:12px;">${escapeHtml(o.customer_email || '')}</span>${codeTag}</td>
-          <td><strong>${dollars(o.amount_total_cents)}</strong></td>
-          <td><span class="pill ${fPill}">${fStatus}</span></td>
-          <td><span style="color:var(--muted);font-size:13px;">${fmt(o.created_at)}</span></td>
-          <td><button class="btn btn-sm secondary" data-action="toggle-details" data-idx="${idx}">Details</button></td>
+        <tr class="data-row" data-order-id="${o.id}">
+          <td><strong style="font-family:Parkinsans;">${escapeHtml(o.short_id)}</strong></td>
+          <td><div style="font-weight:600;">${escapeHtml(o.customer_name || 'Guest')}</div><div class="sub">${escapeHtml(o.customer_email || '')}</div>${codeTag}</td>
+          <td><strong style="font-family:Parkinsans;">${dollars(o.amount_total_cents)}</strong></td>
+          <td><span class="pill ${cls}">${f}</span></td>
+          <td><span style="color:var(--muted);">${fmt(o.created_at)}</span></td>
+          <td style="text-align:right;"><button class="btn secondary sm" data-action="toggle-details" data-idx="${idx}">Details</button></td>
         </tr>
-        <tr><td colspan="6" style="padding:0;"><div class="order-expand" id="order-expand-${idx}"></div></td></tr>
-      `;
+        <tr><td colspan="6" style="padding:0;border:none;"><div class="order-expand" id="order-expand-${idx}" style="display:none;"></div></td></tr>`;
     }).join('');
 
-    document.querySelectorAll('[data-action="toggle-details"]').forEach(btn => {
-      btn.addEventListener('click', () => toggleOrderDetails(+btn.dataset.idx));
-    });
+    tbody.querySelectorAll('[data-action="toggle-details"]').forEach(btn =>
+      btn.addEventListener('click', () => toggleOrderDetails(+btn.dataset.idx)));
 
-    // Organization-code summary (for calculating rebates)
+    // Organization-code summary
     const byCode = {};
     for (const o of cachedOrders) {
       if (!o.organization_code) continue;
-      const c = o.organization_code;
-      (byCode[c] = byCode[c] || { count: 0, total: 0 });
-      byCode[c].count++; byCode[c].total += (o.amount_total_cents || 0);
+      (byCode[o.organization_code] = byCode[o.organization_code] || { count: 0, total: 0 });
+      byCode[o.organization_code].count++; byCode[o.organization_code].total += (o.amount_total_cents || 0);
     }
-    const summaryEl = document.getElementById('org-summary');
     const codes = Object.entries(byCode).sort((a, b) => b[1].total - a[1].total);
+    const summaryEl = document.getElementById('org-summary');
     if (codes.length) {
       document.getElementById('org-summary-body').innerHTML = `<div class="list">${codes.map(([code, v]) => `
         <div class="list-item">
           <div><div class="name">${escapeHtml(code)}</div><div class="meta">${v.count} order${v.count === 1 ? '' : 's'}</div></div>
-          <div style="text-align:right;"><strong>${dollars(v.total)}</strong><div class="meta">total ordered</div></div>
+          <div style="text-align:right;"><strong style="font-family:Parkinsans;">${dollars(v.total)}</strong><div class="meta">total ordered</div></div>
         </div>`).join('')}</div>`;
       summaryEl.style.display = '';
-    } else {
-      summaryEl.style.display = 'none';
-    }
+    } else summaryEl.style.display = 'none';
   }
 
   function toggleOrderDetails(idx) {
     const o = cachedOrders[idx];
     const el = document.getElementById(`order-expand-${idx}`);
-    el.classList.toggle('open');
-    if (!el.classList.contains('open')) return;
+    const open = el.style.display !== 'none' && el.dataset.open === '1';
+    if (open) { el.style.display = 'none'; el.dataset.open = '0'; return; }
+    el.style.display = 'block'; el.dataset.open = '1';
     const addr = o.shipping_address;
-    el.innerHTML = `
+    el.innerHTML = `<div class="order-expand-inner">
       <h4>Items</h4>
-      <div class="order-items">
-        ${o.items.map(i => `<div class="order-item">
-          <span>${escapeHtml(i.name)}</span>
-          <span>×${i.quantity}</span>
-          <span><strong>${dollars(i.line_total_cents)}</strong></span>
-        </div>`).join('')}
-      </div>
-      ${o.organization_code ? `<h4>Organization code</h4><p style="font-size:14px;"><span class="pill teal">${escapeHtml(o.organization_code)}</span></p>` : ''}
-      <h4>Shipping</h4>
-      <p style="font-size:13px;color:var(--teal);">${escapeHtml(o.customer_name || '')}${o.customer_phone ? ' · ' + escapeHtml(o.customer_phone) : ''}<br/>
-      ${addr ? `${escapeHtml(addr.line1 || '')}${addr.line2 ? ', ' + escapeHtml(addr.line2) : ''}, ${escapeHtml(addr.city || '')}, ${escapeHtml(addr.state || '')} ${escapeHtml(addr.postal_code || '')}` : 'No address'}</p>
-      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
-        ${o.fulfillment !== 'fulfilled' ? `<button class="btn btn-sm" data-mark="${o.id}" data-status="fulfilled">Mark fulfilled</button>` : ''}
-        ${o.fulfillment !== 'shipped' ? `<button class="btn btn-sm" data-mark="${o.id}" data-status="shipped">Mark shipped</button>` : ''}
-        <a class="btn btn-sm secondary" target="_blank" href="https://dashboard.stripe.com/payments/${o.id}">Open in Stripe ↗</a>
-      </div>
-    `;
-    el.querySelectorAll('[data-mark]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.mark;
-        const status = btn.dataset.status;
-        const res = await fetch(`/api/admin/orders/${id}/fulfillment`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status })
-        });
-        if (res.ok) {
-          toast(`Order marked ${status}`);
-          loadOrders();
-          loadOverview();
-        }
+      <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${escapeHtml(i.name)}</span><span style="color:var(--muted);">×${i.quantity}</span><span><strong style="font-family:Parkinsans;">${dollars(i.line_total_cents)}</strong></span></div>`).join('')}</div>
+      ${o.organization_code ? `<h4>Organization code</h4><p style="margin-bottom:16px;"><span class="pill teal">${escapeHtml(o.organization_code)}</span></p>` : ''}
+      <h4>Ship to</h4>
+      <p style="font-size:13.5px;color:var(--teal);">${escapeHtml(o.customer_name || '')}${o.customer_phone ? ' · ' + escapeHtml(o.customer_phone) : ''}<br/>
+      ${addr ? `${escapeHtml(addr.line1 || '')}${addr.line2 ? ', ' + escapeHtml(addr.line2) : ''}, ${escapeHtml(addr.city || '')}, ${escapeHtml(addr.state || '')} ${escapeHtml(addr.postal_code || '')}` : 'No address on file'}</p>
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+        ${o.fulfillment !== 'fulfilled' ? `<button class="btn sm" data-mark="${o.id}" data-status="fulfilled">Mark fulfilled</button>` : ''}
+        ${o.fulfillment !== 'shipped' ? `<button class="btn sm" data-mark="${o.id}" data-status="shipped">Mark shipped</button>` : ''}
+        <a class="btn sm secondary" target="_blank" href="https://dashboard.stripe.com/payments/${o.id}">Open in Stripe ↗</a>
+      </div></div>`;
+    el.querySelectorAll('[data-mark]').forEach(btn => btn.addEventListener('click', async () => {
+      const res = await fetch(`/api/admin/orders/${btn.dataset.mark}/fulfillment`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: btn.dataset.status })
       });
-    });
+      if (res.ok) { toast(`Order marked ${btn.dataset.status}`); loadOrders(); }
+    }));
   }
 
-  // --- Inventory ---
+  // ---------- Inventory ----------
   async function loadInventory() {
-    const res = await fetch('/api/admin/inventory');
-    const data = await res.json();
     const tbody = document.getElementById('inventory-table');
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:0;"><div class="skeleton" style="height:56px;margin:12px 20px;"></div></td></tr>`;
+    const data = await (await fetch('/api/admin/inventory')).json();
     tbody.innerHTML = data.inventory.map(row => {
-      const stockClass = row.stock === 0 ? 'danger' : row.stock <= row.low_stock_threshold ? 'warn' : '';
-      const status = row.stock === 0 ? `<span class="pill danger">Out of stock</span>` :
-                     row.stock <= row.low_stock_threshold ? `<span class="pill warn">Low</span>` :
-                     `<span class="pill ok">In stock</span>`;
-      return `
-        <tr>
-          <td><strong>${escapeHtml(row.name)}</strong><br/><span style="color:var(--muted);font-size:12px;">${escapeHtml(row.unit)}</span></td>
-          <td>$${row.price.toFixed(2)}</td>
-          <td>
-            <div class="stock-cell">
-              <button class="adj-btn" data-adj="-1" data-sku="${row.sku_id}">−</button>
-              <input class="stock-input ${stockClass}" type="number" min="0" value="${row.stock}" data-stock="${row.sku_id}" />
-              <button class="adj-btn" data-adj="1" data-sku="${row.sku_id}">+</button>
-            </div>
-          </td>
-          <td>
-            <input class="stock-input" type="number" min="0" value="${row.low_stock_threshold}" data-threshold="${row.sku_id}" />
-          </td>
-          <td>${status}</td>
-          <td><button class="btn btn-sm" data-save="${row.sku_id}">Save</button></td>
-        </tr>`;
+      const sc = row.stock === 0 ? 'danger' : row.stock <= row.low_stock_threshold ? 'warn' : '';
+      const status = row.stock === 0 ? `<span class="pill danger">Out of stock</span>`
+        : row.stock <= row.low_stock_threshold ? `<span class="pill warn">Low</span>`
+        : `<span class="pill ok">In stock</span>`;
+      return `<tr class="data-row">
+        <td><strong style="font-family:Parkinsans;">${escapeHtml(row.name)}</strong><div class="sub">${escapeHtml(row.unit || '')}</div></td>
+        <td>$${row.price.toFixed(2)}</td>
+        <td><div class="stock-cell"><div class="stepper">
+          <button class="adj-btn" data-adj="-1" data-sku="${row.sku_id}">−</button>
+          <input class="stock-input ${sc}" type="number" min="0" value="${row.stock}" data-stock="${row.sku_id}" />
+          <button class="adj-btn" data-adj="1" data-sku="${row.sku_id}">+</button>
+        </div></div></td>
+        <td><input class="thr-input" type="number" min="0" value="${row.low_stock_threshold}" data-threshold="${row.sku_id}" /></td>
+        <td>${status}</td>
+        <td style="text-align:right;"><button class="btn sm" data-save="${row.sku_id}">Save</button></td>
+      </tr>`;
     }).join('');
 
-    document.querySelectorAll('[data-adj]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const adjust = +btn.dataset.adj;
-        const sku = btn.dataset.sku;
-        const res = await fetch(`/api/admin/inventory/${sku}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ adjust })
-        });
-        const updated = await res.json();
-        const input = document.querySelector(`[data-stock="${sku}"]`);
-        input.value = updated.stock;
-        toast(`${adjust > 0 ? 'Added' : 'Removed'} 1 ${sku}`);
-        loadOverview();
-      });
-    });
-
-    document.querySelectorAll('[data-save]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const sku = btn.dataset.save;
-        const stock = +document.querySelector(`[data-stock="${sku}"]`).value;
-        const low_stock_threshold = +document.querySelector(`[data-threshold="${sku}"]`).value;
-        const res = await fetch(`/api/admin/inventory/${sku}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ stock, low_stock_threshold })
-        });
-        if (res.ok) {
-          toast('Saved');
-          loadInventory();
-          loadOverview();
-        }
-      });
-    });
-  }
-
-  // --- Products (Product Manager) ---
-  async function loadProducts() {
-    const res = await fetch('/api/admin/products');
-    const data = await res.json();
-    const tbody = document.getElementById('products-table');
-    tbody.innerHTML = data.products.map(p => `
-      <tr data-id="${escapeHtml(p.id)}">
-        <td>
-          <label class="photo-btn" title="Change photo">
-            <img class="prod-thumb" src="${escapeHtml(p.image)}" alt="" onerror="this.style.opacity=0.25" />
-            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-photo="${escapeHtml(p.id)}" />
-          </label>
-        </td>
-        <td><input class="prod-input" data-field="name" value="${escapeHtml(p.name)}" /></td>
-        <td><input class="prod-input price" data-field="price" type="number" min="0" step="0.01" value="${p.price}" /></td>
-        <td><input class="prod-input" data-field="unit" value="${escapeHtml(p.unit || '')}" /></td>
-        <td><input class="prod-input" data-field="keywords" value="${escapeHtml((p.keywords || []).join(', '))}" /></td>
-        <td class="prod-actions">
-          <button class="btn btn-sm" data-save="${escapeHtml(p.id)}">Save</button>
-          <button class="btn btn-sm danger-btn" data-delete="${escapeHtml(p.id)}">Delete</button>
-        </td>
-      </tr>`).join('');
-
-    // Save row
+    tbody.querySelectorAll('[data-adj]').forEach(btn => btn.addEventListener('click', async () => {
+      const sku = btn.dataset.sku;
+      const res = await fetch(`/api/admin/inventory/${sku}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adjust: +btn.dataset.adj }) });
+      const updated = await res.json();
+      document.querySelector(`[data-stock="${sku}"]`).value = updated.stock;
+      loadOverview();
+    }));
     tbody.querySelectorAll('[data-save]').forEach(btn => btn.addEventListener('click', async () => {
-      const row = btn.closest('tr');
-      const body = {};
-      row.querySelectorAll('.prod-input').forEach(i => body[i.dataset.field] = i.value);
-      const r = await fetch(`/api/admin/products/${btn.dataset.save}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-      });
-      if (r.ok) { toast('Saved'); loadProducts(); }
-      else { const e = await r.json(); toast(e.error || 'Could not save'); }
-    }));
-
-    // Delete row (blocked if in a kit)
-    tbody.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
-      const row = btn.closest('tr');
-      const name = row.querySelector('[data-field="name"]').value;
-      if (!confirm(`Remove "${name}" from your store? This cannot be undone.`)) return;
-      const r = await fetch(`/api/admin/products/${btn.dataset.delete}`, { method: 'DELETE' });
-      if (r.ok) { toast('Product removed'); loadProducts(); }
-      else if (r.status === 409) {
-        const e = await r.json();
-        alert(`Can't remove this product because it's part of these kits:\n\n${(e.kits || []).join('\n')}\n\nRemove it from those kits first (contact Chelsea for kit changes).`);
-      } else { const e = await r.json(); toast(e.error || 'Could not delete'); }
-    }));
-
-    // Change photo
-    tbody.querySelectorAll('[data-photo]').forEach(inp => inp.addEventListener('change', async () => {
-      if (!inp.files || !inp.files[0]) return;
-      const fd = new FormData();
-      fd.append('image', inp.files[0]);
-      toast('Uploading photo…');
-      const r = await fetch(`/api/admin/products/${inp.dataset.photo}/image`, { method: 'POST', body: fd });
-      if (r.ok) { toast('Photo updated'); loadProducts(); }
-      else { const e = await r.json(); toast(e.error || 'Could not upload'); }
+      const sku = btn.dataset.save;
+      const stock = +document.querySelector(`[data-stock="${sku}"]`).value;
+      const low_stock_threshold = +document.querySelector(`[data-threshold="${sku}"]`).value;
+      const res = await fetch(`/api/admin/inventory/${sku}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stock, low_stock_threshold }) });
+      if (res.ok) { toast('Stock saved'); loadInventory(); loadOverview(); }
     }));
   }
 
-  // Add-product form
-  document.getElementById('add-product-toggle').addEventListener('click', () => {
-    document.getElementById('add-product-card').style.display = 'block';
-  });
-  document.getElementById('np-cancel').addEventListener('click', () => {
-    document.getElementById('add-product-card').style.display = 'none';
-  });
-  document.getElementById('np-save').addEventListener('click', async () => {
-    const name = document.getElementById('np-name').value.trim();
-    const price = document.getElementById('np-price').value;
-    const unit = document.getElementById('np-unit').value.trim();
-    const keywords = document.getElementById('np-keywords').value.trim();
-    if (!name || !price) { toast('Name and price are required'); return; }
-    const r = await fetch('/api/admin/products', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, price, unit, keywords })
-    });
-    if (!r.ok) { const e = await r.json(); toast(e.error || 'Could not add'); return; }
-    const { product } = await r.json();
-    // Upload photo if one was chosen
-    const fileInput = document.getElementById('np-image');
-    if (fileInput.files && fileInput.files[0]) {
-      const fd = new FormData(); fd.append('image', fileInput.files[0]);
-      await fetch(`/api/admin/products/${product.id}/image`, { method: 'POST', body: fd });
+  // ---------- Products (list + slide-over editor) ----------
+  let cachedProducts = [];
+  async function loadProducts() {
+    const list = document.getElementById('products-list');
+    list.innerHTML = `<div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;">${'<div class="skeleton" style="height:54px;"></div>'.repeat(5)}</div>`;
+    const data = await (await fetch('/api/admin/products')).json();
+    cachedProducts = data.products || [];
+    renderProducts();
+  }
+  function renderProducts() {
+    const q = (document.getElementById('prod-search').value || '').toLowerCase().trim();
+    const list = document.getElementById('products-list');
+    const rows = cachedProducts.filter(p =>
+      !q || p.name.toLowerCase().includes(q) || (p.keywords || []).join(' ').toLowerCase().includes(q) || (p.unit || '').toLowerCase().includes(q));
+    if (!rows.length) {
+      list.innerHTML = emptyState('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>', 'No matches', q ? 'Try a different search.' : 'Add your first product to get started.');
+      return;
     }
-    toast('Product added');
-    ['np-name','np-price','np-unit','np-keywords','np-image'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('add-product-card').style.display = 'none';
-    loadProducts();
+    list.innerHTML = rows.map(p => `
+      <button class="prow" data-id="${escapeHtml(p.id)}">
+        <img class="prow-img" src="${escapeHtml(p.image || PLACEHOLDER_IMG)}" alt="" onerror="this.src='${PLACEHOLDER_IMG}';this.style.opacity=0.4" />
+        <div style="min-width:0;">
+          <div class="prow-name">${escapeHtml(p.name)}</div>
+          <div class="prow-desc">${escapeHtml(p.unit || (p.keywords || []).slice(0,4).join(', ') || 'No description')}</div>
+        </div>
+        <div class="prow-price">$${Number(p.price).toFixed(2)}</div>
+        <div class="prow-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></div>
+      </button>`).join('');
+    list.querySelectorAll('.prow').forEach(r => r.addEventListener('click', () => {
+      openEditor(cachedProducts.find(p => p.id === r.dataset.id));
+    }));
+  }
+  document.getElementById('prod-search').addEventListener('input', renderProducts);
+
+  // ----- Editor drawer -----
+  let editId = null, pendingFile = null;
+  function openEditor(product) {
+    editId = product ? product.id : null;
+    pendingFile = null;
+    document.getElementById('drawer-title').textContent = product ? 'Edit product' : 'New product';
+    document.getElementById('ed-name').value = product ? product.name : '';
+    document.getElementById('ed-price').value = product ? product.price : '';
+    document.getElementById('ed-unit').value = product ? (product.unit || '') : '';
+    document.getElementById('ed-keywords').value = product ? (product.keywords || []).join(', ') : '';
+    document.getElementById('ed-img').src = (product && product.image) ? product.image : PLACEHOLDER_IMG;
+    document.getElementById('ed-img').style.opacity = 1;
+    document.getElementById('ed-file').value = '';
+    document.getElementById('ed-delete').style.display = product ? '' : 'none';
+    document.getElementById('drawer-backdrop').classList.add('open');
+    document.getElementById('product-drawer').classList.add('open');
+    document.getElementById('product-drawer').setAttribute('aria-hidden', 'false');
+    setTimeout(() => document.getElementById('ed-name').focus(), 280);
+  }
+  function closeEditor() {
+    document.getElementById('drawer-backdrop').classList.remove('open');
+    document.getElementById('product-drawer').classList.remove('open');
+    document.getElementById('product-drawer').setAttribute('aria-hidden', 'true');
+  }
+  document.getElementById('drawer-close').addEventListener('click', closeEditor);
+  document.getElementById('ed-cancel').addEventListener('click', closeEditor);
+  document.getElementById('drawer-backdrop').addEventListener('click', closeEditor);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditor(); });
+
+  document.getElementById('ed-file').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    pendingFile = f;
+    const img = document.getElementById('ed-img');
+    img.src = URL.createObjectURL(f); img.style.opacity = 1;
   });
 
-  // --- Shipping settings ---
-  function shipTierRowHtml(upToDollars, shipDollars) {
+  async function uploadPhoto(id) {
+    if (!pendingFile) return;
+    const fd = new FormData(); fd.append('image', pendingFile);
+    await fetch(`/api/admin/products/${id}/image`, { method: 'POST', body: fd });
+  }
+
+  document.getElementById('ed-save').addEventListener('click', async () => {
+    const name = document.getElementById('ed-name').value.trim();
+    const price = document.getElementById('ed-price').value;
+    const unit = document.getElementById('ed-unit').value.trim();
+    const keywords = document.getElementById('ed-keywords').value.trim();
+    if (!name || price === '' || +price < 0) { toast('Name and a valid price are required'); return; }
+    const saveBtn = document.getElementById('ed-save');
+    saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+    try {
+      if (editId) {
+        const r = await fetch(`/api/admin/products/${editId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price, unit, keywords }) });
+        if (!r.ok) { const e = await r.json(); toast(e.error || 'Could not save'); return; }
+        await uploadPhoto(editId);
+        toast('Product saved');
+      } else {
+        const r = await fetch('/api/admin/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price, unit, keywords }) });
+        if (!r.ok) { const e = await r.json(); toast(e.error || 'Could not add'); return; }
+        const { product } = await r.json();
+        await uploadPhoto(product.id);
+        toast('Product added');
+      }
+      closeEditor(); loadProducts(); loadOverview();
+    } finally { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
+  });
+
+  document.getElementById('ed-delete').addEventListener('click', async () => {
+    if (!editId) return;
+    const name = document.getElementById('ed-name').value;
+    if (!confirm(`Remove "${name}" from your store? This can't be undone.`)) return;
+    const r = await fetch(`/api/admin/products/${editId}`, { method: 'DELETE' });
+    if (r.ok) { toast('Product removed'); closeEditor(); loadProducts(); loadOverview(); }
+    else if (r.status === 409) {
+      const e = await r.json();
+      alert(`You can't remove this product because it's part of these kits:\n\n${(e.kits || []).join('\n')}\n\nRemove it from those kits first (contact Chelsea for kit changes).`);
+    } else { const e = await r.json(); toast(e.error || 'Could not delete'); }
+  });
+
+  // ---------- Shipping ----------
+  function shipTierRowHtml(upTo, ship) {
     return `<div class="ship-tier-row">
-      <span class="ship-input-wrap">$<input type="number" class="tier-upto" min="0" step="0.01" value="${upToDollars}" /></span>
-      <span class="ship-input-wrap">$<input type="number" class="tier-ship" min="0" step="0.01" value="${shipDollars}" /></span>
+      <span class="ship-input-wrap">$<input type="number" class="tier-upto" min="0" step="0.01" value="${upTo}" /></span>
+      <span class="ship-input-wrap">$<input type="number" class="tier-ship" min="0" step="0.01" value="${ship}" /></span>
       <button class="ship-remove" type="button" title="Remove tier">×</button>
     </div>`;
   }
   function wireTierRemoves() {
-    document.querySelectorAll('#ship-tier-rows .ship-remove').forEach(b => {
-      b.onclick = () => { b.closest('.ship-tier-row').remove(); };
-    });
+    document.querySelectorAll('#ship-tier-rows .ship-remove').forEach(b => b.onclick = () => b.closest('.ship-tier-row').remove());
   }
   function setShipMode(mode) {
     document.getElementById('ship-flat-section').style.display = mode === 'flat' ? '' : 'none';
     document.getElementById('ship-tiers-section').style.display = mode === 'tiers' ? '' : 'none';
+    document.querySelectorAll('.ship-mode').forEach(m => m.classList.toggle('sel', m.dataset.mode === mode));
   }
   async function loadShipping() {
     const cfg = await (await fetch('/api/admin/shipping')).json();
@@ -691,14 +812,11 @@
       (thresholds.length ? thresholds : [{ up_to_cents: 3000, ship_cents: 995 }])
         .map(t => shipTierRowHtml((t.up_to_cents / 100).toFixed(2), (t.ship_cents / 100).toFixed(2))).join('');
     document.getElementById('ship-final').value = ((final ? final.ship_cents : 1995) / 100).toFixed(2);
-    wireTierRemoves();
-    setShipMode(mode);
+    wireTierRemoves(); setShipMode(mode);
   }
-  document.querySelectorAll('input[name="ship-mode"]').forEach(r =>
-    r.addEventListener('change', () => setShipMode(r.value)));
+  document.querySelectorAll('input[name="ship-mode"]').forEach(r => r.addEventListener('change', () => setShipMode(r.value)));
   document.getElementById('ship-add-tier').addEventListener('click', () => {
-    document.getElementById('ship-tier-rows').insertAdjacentHTML('beforeend', shipTierRowHtml('', ''));
-    wireTierRemoves();
+    document.getElementById('ship-tier-rows').insertAdjacentHTML('beforeend', shipTierRowHtml('', '')); wireTierRemoves();
   });
   document.getElementById('ship-save').addEventListener('click', async () => {
     const mode = document.querySelector('input[name="ship-mode"]:checked')?.value || 'flat';
@@ -708,19 +826,17 @@
       const tiers = [];
       document.querySelectorAll('#ship-tier-rows .ship-tier-row').forEach(row => {
         const upto = row.querySelector('.tier-upto').value;
-        const ship = row.querySelector('.tier-ship').value;
-        if (upto !== '') tiers.push({ up_to_cents: toCents(upto), ship_cents: toCents(ship) });
+        if (upto !== '') tiers.push({ up_to_cents: toCents(upto), ship_cents: toCents(row.querySelector('.tier-ship').value) });
       });
       tiers.push({ up_to_cents: null, ship_cents: toCents(document.getElementById('ship-final').value) });
       body.tiers = tiers;
     }
-    const r = await fetch('/api/admin/shipping', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-    });
+    const r = await fetch('/api/admin/shipping', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (r.ok) { toast('Shipping saved'); loadShipping(); }
     else { const e = await r.json(); toast(e.error || 'Could not save'); }
   });
 
+  // ---------- Boot ----------
   loadOverview();
 </script>
 
