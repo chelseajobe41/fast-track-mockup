@@ -4,21 +4,50 @@ import helmet from 'helmet';
 import multer from 'multer';
 import Anthropic from '@anthropic-ai/sdk';
 import Stripe from 'stripe';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 // ---------- Boot ----------
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PRODUCTS = JSON.parse(readFileSync(join(__dirname, 'products.json'), 'utf8'));
-const KITS = JSON.parse(readFileSync(join(__dirname, 'kits.json'), 'utf8'));
-const KIT_DISCOUNT = 0.10;  // 10% bundle discount vs buying items individually
-const PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
 const SITE_URL = 'https://fasttrackschoolsupplies.com';
+const KIT_DISCOUNT = 0.10;  // 10% bundle discount vs buying items individually
+
+// Live mutable data (products, inventory, orders, settings, uploaded images) lives in DATA_DIR so
+// it survives Render deploys — a git checkout would otherwise revert repo-tracked data files, wiping
+// admin edits and order history. Locally DATA_DIR defaults to the repo dir (today's behavior);
+// production sets DATA_DIR=/var/data (a mounted Render persistent disk). On first boot we seed
+// DATA_DIR from the repo's bundled copies, so a fresh disk starts with the current catalog.
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const IMAGES_DIR = join(DATA_DIR, 'product-images');
+const PRODUCTS_PATH = join(DATA_DIR, 'products.json');
+const INVENTORY_PATH = join(DATA_DIR, 'inventory.json');
+const ORDERS_PATH = join(DATA_DIR, 'orders.json');
+const SETTINGS_PATH = join(DATA_DIR, 'settings.json');
+
+function seedDataFile(name, fallback) {
+  const target = join(DATA_DIR, name);
+  if (existsSync(target)) return;
+  const seed = join(__dirname, name);
+  if (existsSync(seed)) copyFileSync(seed, target);
+  else if (fallback !== undefined) writeFileSync(target, JSON.stringify(fallback, null, 2));
+}
+if (DATA_DIR !== __dirname) {
+  mkdirSync(DATA_DIR, { recursive: true });
+  seedDataFile('products.json');
+  seedDataFile('inventory.json', {});
+  seedDataFile('orders.json', []);
+}
+if (!existsSync(IMAGES_DIR)) mkdirSync(IMAGES_DIR, { recursive: true });
+
+// Atomic JSON write: write to a temp file then rename, so a crash mid-write can't corrupt data.
+function writeJsonAtomic(path, data) {
+  const tmp = `${path}.tmp`;
+  writeFileSync(tmp, JSON.stringify(data, null, 2));
+  renameSync(tmp, path);
+}
 
 // Templates for server-side-rendered pages (read once at boot; Render restarts on every deploy).
-// We inject per-page SEO tags + valid JSON-LD into these before serving so Google sees correct
-// canonical/title/schema in the INITIAL HTML rather than client-rendered-after-load.
 const KIT_TEMPLATE = readFileSync(join(__dirname, 'kit.html'), 'utf8');
 const STORE_TEMPLATE = readFileSync(join(__dirname, 'store.html'), 'utf8');
 
@@ -29,8 +58,21 @@ function htmlEscape(s) {
   ));
 }
 
-const INVENTORY_PATH = join(__dirname, 'inventory.json');
-const ORDERS_PATH = join(__dirname, 'orders.json');
+// Kits reference products by id but are not editable in the admin, so they stay a boot constant.
+const KITS = JSON.parse(readFileSync(join(__dirname, 'kits.json'), 'utf8'));
+
+// ---------- Mutable catalog (editable via admin; refreshed in-memory on every write) ----------
+// PRODUCTS/PRODUCT_BY_ID/SYSTEM_PROMPT are `let` so admin edits take effect immediately without a
+// restart. Every product write calls reloadCatalog(), so checkout/kits/store/AI all read fresh data.
+let PRODUCTS, PRODUCT_BY_ID, SYSTEM_PROMPT;
+function readProducts() { return JSON.parse(readFileSync(PRODUCTS_PATH, 'utf8')); }
+function writeProducts(list) { writeJsonAtomic(PRODUCTS_PATH, list); }
+function reloadCatalog() {
+  PRODUCTS = readProducts();
+  PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
+  SYSTEM_PROMPT = buildSystemPrompt();
+}
+reloadCatalog();  // initialize PRODUCTS / PRODUCT_BY_ID / SYSTEM_PROMPT
 
 const FLAT_SHIPPING_CENTS = 995;  // Flat $9.95 shipping on every order
 const SUBSCRIPTION_DISCOUNT = 0.10;  // 10% off subscribed items
@@ -55,9 +97,44 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'change-me';
 // ---------- Persistence helpers (JSON file based) ----------
 // NOTE: For higher volume, swap to SQLite or Postgres. JSON files are fine for v1.
 function readInventory() { return JSON.parse(readFileSync(INVENTORY_PATH, 'utf8')); }
-function writeInventory(inv) { writeFileSync(INVENTORY_PATH, JSON.stringify(inv, null, 2)); }
+function writeInventory(inv) { writeJsonAtomic(INVENTORY_PATH, inv); }
 function readOrders() { return JSON.parse(readFileSync(ORDERS_PATH, 'utf8')); }
-function writeOrders(orders) { writeFileSync(ORDERS_PATH, JSON.stringify(orders, null, 2)); }
+function writeOrders(orders) { writeJsonAtomic(ORDERS_PATH, orders); }
+
+// Store settings (shipping config). Defaults to the prior flat $9.95 if no settings file exists yet.
+const DEFAULT_SETTINGS = {
+  shipping: {
+    mode: 'flat',            // 'flat' | 'tiers'
+    flat_cents: 995,         // used when mode === 'flat'
+    // used when mode === 'tiers': ordered ascending; up_to_cents null = "and above" (top tier)
+    tiers: [
+      { up_to_cents: 3000, ship_cents: 995 },
+      { up_to_cents: 6000, ship_cents: 1495 },
+      { up_to_cents: null, ship_cents: 1995 }
+    ]
+  }
+};
+function readSettings() {
+  if (!existsSync(SETTINGS_PATH)) return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+  try {
+    const s = JSON.parse(readFileSync(SETTINGS_PATH, 'utf8'));
+    return { shipping: { ...DEFAULT_SETTINGS.shipping, ...(s.shipping || {}) } };
+  } catch { return JSON.parse(JSON.stringify(DEFAULT_SETTINGS)); }
+}
+function writeSettings(s) { writeJsonAtomic(SETTINGS_PATH, s); }
+
+// Compute shipping (in cents) for a given order subtotal (in cents) from the current settings.
+function shippingCentsFor(subtotalCents) {
+  const cfg = readSettings().shipping;
+  if (cfg.mode === 'tiers' && Array.isArray(cfg.tiers) && cfg.tiers.length) {
+    for (const t of cfg.tiers) {
+      if (t.up_to_cents === null || t.up_to_cents === undefined) return t.ship_cents;
+      if (subtotalCents <= t.up_to_cents) return t.ship_cents;
+    }
+    return cfg.tiers[cfg.tiers.length - 1].ship_cents;
+  }
+  return cfg.flat_cents ?? 995;
+}
 
 function decrementInventory(items) {
   const inv = readInventory();
@@ -76,7 +153,10 @@ function logOrder(order) {
 }
 
 // ---------- AI prompt ----------
-const SYSTEM_PROMPT = `You are the AI assistant for Fast Track School Supplies, a service that takes school supply lists from parents and turns them into ordered kits.
+// Built from the current catalog; rebuilt by reloadCatalog() whenever products change so the AI
+// always matches against the live product list. (Hoisted function — callable from reloadCatalog above.)
+function buildSystemPrompt() {
+  return `You are the AI assistant for Fast Track School Supplies, a service that takes school supply lists from parents and turns them into ordered kits.
 
 Your job: given an image of a school supply list, extract every line item, then match each one to a SKU in the catalog below.
 
@@ -91,6 +171,7 @@ Rules:
 
 CATALOG (JSON):
 ${JSON.stringify(PRODUCTS.map(p => ({ id: p.id, name: p.name, unit: p.unit, keywords: p.keywords })), null, 2)}`;
+}
 
 const OUTPUT_SCHEMA = {
   type: "object",
@@ -289,7 +370,8 @@ const DENY_PATHS = new Set([
   '/.env.example',
   '/README.md',
   '/kit.html',            // SSR template — served only via /kits/:id with tokens filled
-  '/store.html'           // SSR template — served only via /store with schema injected
+  '/store.html',          // SSR template — served only via /store with schema injected
+  '/settings.json'        // store settings (shipping config) — admin-only
 ]);
 const DENY_PREFIXES = ['/node_modules', '/.git', '/.claude'];
 app.use((req, res, next) => {
@@ -300,6 +382,21 @@ app.use((req, res, next) => {
     }
   }
   next();
+});
+
+// Serve the public product catalog from memory (the store page fetches /products.json). Served
+// from the in-memory PRODUCTS so it's always fresh AND works when the file lives off the web root
+// (DATA_DIR on prod). Registered before express.static so it wins over any repo copy.
+app.get('/products.json', (_req, res) => res.json(PRODUCTS));
+
+// Serve admin-uploaded product images from IMAGES_DIR. Filename is sanitized to a bare basename to
+// block path traversal (e.g. /uploads/../server.js). Product image URLs are /uploads/<id>.<ext>.
+app.get('/uploads/:file', (req, res) => {
+  const safe = req.params.file.replace(/[^a-zA-Z0-9._-]/g, '');
+  if (!safe || safe.includes('..')) return res.status(404).end();
+  const full = join(IMAGES_DIR, safe);
+  if (!full.startsWith(IMAGES_DIR) || !existsSync(full)) return res.status(404).end();
+  res.sendFile(full);
 });
 
 app.use(express.static(__dirname));

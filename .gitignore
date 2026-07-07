@@ -3,3 +3,6 @@ node_modules
 .env.local
 .DS_Store
 npm-debug.log*
+
+# Local persistent-data dir for testing the admin (DATA_DIR)
+.localdata/
