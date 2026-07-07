@@ -236,11 +236,29 @@ the placeholder.
 
 ## 12. Product Manager / self-service admin (branch `product-manager` until live)
 
-Adds owner self-service to `/admin` (same Basic-Auth login). Three features:
+Adds owner self-service to `/admin` (same Basic-Auth login). Redesigned as a Shopify-style app:
+left sidebar (Home / Orders / Products / Shipping), KPI dashboard, slide-over product editor.
+Inventory is merged INTO Products (stock pill on each row; stock stepper + low-stock threshold
+inside the editor — one Save writes product + stock). No separate Inventory tab.
 
-- **Products tab** — add/edit/remove products (name, price, description, keywords) and upload photos
-  from the computer. Product ids are immutable (kits + order logs reference them). Deleting a product
-  that's in a kit is blocked (409 + names the kits).
+- **Products tab** — searchable, category-grouped list (same keyword rules as the storefront
+  chips); add/edit/remove products (name, price, description, keywords) and upload photos from the
+  computer. Product ids are immutable (kits + order logs reference them). Deleting a product that's
+  in a kit is blocked (409 + names the kits). Destructive/irreversible actions use inline two-step
+  "armed" buttons, never native confirm() dialogs.
+
+### Draft → Preview → Publish (catalog edits are NOT instant-live)
+
+Product edits write to `products-draft.json` in `DATA_DIR` (deny-listed from static serving), NOT
+the live catalog. The admin shows an "unpublished changes" bar (summary + Preview / Discard /
+Publish). `POST /api/admin/preview` mints a 30-min token; `/store?preview=<token>` sets an HttpOnly
+cookie and renders the DRAFT catalog with a fixed "not live yet" banner (kit pages + /products.json
+are preview-aware too). Checkout is blocked in preview sessions (guard runs before the Stripe-config
+check). `POST /api/admin/publish` promotes draft → `products.json`, prunes inventory rows for
+removed products, and calls `reloadCatalog()`; `POST /api/admin/discard-draft` throws the draft
+away. Stock and shipping stay INSTANT (operational, not presentational). Photo uploads get a unique
+filename per upload (`<id>-<ts>.<ext>`) so the live catalog keeps the old image until publish.
+A no-op edit (draft identical to published) auto-discards the draft — no phantom "unpublished" bar.
 - **Shipping tab** — flat rate OR order-total tiers ("up to $30 → $9.95", … , "all larger → $19.95").
   Checkout computes shipping via `shippingCentsFor(subtotalCents)` from `settings.json`; cart pages
   fetch `/api/shipping-config` to show a matching amount.

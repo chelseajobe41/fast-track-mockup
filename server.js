@@ -4,9 +4,10 @@ import helmet from 'helmet';
 import multer from 'multer';
 import Anthropic from '@anthropic-ai/sdk';
 import Stripe from 'stripe';
-import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync, unlinkSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
+import { randomBytes } from 'crypto';
 
 // ---------- Boot ----------
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -79,6 +80,83 @@ const KITS = JSON.parse(readFileSync(join(__dirname, 'kits.json'), 'utf8'));
 let PRODUCTS, PRODUCT_BY_ID, SYSTEM_PROMPT;
 function readProducts() { return JSON.parse(readFileSync(PRODUCTS_PATH, 'utf8')); }
 function writeProducts(list) { writeJsonAtomic(PRODUCTS_PATH, list); }
+
+// ---------- Draft catalog (edit -> preview -> publish) ----------
+// Admin catalog edits are held in a DRAFT file customers never see. The storefront serves the
+// published catalog; the owner previews the draft with a token, then publishes (draft becomes
+// the live catalog in one step). The draft file existing == "you have unpublished changes".
+// Stock and shipping stay instant — they're operational, not presentational.
+const DRAFT_PATH = join(DATA_DIR, 'products-draft.json');
+function readDraft() { return existsSync(DRAFT_PATH) ? JSON.parse(readFileSync(DRAFT_PATH, 'utf8')) : null; }
+function discardDraftFile() { if (existsSync(DRAFT_PATH)) unlinkSync(DRAFT_PATH); }
+// What the admin edits: the draft if one exists, else a working copy of the published catalog.
+function workingProducts() { return readDraft() ?? readProducts(); }
+// Persist an edited working copy. If it's identical to what's already published (e.g. the owner
+// undid their edit), drop the draft instead so the admin doesn't show a phantom "unpublished" state.
+function saveWorking(list) {
+  if (JSON.stringify(list) === JSON.stringify(readProducts())) { discardDraftFile(); return false; }
+  writeJsonAtomic(DRAFT_PATH, list);
+  return true;
+}
+// Summary of draft vs published, for the admin's "unpublished changes" bar.
+function draftSummary() {
+  const draft = readDraft();
+  if (!draft) return { unpublished: false, added: 0, changed: 0, removed: 0 };
+  const pub = readProducts();
+  const pubById = new Map(pub.map(p => [p.id, p]));
+  const draftIds = new Set(draft.map(p => p.id));
+  let added = 0, changed = 0;
+  for (const p of draft) {
+    const q = pubById.get(p.id);
+    if (!q) added++;
+    else if (JSON.stringify(p) !== JSON.stringify(q)) changed++;
+  }
+  const removed = pub.filter(p => !draftIds.has(p.id)).length;
+  return { unpublished: true, added, changed, removed };
+}
+
+// ---------- Store preview sessions ----------
+// Short-lived tokens minted by the admin. A preview request (?preview=<token>, then a cookie so
+// navigation keeps working) makes the storefront render the DRAFT catalog with a banner. Tokens
+// expire after 30 minutes; checkout is blocked in preview so draft prices can never be charged.
+const PREVIEW_TOKENS = new Map(); // token -> expiry epoch ms
+const PREVIEW_TTL_MS = 30 * 60 * 1000;
+function getCookie(req, name) {
+  const header = req.headers.cookie;
+  if (!header) return null;
+  for (const part of header.split(';')) {
+    const [k, ...v] = part.trim().split('=');
+    if (k === name) return decodeURIComponent(v.join('='));
+  }
+  return null;
+}
+function validPreviewToken(req) {
+  const tok = req.query?.preview || getCookie(req, 'ft_preview');
+  if (!tok || tok === 'off') return null;
+  const exp = PREVIEW_TOKENS.get(tok);
+  if (!exp || exp < Date.now()) { PREVIEW_TOKENS.delete(tok); return null; }
+  return tok;
+}
+// The catalog a given request should see: draft in a valid preview session, published otherwise.
+function catalogFor(req) {
+  if (validPreviewToken(req)) {
+    const draft = readDraft();
+    if (draft) return { list: draft, byId: Object.fromEntries(draft.map(p => [p.id, p])), preview: true };
+  }
+  return { list: PRODUCTS, byId: PRODUCT_BY_ID, preview: false };
+}
+// Fixed banner injected into previewed storefront pages so preview is unmistakable.
+function injectPreviewBanner(html) {
+  const banner = `
+<div style="position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#223A3F;color:#FAF6EF;font-family:'Parkinsans',system-ui,sans-serif;font-size:14px;font-weight:600;padding:13px 20px;display:flex;align-items:center;justify-content:center;gap:14px;box-shadow:0 -8px 30px rgba(21,37,40,0.25);flex-wrap:wrap;">
+  <span style="display:inline-flex;align-items:center;gap:8px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FDCA06" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>Store preview — these changes are not live yet. Customers can't see this.</span>
+  <span style="display:inline-flex;gap:10px;">
+    <a href="/admin" style="color:#FDCA06;text-decoration:underline;">Back to admin</a>
+    <a href="/store?preview=off" style="color:#FAF6EF;opacity:0.8;text-decoration:underline;">Exit preview</a>
+  </span>
+</div>`;
+  return html.includes('</body>') ? html.replace('</body>', banner + '\n</body>') : html + banner;
+}
 function reloadCatalog() {
   PRODUCTS = readProducts();
   PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
@@ -385,7 +463,8 @@ const DENY_PATHS = new Set([
   '/README.md',
   '/kit.html',            // SSR template — served only via /kits/:id with tokens filled
   '/store.html',          // SSR template — served only via /store with schema injected
-  '/settings.json'        // store settings (shipping config) — admin-only
+  '/settings.json',       // store settings (shipping config) — admin-only
+  '/products-draft.json'  // unpublished draft catalog — visible only via preview sessions
 ]);
 const DENY_PREFIXES = ['/node_modules', '/.git', '/.claude'];
 app.use((req, res, next) => {
@@ -401,7 +480,8 @@ app.use((req, res, next) => {
 // Serve the public product catalog from memory (the store page fetches /products.json). Served
 // from the in-memory PRODUCTS so it's always fresh AND works when the file lives off the web root
 // (DATA_DIR on prod). Registered before express.static so it wins over any repo copy.
-app.get('/products.json', (_req, res) => res.json(PRODUCTS));
+// Preview sessions get the draft catalog so the owner sees unpublished changes.
+app.get('/products.json', (req, res) => res.json(catalogFor(req).list));
 
 // Serve admin-uploaded product images from IMAGES_DIR. Filename is sanitized to a bare basename to
 // block path traversal (e.g. /uploads/../server.js). Product image URLs are /uploads/<id>.<ext>.
@@ -417,15 +497,34 @@ app.use(express.static(__dirname));
 
 // Page routes
 app.get('/upload', (_req, res) => res.sendFile(join(__dirname, 'upload.html')));
-app.get('/store', (_req, res) => res.type('html').send(renderStorePage()));
+app.get('/store', (req, res) => {
+  // Leaving preview: clear the cookie and land on the live store.
+  if (req.query.preview === 'off') {
+    res.setHeader('Set-Cookie', 'ft_preview=; Path=/; Max-Age=0; SameSite=Lax; HttpOnly');
+    return res.redirect(302, '/store');
+  }
+  const tok = validPreviewToken(req);
+  // Entering preview via a fresh token link: set the session cookie so /products.json and kit
+  // pages opened from here stay in preview without carrying the query param around.
+  if (tok && req.query.preview) {
+    res.setHeader('Set-Cookie', `ft_preview=${tok}; Path=/; Max-Age=${PREVIEW_TTL_MS / 1000}; SameSite=Lax; HttpOnly`);
+  }
+  const { list, preview } = catalogFor(req);
+  let html = renderStorePage(list);
+  if (preview) html = injectPreviewBanner(html);
+  res.type('html').send(html);
+});
 app.get('/kits', (_req, res) => res.sendFile(join(__dirname, 'kits.html')));
 // Old query-param kit URLs 301 to clean paths (preserves any existing inbound links/shares).
 app.get('/kit', (req, res) => res.redirect(301, KITS[req.query.id] ? `/kits/${req.query.id}` : '/kits'));
 // Server-side-rendered kit detail page (clean URL). Fills SEO tokens + valid Product JSON-LD.
 app.get('/kits/:kitId', (req, res) => {
-  const detail = buildKitDetail(req.params.kitId);
+  const { byId, preview } = catalogFor(req);
+  const detail = buildKitDetail(req.params.kitId, byId);
   if (!detail.found) return res.redirect(302, '/kits');
-  res.type('html').send(renderKitPage(detail));
+  let html = renderKitPage(detail);
+  if (preview) html = injectPreviewBanner(html);
+  res.type('html').send(html);
 });
 app.get('/gift', (_req, res) => res.sendFile(join(__dirname, 'gift.html')));
 app.get('/success', (_req, res) => res.sendFile(join(__dirname, 'success.html')));
@@ -566,11 +665,12 @@ app.get('/api/inventory-public', (_req, res) => {
 });
 
 // ---------- Kits API ----------
-app.get('/api/kits', (_req, res) => {
+app.get('/api/kits', (req, res) => {
+  const { byId } = catalogFor(req);
   const inventory = readInventory();
   const list = Object.entries(KITS).map(([kit_id, kit]) => {
     const items = kit.items.map(({ id, quantity }) => {
-      const p = PRODUCT_BY_ID[id];
+      const p = byId[id];
       if (!p) return null;
       return { sku_id: id, name: p.name, price: p.price, image: p.image, quantity };
     }).filter(Boolean);
@@ -597,13 +697,13 @@ app.get('/api/kits', (_req, res) => {
 
 // Shared kit-detail computation. Single source of truth for the /api/kits/:id
 // JSON response AND the server-side-rendered /kits/:id HTML page.
-function buildKitDetail(kitId) {
+function buildKitDetail(kitId, byId = PRODUCT_BY_ID) {
   const kit = KITS[kitId];
   if (!kit) return { found: false };
   const inventory = readInventory();
   const items = kit.items
     .map(({ id, quantity }) => {
-      const p = PRODUCT_BY_ID[id];
+      const p = byId[id];
       if (!p) return null;
       const stock = inventory[id]?.stock ?? 0;
       const discountedPrice = +(p.price * (1 - KIT_DISCOUNT)).toFixed(2);
@@ -641,7 +741,7 @@ function buildKitDetail(kitId) {
 }
 
 app.get('/api/kits/:kitId', (req, res) => {
-  const detail = buildKitDetail(req.params.kitId);
+  const detail = buildKitDetail(req.params.kitId, catalogFor(req).byId);
   if (!detail.found) return res.status(404).json({ error: 'Kit not found.' });
   const { found, all_in_stock, ...payload } = detail;
   res.json(payload);
@@ -684,9 +784,9 @@ function renderKitPage(detail) {
 
 // Server-side render of /store: injects an ItemList of Products (with offers) so the
 // collection page exposes price/availability schema in the initial HTML.
-function renderStorePage() {
+function renderStorePage(products = PRODUCTS) {
   const inventory = readInventory();
-  const elements = PRODUCTS.map((p, i) => {
+  const elements = products.map((p, i) => {
     const stock = inventory[p.id]?.stock ?? 0;
     return {
       '@type': 'ListItem',
@@ -721,6 +821,12 @@ function renderStorePage() {
 
 // ---------- Stripe checkout (handles one-time AND subscription) ----------
 app.post('/api/checkout', async (req, res) => {
+  // Never charge against a draft: preview sessions see draft prices, but checkout always uses the
+  // published catalog — so block it entirely in preview to avoid "the price I saw" confusion.
+  // Checked before anything else so the preview message always wins.
+  if (validPreviewToken(req)) {
+    return res.status(400).json({ error: "You're viewing a store preview. Publish your changes in the admin, then order from the live store." });
+  }
   if (!stripe) return res.status(500).json({ error: 'Stripe is not configured. Set STRIPE_SECRET_KEY.' });
   try {
     const cart = normalizeCart(req.body);
@@ -994,83 +1100,116 @@ function validateProductBody(body, { partial } = {}) {
   return { ok: true, value: out };
 }
 
-// List products with live stock joined in.
+// List products with live stock joined in. The admin edits the WORKING catalog (draft if one
+// exists), and the response carries the unpublished-changes summary for the publish bar.
 app.get('/api/admin/products', requireAdmin, (_req, res) => {
   const inv = readInventory();
   res.json({
-    products: PRODUCTS.map(p => ({
+    products: workingProducts().map(p => ({
       ...p,
       stock: inv[p.id]?.stock ?? 0,
       low_stock_threshold: inv[p.id]?.low_stock_threshold ?? 10
-    }))
+    })),
+    ...draftSummary()
   });
 });
 
-// Create a product (photo uploaded separately after).
+// Create a product (photo uploaded separately after). Lands in the draft — not live until publish.
 app.post('/api/admin/products', requireAdmin, (req, res) => {
   const v = validateProductBody(req.body, { partial: false });
   if (!v.ok) return res.status(400).json({ error: v.error });
-  const products = readProducts();
-  const id = slugifyId(v.value.name, new Set(products.map(p => p.id)));
+  const products = workingProducts();
+  const id = slugifyId(v.value.name, new Set([...products.map(p => p.id), ...PRODUCTS.map(p => p.id)]));
   const product = {
     id, name: v.value.name, price: v.value.price,
     unit: v.value.unit || '', image: '/assets/photo-coming.svg', keywords: v.value.keywords || []
   };
   products.push(product);
   products.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-  writeProducts(products);
+  saveWorking(products);
+  // Seed stock right away — the editor saves stock in the same action, and stock is live-instant.
   const inv = readInventory();
   if (!inv[id]) { inv[id] = { stock: 0, low_stock_threshold: 10 }; writeInventory(inv); }
-  reloadCatalog();
-  res.json({ product });
+  res.json({ product, ...draftSummary() });
 });
 
-// Update a product (id immutable; only name/price/unit/keywords editable).
+// Update a product (id immutable; only name/price/unit/keywords editable). Draft-only until publish.
 app.post('/api/admin/products/:id', requireAdmin, (req, res) => {
-  const products = readProducts();
+  const products = workingProducts();
   const product = products.find(p => p.id === req.params.id);
   if (!product) return res.status(404).json({ error: 'Product not found.' });
   const v = validateProductBody(req.body, { partial: true });
   if (!v.ok) return res.status(400).json({ error: v.error });
   Object.assign(product, v.value);
   products.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-  writeProducts(products);
-  reloadCatalog();
-  res.json({ product });
+  saveWorking(products);
+  res.json({ product, ...draftSummary() });
 });
 
 // Delete a product — blocked (409) if any kit references it, so a kit can't silently lose an item.
+// Removal is a draft change; its inventory row is pruned when the removal is published.
 app.delete('/api/admin/products/:id', requireAdmin, (req, res) => {
   const id = req.params.id;
   const usedBy = Object.values(KITS).filter(kit => kit.items.some(i => i.id === id)).map(kit => kit.name);
   if (usedBy.length) return res.status(409).json({ error: 'in_kit', kits: usedBy });
-  const products = readProducts();
+  const products = workingProducts();
   if (!products.some(p => p.id === id)) return res.status(404).json({ error: 'Product not found.' });
-  writeProducts(products.filter(p => p.id !== id));
-  const inv = readInventory();
-  if (inv[id]) { delete inv[id]; writeInventory(inv); }
-  reloadCatalog();
-  res.json({ ok: true });
+  saveWorking(products.filter(p => p.id !== id));
+  res.json({ ok: true, ...draftSummary() });
 });
 
-// Upload/replace a product photo. Stored on the persistent disk, served via /uploads/<id>.<ext>,
-// saved as an absolute https URL (Stripe Checkout requires absolute image URLs).
+// Upload/replace a product photo. Stored on the persistent disk under a unique filename per upload
+// so the published catalog keeps pointing at the OLD file until the change is published (and the
+// new URL busts browser caches). Served via /uploads/<file>; stored relative, absolutized only
+// where Stripe/schema.org need a full https URL.
 app.post('/api/admin/products/:id/image', requireAdmin, upload.single('image'), (req, res) => {
-  const products = readProducts();
+  const products = workingProducts();
   const product = products.find(p => p.id === req.params.id);
   if (!product) return res.status(404).json({ error: 'Product not found.' });
   if (!req.file) return res.status(400).json({ error: 'No image uploaded.' });
   const extByType = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
   const ext = extByType[req.file.mimetype];
   if (!ext) return res.status(400).json({ error: 'Image must be JPG, PNG, WebP, or GIF.' });
-  const filename = `${product.id}.${ext}`;
+  const filename = `${product.id}-${Date.now()}.${ext}`;
   writeFileSync(join(IMAGES_DIR, filename), req.file.buffer);
-  // Store relative so the photo resolves both on the live domain and during local review; it's
-  // absolutized (via absolutize()) only where Stripe/schema.org need a full https URL.
   product.image = `/uploads/${filename}`;
-  writeProducts(products);
+  saveWorking(products);
+  res.json({ image: product.image, ...draftSummary() });
+});
+
+// ---------- Admin: publish / discard / preview ----------
+// Publish: the draft becomes the live catalog in one atomic step, then the in-memory catalog
+// (store SSR, checkout prices, AI prompt) reloads. Inventory rows for removed products are pruned.
+app.post('/api/admin/publish', requireAdmin, (_req, res) => {
+  const draft = readDraft();
+  if (!draft) return res.status(400).json({ error: 'No unpublished changes to publish.' });
+  // Defensive: no kit may reference a product missing from the new catalog.
+  const ids = new Set(draft.map(p => p.id));
+  const brokenKits = Object.values(KITS).filter(kit => kit.items.some(i => !ids.has(i.id))).map(kit => kit.name);
+  if (brokenKits.length) return res.status(409).json({ error: 'in_kit', kits: brokenKits });
+  const summary = draftSummary();
+  writeProducts(draft);
+  discardDraftFile();
+  const inv = readInventory();
+  let pruned = false;
+  for (const key of Object.keys(inv)) if (!ids.has(key)) { delete inv[key]; pruned = true; }
+  if (pruned) writeInventory(inv);
   reloadCatalog();
-  res.json({ image: product.image });
+  res.json({ ok: true, published: { added: summary.added, changed: summary.changed, removed: summary.removed } });
+});
+
+// Discard: throw away all unpublished changes; the live catalog is untouched.
+app.post('/api/admin/discard-draft', requireAdmin, (_req, res) => {
+  discardDraftFile();
+  res.json({ ok: true });
+});
+
+// Mint a 30-minute store-preview link (opened in a new tab by the admin's Preview button).
+app.post('/api/admin/preview', requireAdmin, (_req, res) => {
+  for (const [t, exp] of PREVIEW_TOKENS) if (exp < Date.now()) PREVIEW_TOKENS.delete(t);
+  const token = randomBytes(16).toString('hex');
+  PREVIEW_TOKENS.set(token, Date.now() + PREVIEW_TTL_MS);
+  res.json({ url: `/store?preview=${token}`, expires_minutes: PREVIEW_TTL_MS / 60000 });
 });
 
 // ---------- Admin: Shipping settings ----------

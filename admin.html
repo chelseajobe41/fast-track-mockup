@@ -118,6 +118,8 @@
   .btn.sm { padding: 6px 13px; font-size: 12.5px; }
   .btn.ghost-danger { background: none; color: var(--red); border-color: transparent; }
   .btn.ghost-danger:hover { background: var(--red-soft); border-color: transparent; color: var(--red); }
+  .btn.armed { background: var(--orange) !important; border-color: var(--orange) !important; color: #fff !important; animation: armPulse 1s ease infinite; }
+  @keyframes armPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(220,61,45,0.35); } 50% { box-shadow: 0 0 0 6px rgba(220,61,45,0); } }
   .icon-btn { background: none; border: 1px solid transparent; border-radius: 9px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); transition: background 0.15s, color 0.15s; }
   .icon-btn:hover { background: var(--cream); color: var(--teal); }
   .icon-btn svg { width: 18px; height: 18px; }
@@ -129,8 +131,27 @@
   .search input:focus { outline: none; border-color: var(--teal); }
   .search input::placeholder { color: var(--muted-2); }
 
+  /* ---------- Publish bar (unpublished draft changes) ---------- */
+  .pub-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; background: #FFF9E8; border: 1px solid rgba(253,202,6,0.55); border-radius: var(--r-lg); padding: 14px 20px; margin-bottom: 18px; box-shadow: var(--shadow-sm); }
+  .pub-info { display: flex; align-items: center; gap: 12px; font-family: 'Parkinsans'; }
+  .pub-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--orange); flex: none; animation: pulse 2s ease infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(220,61,45,0.35); } 50% { box-shadow: 0 0 0 6px rgba(220,61,45,0); } }
+  .pub-info strong { font-size: 14px; color: var(--teal); }
+  .pub-info .pub-sum { font-size: 12.5px; color: var(--muted); font-family: 'Barlow'; }
+  .pub-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  /* ---------- Category chips ---------- */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .chip { background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px; font-family: 'Parkinsans'; font-size: 12.5px; font-weight: 600; color: var(--muted); cursor: pointer; transition: background 0.13s, color 0.13s, border-color 0.13s; }
+  .chip:hover { border-color: var(--teal); color: var(--teal); }
+  .chip.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .chip .n { opacity: 0.65; font-weight: 500; margin-left: 3px; }
+
   /* ---------- Products list ---------- */
-  .prod-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .prod-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .plist-sec { padding: 14px 20px 8px; font-family: 'Parkinsans'; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); background: var(--cream); border-top: 1px solid var(--line-soft); display: flex; justify-content: space-between; align-items: baseline; }
+  .plist-sec:first-child { border-top: none; }
+  .plist-sec .n { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--muted-2); }
   .prod-list { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
   .prow { display: grid; grid-template-columns: 60px 1fr 110px auto auto; align-items: center; gap: 16px; width: 100%; padding: 12px 20px; border: none; border-top: 1px solid var(--line-soft); background: none; cursor: pointer; text-align: left; transition: background 0.12s; }
   .prow:first-child { border-top: none; }
@@ -367,12 +388,30 @@
 
       <!-- PRODUCTS -->
       <section class="panel" id="panel-products">
+        <div class="pub-bar" id="pub-bar" style="display:none;">
+          <div class="pub-info">
+            <span class="pub-dot"></span>
+            <div>
+              <strong>You have unpublished changes</strong>
+              <div class="pub-sum" id="pub-summary"></div>
+            </div>
+          </div>
+          <div class="pub-actions">
+            <button class="btn secondary" id="pub-preview">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Preview store
+            </button>
+            <button class="btn ghost-danger" id="pub-discard">Discard</button>
+            <button class="btn" id="pub-publish">Publish to store</button>
+          </div>
+        </div>
         <div class="prod-toolbar">
           <div class="search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
             <input type="text" id="prod-search" placeholder="Search products…" />
           </div>
         </div>
+        <div class="chips" id="cat-chips"></div>
         <div class="prod-list" id="products-list"></div>
       </section>
 
@@ -494,11 +533,35 @@
   function dollars(cents) { return `$${((cents || 0) / 100).toFixed(2)}`; }
   function fmt(date) { return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
   function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
-  function toast(msg) {
+  function toast(msg, ms = 2300) {
     const el = document.getElementById('toast');
     el.innerHTML = ICON_CHECK + `<span>${escapeHtml(msg)}</span>`;
     el.classList.add('show');
-    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2300);
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), ms);
+  }
+
+  // Inline two-step confirmation: first click arms the button ("Really …?"), second click within
+  // 4s runs the action. No native confirm() dialogs — they look dated and block the page.
+  function armConfirm(btn, armedLabel, action) {
+    btn.addEventListener('click', async () => {
+      if (btn.dataset.armed === '1') {
+        btn.dataset.armed = '0';
+        clearTimeout(btn._arm);
+        btn.classList.remove('armed');
+        btn.innerHTML = btn.dataset.restLabel;
+        await action();
+        return;
+      }
+      btn.dataset.restLabel = btn.innerHTML;
+      btn.dataset.armed = '1';
+      btn.classList.add('armed');
+      btn.textContent = armedLabel;
+      btn._arm = setTimeout(() => {
+        btn.dataset.armed = '0';
+        btn.classList.remove('armed');
+        btn.innerHTML = btn.dataset.restLabel;
+      }, 4000);
+    });
   }
   function emptyState(icon, title, sub) {
     return `<div class="empty"><div class="empty-ico">${icon}</div><h3>${title}</h3>${sub}</div>`;
@@ -636,24 +699,99 @@
   }
 
   // ---------- Products (list + slide-over editor; stock lives here too) ----------
+  // Categories mirror the storefront's rules exactly (first match wins) so the admin
+  // groups products the same way shoppers see them.
+  const CATEGORIES = [
+    { id: 'writing', label: 'Writing', match: p => /pencil|pen|sharpie|dry erase marker|marker/i.test(p.name) && !/colored|crayola|color/i.test(p.name) },
+    { id: 'paper', label: 'Paper', match: p => /notebook|paper|cardstock|index cards|sticky notes/i.test(p.name) },
+    { id: 'binders', label: 'Binders & Folders', match: p => /binder|folder|divider|sheet protector|pouch|pencil box/i.test(p.name) },
+    { id: 'adhesives', label: 'Glue & Tape', match: p => /glue|tape/i.test(p.name) },
+    { id: 'art', label: 'Art Supplies', match: p => /crayon|colored pencil|crayola/i.test(p.name) || /markers/i.test(p.name) },
+    { id: 'tools', label: 'Tools', match: p => /scissors|ruler|calculator|sharpener/i.test(p.name) },
+    { id: 'erasers', label: 'Erasers', match: p => /eraser/i.test(p.name) },
+    { id: 'classroom', label: 'Classroom', match: p => /tissue|paper towel|disinfectant|wipes/i.test(p.name) },
+    { id: 'bags', label: 'Ziploc Bags', match: p => /bags|ziploc/i.test(p.name) },
+    { id: 'personal', label: 'Personal', match: p => /backpack|water bottle/i.test(p.name) }
+  ];
+  const OTHER_CAT = { id: 'other', label: 'Everything else' };
+  function categoryOf(p) { return CATEGORIES.find(c => c.match(p)) || OTHER_CAT; }
+
   let cachedProducts = [];
+  let activeCat = 'all';
+
   async function loadProducts() {
     const list = document.getElementById('products-list');
     list.innerHTML = `<div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;">${'<div class="skeleton" style="height:54px;"></div>'.repeat(5)}</div>`;
     const data = await (await fetch('/api/admin/products')).json();
     cachedProducts = data.products || [];
+    updatePublishBar(data);
     renderProducts();
   }
+
+  // ----- Unpublished-changes bar -----
+  function updatePublishBar(d) {
+    const bar = document.getElementById('pub-bar');
+    if (!d.unpublished) { bar.style.display = 'none'; return; }
+    const bits = [];
+    if (d.changed) bits.push(`${d.changed} edited`);
+    if (d.added) bits.push(`${d.added} new`);
+    if (d.removed) bits.push(`${d.removed} removed`);
+    document.getElementById('pub-summary').textContent =
+      (bits.join(' · ') || 'Pending changes') + ' — preview them, then publish when you’re happy.';
+    bar.style.display = '';
+  }
+  document.getElementById('pub-preview').addEventListener('click', async () => {
+    const r = await fetch('/api/admin/preview', { method: 'POST' });
+    if (!r.ok) { toast('Could not open preview'); return; }
+    const { url } = await r.json();
+    window.open(url, '_blank');
+  });
+  armConfirm(document.getElementById('pub-publish'), 'Yes, make it live', async () => {
+    const btn = document.getElementById('pub-publish');
+    btn.disabled = true; btn.textContent = 'Publishing…';
+    try {
+      const r = await fetch('/api/admin/publish', { method: 'POST' });
+      if (r.ok) { toast('Published — your store is up to date'); loadProducts(); loadOverview(); }
+      else if (r.status === 409) {
+        const e = await r.json();
+        toast(`Can’t publish — a kit would lose an item (${(e.kits || []).join(', ')})`, 5200);
+      } else { const e = await r.json(); toast(e.error || 'Could not publish'); }
+    } finally { btn.disabled = false; btn.textContent = 'Publish to store'; }
+  });
+  armConfirm(document.getElementById('pub-discard'), 'Yes, throw them away', async () => {
+    const r = await fetch('/api/admin/discard-draft', { method: 'POST' });
+    if (r.ok) { toast('Changes discarded'); loadProducts(); }
+  });
+
+  // ----- Grouped, filterable product list -----
   function renderProducts() {
     const q = (document.getElementById('prod-search').value || '').toLowerCase().trim();
     const list = document.getElementById('products-list');
-    const rows = cachedProducts.filter(p =>
-      !q || p.name.toLowerCase().includes(q) || (p.keywords || []).join(' ').toLowerCase().includes(q) || (p.unit || '').toLowerCase().includes(q));
-    if (!rows.length) {
+
+    // Tag each product with its category once per render
+    const tagged = cachedProducts.map(p => ({ p, cat: categoryOf(p) }));
+
+    // Category chips with counts (only categories that have products)
+    const counts = {};
+    tagged.forEach(({ cat }) => counts[cat.id] = (counts[cat.id] || 0) + 1);
+    const chipCats = [...CATEGORIES, OTHER_CAT].filter(c => counts[c.id]);
+    document.getElementById('cat-chips').innerHTML =
+      `<button class="chip ${activeCat === 'all' ? 'active' : ''}" data-cat="all">All <span class="n">${cachedProducts.length}</span></button>` +
+      chipCats.map(c => `<button class="chip ${activeCat === c.id ? 'active' : ''}" data-cat="${c.id}">${c.label} <span class="n">${counts[c.id]}</span></button>`).join('');
+    document.querySelectorAll('#cat-chips .chip').forEach(ch => ch.addEventListener('click', () => {
+      activeCat = ch.dataset.cat; renderProducts();
+    }));
+
+    const visible = tagged.filter(({ p, cat }) =>
+      (activeCat === 'all' || cat.id === activeCat) &&
+      (!q || p.name.toLowerCase().includes(q) || (p.keywords || []).join(' ').toLowerCase().includes(q) || (p.unit || '').toLowerCase().includes(q)));
+
+    if (!visible.length) {
       list.innerHTML = emptyState('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>', 'No matches', q ? 'Try a different search.' : 'Add your first product to get started.');
       return;
     }
-    list.innerHTML = rows.map(p => {
+
+    const rowHtml = ({ p }) => {
       const stock = p.stock ?? 0, thr = p.low_stock_threshold ?? 10;
       const stockPill = stock === 0 ? '<span class="pill danger">Out of stock</span>'
         : stock <= thr ? `<span class="pill warn">${stock} low</span>`
@@ -668,7 +806,17 @@
         <div class="prow-stock">${stockPill}</div>
         <div class="prow-price">$${Number(p.price).toFixed(2)}</div>
         <div class="prow-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></div>
-      </button>`; }).join('');
+      </button>`;
+    };
+
+    // Group under section headers, in the store's category order
+    const order = [...CATEGORIES, OTHER_CAT];
+    list.innerHTML = order.map(c => {
+      const rows = visible.filter(v => v.cat.id === c.id);
+      if (!rows.length) return '';
+      return `<div class="plist-sec">${c.label}<span class="n">${rows.length} item${rows.length === 1 ? '' : 's'}</span></div>` + rows.map(rowHtml).join('');
+    }).join('');
+
     list.querySelectorAll('.prow').forEach(r => r.addEventListener('click', () => {
       openEditor(cachedProducts.find(p => p.id === r.dataset.id));
     }));
@@ -763,20 +911,18 @@
       const invRes = await fetch(`/api/admin/inventory/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stock, low_stock_threshold }) });
       if (!invRes.ok) { toast('Saved, but stock could not be updated'); return; }
       await uploadPhoto(id);
-      toast(editId ? 'Product saved' : 'Product added');
+      toast(editId ? 'Saved — publish when you’re ready' : 'Added — publish when you’re ready');
       closeEditor(); loadProducts(); loadOverview();
     } finally { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
   });
 
-  document.getElementById('ed-delete').addEventListener('click', async () => {
+  armConfirm(document.getElementById('ed-delete'), 'Really remove?', async () => {
     if (!editId) return;
-    const name = document.getElementById('ed-name').value;
-    if (!confirm(`Remove "${name}" from your store? This can't be undone.`)) return;
     const r = await fetch(`/api/admin/products/${editId}`, { method: 'DELETE' });
-    if (r.ok) { toast('Product removed'); closeEditor(); loadProducts(); loadOverview(); }
+    if (r.ok) { toast('Removed — publish to make it final'); closeEditor(); loadProducts(); loadOverview(); }
     else if (r.status === 409) {
       const e = await r.json();
-      alert(`You can't remove this product because it's part of these kits:\n\n${(e.kits || []).join('\n')}\n\nRemove it from those kits first (contact Chelsea for kit changes).`);
+      toast(`Can’t remove — it’s inside: ${(e.kits || []).join(', ')}. Kit changes go through Chelsea.`, 6000);
     } else { const e = await r.json(); toast(e.error || 'Could not delete'); }
   });
 
