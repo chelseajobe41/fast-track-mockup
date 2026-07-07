@@ -157,18 +157,19 @@
   .cart-item-remove:hover { color: var(--red); }
   .cart-item-price { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 14px; color: var(--teal); text-align: right; min-width: 56px; }
 
-  .cart-foot { border-top: 1px solid var(--line); padding: 24px 28px; }
-  .cart-summary { margin-bottom: 18px; }
+  .cart-foot { border-top: 1px solid var(--line); padding: 18px 28px 22px; box-shadow: 0 -10px 20px rgba(34,58,63,0.05); }
+  .cart-summary { margin-bottom: 12px; }
   .summary-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; color: var(--teal-soft); }
   .summary-row.bold { font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); font-size: 18px; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
   .free-tag { color: var(--green); font-weight: 700; }
   .shipping-note { font-size: 12px; color: var(--muted); margin-top: 6px; padding: 8px 12px; background: var(--cream); border-radius: 8px; }
   .shipping-note.close { color: var(--orange); }
-  .cart-code { margin-top: 14px; }
-  .cart-code label { display: block; font-family: 'Parkinsans', sans-serif; font-size: 12.5px; font-weight: 600; color: var(--teal); margin-bottom: 6px; }
-  .cart-code label span { font-weight: 500; color: var(--muted); }
-  .cart-code input { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; padding: 11px 14px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--teal); background: #fff; transition: border-color 0.15s, box-shadow 0.15s; }
-  .cart-code input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(34,58,63,0.08); }
+  .cart-code { margin-top: 4px; }
+  .cart-code-toggle { background: none; border: none; padding: 6px 0; display: inline-flex; align-items: center; gap: 7px; font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; }
+  .cart-code-toggle:hover { color: var(--teal); }
+  .cart-code-field { margin-top: 8px; }
+  .cart-code-field input { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; padding: 11px 14px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--teal); background: #fff; transition: border-color 0.15s, box-shadow 0.15s; }
+  .cart-code-field input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(34,58,63,0.08); }
   .checkout-btn { width: 100%; background: var(--orange); color: #fff; padding: 16px 24px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 16px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.15s, transform 0.15s; }
   .checkout-btn:hover:not(:disabled) { background: #b22e21; transform: translateY(-1px); }
   .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -276,8 +277,13 @@
     </div>
     <div class="shipping-note" id="shipping-note"></div>
     <div class="cart-code">
-      <label for="cart-org-code">Fundraiser or organization code <span>(optional)</span></label>
-      <input type="text" id="cart-org-code" maxlength="50" placeholder="e.g. LINCOLN-PTA" autocomplete="off" />
+      <button type="button" class="cart-code-toggle" id="cart-code-toggle" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Have a fundraiser or organization code?
+      </button>
+      <div class="cart-code-field" id="cart-code-field" hidden>
+        <input type="text" id="cart-org-code" maxlength="50" placeholder="e.g. LINCOLN-PTA" autocomplete="off" />
+      </div>
     </div>
     <button class="checkout-btn" id="checkout-btn" style="margin-top: 14px;">
       Continue to checkout
@@ -639,6 +645,11 @@
   document.getElementById('cart-close').addEventListener('click', () => closeCart());
   document.getElementById('cart-overlay').addEventListener('click', () => closeCart());
   document.getElementById('checkout-btn').addEventListener('click', goCheckout);
+  document.getElementById('cart-code-toggle').addEventListener('click', () => {
+    document.getElementById('cart-code-field').hidden = false;
+    document.getElementById('cart-code-toggle').style.display = 'none';
+    document.getElementById('cart-org-code').focus();
+  });
   document.getElementById('clear-cart-btn').addEventListener('click', () => {
     cart = {};
     cartMode = 'one-time';
