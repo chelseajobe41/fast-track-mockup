@@ -56,11 +56,11 @@
   .cart-btn:hover { background: var(--orange); }
   .cart-count { background: var(--yellow); color: var(--teal); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; min-width: 22px; text-align: center; }
   /* Floating cart button — appears once the cart has items, stays visible while scrolling */
-  .cart-fab { position: fixed; bottom: 24px; right: 24px; z-index: 90; background: var(--teal); color: #fff; border: none; border-radius: 999px; padding: 14px 20px; display: inline-flex; align-items: center; gap: 10px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 14px 34px rgba(34,58,63,0.30); opacity: 0; transform: translateY(24px) scale(0.96); pointer-events: none; transition: opacity 0.25s, transform 0.25s, background 0.15s; }
+  .cart-fab { position: fixed; bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px)); right: 24px; z-index: 90; background: var(--teal); color: #fff; border: none; border-radius: 999px; padding: 14px 20px; display: inline-flex; align-items: center; gap: 10px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 14px 34px rgba(34,58,63,0.30); opacity: 0; transform: translateY(24px) scale(0.96); pointer-events: none; transition: opacity 0.25s, transform 0.25s, background 0.15s; }
   .cart-fab.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
   .cart-fab:hover { background: var(--orange); }
   .cart-fab-count { background: var(--yellow); color: var(--teal); font-size: 13px; font-weight: 800; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 999px; display: grid; place-items: center; }
-  @media (max-width: 480px) { .cart-fab { bottom: 16px; right: 16px; padding: 13px 18px; } .cart-fab-label { display: none; } }
+  @media (max-width: 480px) { .cart-fab { bottom: max(16px, calc(env(safe-area-inset-bottom) + 10px)); right: 16px; padding: 13px 18px; } .cart-fab-label { display: none; } }
 
   /* Hero */
   .store-hero { background: var(--cream); padding: 64px 0 40px; border-bottom: 1px solid var(--line); }
@@ -140,7 +140,7 @@
   /* Cart drawer */
   .cart-overlay { position: fixed; inset: 0; background: rgba(34,58,63,0.5); opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 90; }
   .cart-overlay.open { opacity: 1; pointer-events: auto; }
-  .cart-drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 100vw; background: var(--white); transform: translateX(100%); transition: transform 0.25s ease-out; z-index: 100; display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(34,58,63,0.18); }
+  .cart-drawer { position: fixed; top: 0; right: 0; height: 100vh; height: 100dvh; width: 440px; max-width: 100vw; background: var(--white); transform: translateX(100%); transition: transform 0.25s ease-out; z-index: 100; display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(34,58,63,0.18); }
   .cart-drawer.open { transform: translateX(0); }
   .cart-head { padding: 18px 28px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
   .cart-head h2 { font-family: 'Parkinsans', sans-serif; font-size: 21px; font-weight: 700; color: var(--teal); letter-spacing: -0.01em; }
@@ -164,7 +164,7 @@
   .cart-item-remove:hover { color: var(--red); }
   .cart-item-price { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 13.5px; color: var(--teal); text-align: right; min-width: 50px; }
 
-  .cart-foot { border-top: 1px solid var(--line); padding: 14px 28px 16px; box-shadow: 0 -10px 20px rgba(34,58,63,0.05); }
+  .cart-foot { border-top: 1px solid var(--line); padding: 14px 28px max(16px, env(safe-area-inset-bottom)); box-shadow: 0 -10px 20px rgba(34,58,63,0.05); }
   .cart-summary { margin-bottom: 8px; }
   .summary-row { display: flex; justify-content: space-between; font-size: 14px; padding: 3px 0; color: var(--teal-soft); }
   .summary-row.bold { font-family: 'Parkinsans', sans-serif; font-weight: 700; color: var(--teal); font-size: 18px; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
@@ -200,7 +200,7 @@
     .cart-mode-bar { padding: 8px 16px; }
     .mode-btn { padding: 9px 8px; }
     .cart-item { padding: 10px 16px; gap: 10px; }
-    .cart-foot { padding: 12px 16px 14px; }
+    .cart-foot { padding: 12px 16px max(14px, env(safe-area-inset-bottom)); }
     .summary-row { padding: 2px 0; }
     .summary-row.bold { font-size: 17px; margin-top: 6px; padding-top: 10px; }
     .checkout-btn { padding: 13px 20px; font-size: 15px; }
