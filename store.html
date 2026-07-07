@@ -601,7 +601,7 @@
             <button class="cart-item-remove" data-remove="${id}" aria-label="Remove">×</button>
           </div>
         </div>
-        <div class="cart-item-price">$${(effectivePrice * qty).toFixed(2)}</div>
+        <div class="cart-item-price">$${(charged * qty).toFixed(2)}</div>
       </div>`;
     }).join('');
     body.querySelectorAll('[data-qty-inc]').forEach(b => b.addEventListener('click', () => changeQty(b.dataset.qtyInc, 1)));
