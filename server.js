@@ -6,7 +6,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import Stripe from 'stripe';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync } from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 
 // ---------- Boot ----------
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -18,7 +18,7 @@ const KIT_DISCOUNT = 0.10;  // 10% bundle discount vs buying items individually
 // admin edits and order history. Locally DATA_DIR defaults to the repo dir (today's behavior);
 // production sets DATA_DIR=/var/data (a mounted Render persistent disk). On first boot we seed
 // DATA_DIR from the repo's bundled copies, so a fresh disk starts with the current catalog.
-const DATA_DIR = process.env.DATA_DIR || __dirname;
+const DATA_DIR = resolve(process.env.DATA_DIR || __dirname);  // absolute (res.sendFile needs it)
 const IMAGES_DIR = join(DATA_DIR, 'product-images');
 const PRODUCTS_PATH = join(DATA_DIR, 'products.json');
 const INVENTORY_PATH = join(DATA_DIR, 'inventory.json');
@@ -929,6 +929,118 @@ app.post('/api/admin/inventory/:skuId', requireAdmin, (req, res) => {
   if (typeof req.body.low_stock_threshold === 'number') inv[req.params.skuId].low_stock_threshold = req.body.low_stock_threshold;
   writeInventory(inv);
   res.json({ sku_id: req.params.skuId, ...inv[req.params.skuId] });
+});
+
+// ---------- Admin: Products CRUD (the "Product Manager") ----------
+// Generate a URL-safe unique id from a name. Ids are immutable once created (kits + order logs
+// reference them), so this only runs on create.
+function slugifyId(name, existingIds) {
+  const base = String(name).toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'product';
+  let id = base, n = 2;
+  while (existingIds.has(id)) id = `${base}-${n++}`;
+  return id;
+}
+
+// Validate + normalize an incoming product body. partial=true skips required-field checks (updates).
+function validateProductBody(body, { partial } = {}) {
+  const out = {};
+  if (body.name !== undefined || !partial) {
+    const name = sanitizeText(body.name, 120);
+    if (!name) return { ok: false, error: 'Name is required.' };
+    out.name = name;
+  }
+  if (body.price !== undefined || !partial) {
+    const price = Number(body.price);
+    if (!Number.isFinite(price) || price <= 0 || price > 100000) {
+      return { ok: false, error: 'Price must be a positive number.' };
+    }
+    out.price = +price.toFixed(2);
+  }
+  if (body.unit !== undefined) out.unit = sanitizeText(body.unit, 120);
+  if (body.keywords !== undefined) {
+    let kw = body.keywords;
+    if (typeof kw === 'string') kw = kw.split(',');
+    out.keywords = (Array.isArray(kw) ? kw : []).map(k => sanitizeText(k, 60)).filter(Boolean).slice(0, 30);
+  }
+  return { ok: true, value: out };
+}
+
+// List products with live stock joined in.
+app.get('/api/admin/products', requireAdmin, (_req, res) => {
+  const inv = readInventory();
+  res.json({
+    products: PRODUCTS.map(p => ({
+      ...p,
+      stock: inv[p.id]?.stock ?? 0,
+      low_stock_threshold: inv[p.id]?.low_stock_threshold ?? 10
+    }))
+  });
+});
+
+// Create a product (photo uploaded separately after).
+app.post('/api/admin/products', requireAdmin, (req, res) => {
+  const v = validateProductBody(req.body, { partial: false });
+  if (!v.ok) return res.status(400).json({ error: v.error });
+  const products = readProducts();
+  const id = slugifyId(v.value.name, new Set(products.map(p => p.id)));
+  const product = {
+    id, name: v.value.name, price: v.value.price,
+    unit: v.value.unit || '', image: '/assets/photo-coming.svg', keywords: v.value.keywords || []
+  };
+  products.push(product);
+  products.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+  writeProducts(products);
+  const inv = readInventory();
+  if (!inv[id]) { inv[id] = { stock: 0, low_stock_threshold: 10 }; writeInventory(inv); }
+  reloadCatalog();
+  res.json({ product });
+});
+
+// Update a product (id immutable; only name/price/unit/keywords editable).
+app.post('/api/admin/products/:id', requireAdmin, (req, res) => {
+  const products = readProducts();
+  const product = products.find(p => p.id === req.params.id);
+  if (!product) return res.status(404).json({ error: 'Product not found.' });
+  const v = validateProductBody(req.body, { partial: true });
+  if (!v.ok) return res.status(400).json({ error: v.error });
+  Object.assign(product, v.value);
+  products.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+  writeProducts(products);
+  reloadCatalog();
+  res.json({ product });
+});
+
+// Delete a product — blocked (409) if any kit references it, so a kit can't silently lose an item.
+app.delete('/api/admin/products/:id', requireAdmin, (req, res) => {
+  const id = req.params.id;
+  const usedBy = Object.values(KITS).filter(kit => kit.items.some(i => i.id === id)).map(kit => kit.name);
+  if (usedBy.length) return res.status(409).json({ error: 'in_kit', kits: usedBy });
+  const products = readProducts();
+  if (!products.some(p => p.id === id)) return res.status(404).json({ error: 'Product not found.' });
+  writeProducts(products.filter(p => p.id !== id));
+  const inv = readInventory();
+  if (inv[id]) { delete inv[id]; writeInventory(inv); }
+  reloadCatalog();
+  res.json({ ok: true });
+});
+
+// Upload/replace a product photo. Stored on the persistent disk, served via /uploads/<id>.<ext>,
+// saved as an absolute https URL (Stripe Checkout requires absolute image URLs).
+app.post('/api/admin/products/:id/image', requireAdmin, upload.single('image'), (req, res) => {
+  const products = readProducts();
+  const product = products.find(p => p.id === req.params.id);
+  if (!product) return res.status(404).json({ error: 'Product not found.' });
+  if (!req.file) return res.status(400).json({ error: 'No image uploaded.' });
+  const extByType = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
+  const ext = extByType[req.file.mimetype];
+  if (!ext) return res.status(400).json({ error: 'Image must be JPG, PNG, WebP, or GIF.' });
+  const filename = `${product.id}.${ext}`;
+  writeFileSync(join(IMAGES_DIR, filename), req.file.buffer);
+  product.image = `${SITE_URL}/uploads/${filename}`;
+  writeProducts(products);
+  reloadCatalog();
+  res.json({ image: product.image });
 });
 
 // ---------- Boot ----------

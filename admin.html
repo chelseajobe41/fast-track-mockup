@@ -104,6 +104,28 @@
   .empty { padding: 64px 32px; text-align: center; color: var(--muted); font-size: 14px; }
   .empty h3 { color: var(--teal); margin-bottom: 8px; font-size: 18px; }
 
+  /* Products manager */
+  .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .panel-head h2 { margin: 0; }
+  .add-product-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; }
+  .add-product-card h3 { font-family: 'Parkinsans', sans-serif; font-size: 15px; color: var(--teal); margin-bottom: 16px; }
+  .add-grid { display: grid; grid-template-columns: 1fr 140px 1fr; gap: 14px 18px; }
+  .add-grid label { display: flex; flex-direction: column; gap: 6px; font-family: 'Parkinsans', sans-serif; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .add-grid .add-wide { grid-column: 1 / -1; }
+  .add-grid input { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--teal); }
+  .add-grid input:focus { outline: 2px solid var(--teal); background: #fff; }
+  .add-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+  .prod-thumb { width: 52px; height: 52px; object-fit: contain; background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 4px; display: block; }
+  .prod-input { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-family: 'Barlow', sans-serif; font-size: 13px; color: var(--teal); width: 100%; }
+  .prod-input:focus { outline: 2px solid var(--teal); background: #fff; }
+  .prod-input.price { width: 84px; text-align: right; }
+  td.prod-actions { white-space: nowrap; }
+  td.prod-actions .btn-sm { margin-left: 4px; }
+  .btn.danger-btn { background: #fff; color: var(--red); border: 1px solid rgba(192,52,52,0.35); }
+  .btn.danger-btn:hover { background: var(--red); color: #fff; }
+  .photo-btn { position: relative; overflow: hidden; }
+  .photo-btn input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
   /* Toast */
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--teal); color: #fff; padding: 14px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(120px); opacity: 0; transition: transform 0.2s, opacity 0.2s; pointer-events: none; }
   .toast.show { transform: translateY(0); opacity: 1; }
@@ -138,6 +160,7 @@
   <div class="container tabs-row">
     <button class="tab active" data-panel="overview">Overview</button>
     <button class="tab" data-panel="orders">Orders</button>
+    <button class="tab" data-panel="products">Products</button>
     <button class="tab" data-panel="inventory">Inventory</button>
   </div>
 </div>
@@ -197,6 +220,45 @@
       </div>
     </section>
 
+    <!-- PRODUCTS -->
+    <section class="panel" id="panel-products">
+      <div class="panel-head">
+        <h2>Products</h2>
+        <button class="btn" id="add-product-toggle">+ Add product</button>
+      </div>
+
+      <div class="add-product-card" id="add-product-card" style="display:none;">
+        <h3>New product</h3>
+        <div class="add-grid">
+          <label>Name<input type="text" id="np-name" placeholder="e.g. Washable Markers, 8-pack" /></label>
+          <label>Price<input type="number" id="np-price" min="0" step="0.01" placeholder="0.00" /></label>
+          <label>Description<input type="text" id="np-unit" placeholder="e.g. 8 ct, washable" /></label>
+          <label>Photo<input type="file" id="np-image" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
+          <label class="add-wide">Search keywords (comma separated, optional)<input type="text" id="np-keywords" placeholder="markers, washable markers, crayola" /></label>
+        </div>
+        <div class="add-actions">
+          <button class="btn secondary" id="np-cancel">Cancel</button>
+          <button class="btn" id="np-save">Add to store</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Photo</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Description</th>
+              <th>Keywords</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="products-table"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- INVENTORY -->
     <section class="panel" id="panel-inventory">
       <h2>Inventory</h2>
@@ -229,6 +291,7 @@
     document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${t.dataset.panel}`));
     if (t.dataset.panel === 'orders') loadOrders();
     if (t.dataset.panel === 'inventory') loadInventory();
+    if (t.dataset.panel === 'products') loadProducts();
   }));
 
   function dollars(cents) { return `$${((cents || 0) / 100).toFixed(2)}`; }
@@ -420,6 +483,97 @@
       });
     });
   }
+
+  // --- Products (Product Manager) ---
+  async function loadProducts() {
+    const res = await fetch('/api/admin/products');
+    const data = await res.json();
+    const tbody = document.getElementById('products-table');
+    tbody.innerHTML = data.products.map(p => `
+      <tr data-id="${escapeHtml(p.id)}">
+        <td>
+          <label class="photo-btn" title="Change photo">
+            <img class="prod-thumb" src="${escapeHtml(p.image)}" alt="" onerror="this.style.opacity=0.25" />
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-photo="${escapeHtml(p.id)}" />
+          </label>
+        </td>
+        <td><input class="prod-input" data-field="name" value="${escapeHtml(p.name)}" /></td>
+        <td><input class="prod-input price" data-field="price" type="number" min="0" step="0.01" value="${p.price}" /></td>
+        <td><input class="prod-input" data-field="unit" value="${escapeHtml(p.unit || '')}" /></td>
+        <td><input class="prod-input" data-field="keywords" value="${escapeHtml((p.keywords || []).join(', '))}" /></td>
+        <td class="prod-actions">
+          <button class="btn btn-sm" data-save="${escapeHtml(p.id)}">Save</button>
+          <button class="btn btn-sm danger-btn" data-delete="${escapeHtml(p.id)}">Delete</button>
+        </td>
+      </tr>`).join('');
+
+    // Save row
+    tbody.querySelectorAll('[data-save]').forEach(btn => btn.addEventListener('click', async () => {
+      const row = btn.closest('tr');
+      const body = {};
+      row.querySelectorAll('.prod-input').forEach(i => body[i.dataset.field] = i.value);
+      const r = await fetch(`/api/admin/products/${btn.dataset.save}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      if (r.ok) { toast('Saved'); loadProducts(); }
+      else { const e = await r.json(); toast(e.error || 'Could not save'); }
+    }));
+
+    // Delete row (blocked if in a kit)
+    tbody.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
+      const row = btn.closest('tr');
+      const name = row.querySelector('[data-field="name"]').value;
+      if (!confirm(`Remove "${name}" from your store? This cannot be undone.`)) return;
+      const r = await fetch(`/api/admin/products/${btn.dataset.delete}`, { method: 'DELETE' });
+      if (r.ok) { toast('Product removed'); loadProducts(); }
+      else if (r.status === 409) {
+        const e = await r.json();
+        alert(`Can't remove this product because it's part of these kits:\n\n${(e.kits || []).join('\n')}\n\nRemove it from those kits first (contact Chelsea for kit changes).`);
+      } else { const e = await r.json(); toast(e.error || 'Could not delete'); }
+    }));
+
+    // Change photo
+    tbody.querySelectorAll('[data-photo]').forEach(inp => inp.addEventListener('change', async () => {
+      if (!inp.files || !inp.files[0]) return;
+      const fd = new FormData();
+      fd.append('image', inp.files[0]);
+      toast('Uploading photo…');
+      const r = await fetch(`/api/admin/products/${inp.dataset.photo}/image`, { method: 'POST', body: fd });
+      if (r.ok) { toast('Photo updated'); loadProducts(); }
+      else { const e = await r.json(); toast(e.error || 'Could not upload'); }
+    }));
+  }
+
+  // Add-product form
+  document.getElementById('add-product-toggle').addEventListener('click', () => {
+    document.getElementById('add-product-card').style.display = 'block';
+  });
+  document.getElementById('np-cancel').addEventListener('click', () => {
+    document.getElementById('add-product-card').style.display = 'none';
+  });
+  document.getElementById('np-save').addEventListener('click', async () => {
+    const name = document.getElementById('np-name').value.trim();
+    const price = document.getElementById('np-price').value;
+    const unit = document.getElementById('np-unit').value.trim();
+    const keywords = document.getElementById('np-keywords').value.trim();
+    if (!name || !price) { toast('Name and price are required'); return; }
+    const r = await fetch('/api/admin/products', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, price, unit, keywords })
+    });
+    if (!r.ok) { const e = await r.json(); toast(e.error || 'Could not add'); return; }
+    const { product } = await r.json();
+    // Upload photo if one was chosen
+    const fileInput = document.getElementById('np-image');
+    if (fileInput.files && fileInput.files[0]) {
+      const fd = new FormData(); fd.append('image', fileInput.files[0]);
+      await fetch(`/api/admin/products/${product.id}/image`, { method: 'POST', body: fd });
+    }
+    toast('Product added');
+    ['np-name','np-price','np-unit','np-keywords','np-image'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('add-product-card').style.display = 'none';
+    loadProducts();
+  });
 
   loadOverview();
 </script>
