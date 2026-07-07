@@ -411,7 +411,7 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
         };
       });
       const isSub = session.mode === 'subscription';
-      const orgCode = (session.custom_fields || []).find(f => f.key === 'organization_code')?.text?.value || null;
+      const orgCode = session.metadata?.organization_code || null;
       const order = {
         id: session.id,
         short_id: session.id.slice(-10).toUpperCase(),
@@ -964,15 +964,6 @@ app.post('/api/checkout', async (req, res) => {
       // Lets customers enter promo codes at checkout. Codes are created in
       // Stripe Dashboard -> Products -> Coupons -> Create promotion code.
       allow_promotion_codes: true,
-      // Optional organization/fundraiser code — captured on the order so the owner can rebate the
-      // group. Tracking only (no customer discount). Read back from the session in the webhook.
-      custom_fields: [{
-        key: 'organization_code',
-        label: { type: 'custom', custom: 'Organization or fundraiser code (optional)' },
-        type: 'text',
-        optional: true,
-        text: { maximum_length: 50 }
-      }],
       success_url: `${BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${BASE_URL}/cancel`,
       metadata: {
@@ -980,7 +971,10 @@ app.post('/api/checkout', async (req, res) => {
         subscription_interval: sanitizeText(intervalKey, 50) || '',
         kit_id: sanitizeText(req.body.kit_id, 50) || '',
         gift_note: sanitizeText(req.body.gift_note, 500),
-        sender_name: sanitizeText(req.body.sender_name, 100)
+        sender_name: sanitizeText(req.body.sender_name, 100),
+        // Optional organization/fundraiser code, entered in the cart. Captured on the order so the
+        // owner can rebate the group. Tracking only — does NOT affect the price. Read in the webhook.
+        organization_code: sanitizeText(req.body.organization_code, 50)
       }
     };
 
