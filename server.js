@@ -272,6 +272,7 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
         };
       });
       const isSub = session.mode === 'subscription';
+      const orgCode = (session.custom_fields || []).find(f => f.key === 'organization_code')?.text?.value || null;
       const order = {
         id: session.id,
         short_id: session.id.slice(-10).toUpperCase(),
@@ -287,6 +288,7 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
         order_type: isSub ? 'subscription' : 'one-time',
         subscription_id: session.subscription || null,
         subscription_interval: session.metadata?.subscription_interval || null,
+        organization_code: orgCode,
         status: 'paid',
         fulfillment: 'pending',
         items
@@ -781,6 +783,15 @@ app.post('/api/checkout', async (req, res) => {
       // Lets customers enter promo codes at checkout. Codes are created in
       // Stripe Dashboard -> Products -> Coupons -> Create promotion code.
       allow_promotion_codes: true,
+      // Optional organization/fundraiser code — captured on the order so the owner can rebate the
+      // group. Tracking only (no customer discount). Read back from the session in the webhook.
+      custom_fields: [{
+        key: 'organization_code',
+        label: { type: 'custom', custom: 'Organization or fundraiser code (optional)' },
+        type: 'text',
+        optional: true,
+        text: { maximum_length: 50 }
+      }],
       success_url: `${BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${BASE_URL}/cancel`,
       metadata: {

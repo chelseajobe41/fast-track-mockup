@@ -145,6 +145,11 @@
   .ship-hint { color: var(--muted); font-size: 12px; margin-top: 12px; font-style: italic; }
   #ship-add-tier { margin: 6px 0 4px; }
 
+  /* Organization-code summary */
+  .org-summary { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin-bottom: 18px; }
+  .org-summary .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .org-summary .card-head h3 { font-family: 'Parkinsans', sans-serif; font-size: 15px; color: var(--teal); }
+
   /* Toast */
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--teal); color: #fff; padding: 14px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(120px); opacity: 0; transition: transform 0.2s, opacity 0.2s; pointer-events: none; }
   .toast.show { transform: translateY(0); opacity: 1; }
@@ -223,6 +228,10 @@
     <!-- ORDERS -->
     <section class="panel" id="panel-orders">
       <h2>Orders</h2>
+      <div class="org-summary" id="org-summary" style="display:none;">
+        <div class="card-head"><h3>Organization codes</h3><span class="pill teal">For rebates</span></div>
+        <div class="card-body" id="org-summary-body"></div>
+      </div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -414,10 +423,11 @@
     tbody.innerHTML = cachedOrders.map((o, idx) => {
       const fStatus = o.fulfillment || 'pending';
       const fPill = fStatus === 'shipped' ? 'ok' : fStatus === 'fulfilled' ? 'teal' : 'warn';
+      const codeTag = o.organization_code ? `<br/><span class="pill teal" style="margin-top:4px;">code: ${escapeHtml(o.organization_code)}</span>` : '';
       return `
         <tr data-order-id="${o.id}">
           <td><strong>${o.short_id}</strong></td>
-          <td>${escapeHtml(o.customer_name || '—')}<br/><span class="meta" style="color:var(--muted);font-size:12px;">${escapeHtml(o.customer_email || '')}</span></td>
+          <td>${escapeHtml(o.customer_name || '—')}<br/><span class="meta" style="color:var(--muted);font-size:12px;">${escapeHtml(o.customer_email || '')}</span>${codeTag}</td>
           <td><strong>${dollars(o.amount_total_cents)}</strong></td>
           <td><span class="pill ${fPill}">${fStatus}</span></td>
           <td><span style="color:var(--muted);font-size:13px;">${fmt(o.created_at)}</span></td>
@@ -430,6 +440,27 @@
     document.querySelectorAll('[data-action="toggle-details"]').forEach(btn => {
       btn.addEventListener('click', () => toggleOrderDetails(+btn.dataset.idx));
     });
+
+    // Organization-code summary (for calculating rebates)
+    const byCode = {};
+    for (const o of cachedOrders) {
+      if (!o.organization_code) continue;
+      const c = o.organization_code;
+      (byCode[c] = byCode[c] || { count: 0, total: 0 });
+      byCode[c].count++; byCode[c].total += (o.amount_total_cents || 0);
+    }
+    const summaryEl = document.getElementById('org-summary');
+    const codes = Object.entries(byCode).sort((a, b) => b[1].total - a[1].total);
+    if (codes.length) {
+      document.getElementById('org-summary-body').innerHTML = `<div class="list">${codes.map(([code, v]) => `
+        <div class="list-item">
+          <div><div class="name">${escapeHtml(code)}</div><div class="meta">${v.count} order${v.count === 1 ? '' : 's'}</div></div>
+          <div style="text-align:right;"><strong>${dollars(v.total)}</strong><div class="meta">total ordered</div></div>
+        </div>`).join('')}</div>`;
+      summaryEl.style.display = '';
+    } else {
+      summaryEl.style.display = 'none';
+    }
   }
 
   function toggleOrderDetails(idx) {
@@ -447,6 +478,7 @@
           <span><strong>${dollars(i.line_total_cents)}</strong></span>
         </div>`).join('')}
       </div>
+      ${o.organization_code ? `<h4>Organization code</h4><p style="font-size:14px;"><span class="pill teal">${escapeHtml(o.organization_code)}</span></p>` : ''}
       <h4>Shipping</h4>
       <p style="font-size:13px;color:var(--teal);">${escapeHtml(o.customer_name || '')}${o.customer_phone ? ' · ' + escapeHtml(o.customer_phone) : ''}<br/>
       ${addr ? `${escapeHtml(addr.line1 || '')}${addr.line2 ? ', ' + escapeHtml(addr.line2) : ''}, ${escapeHtml(addr.city || '')}, ${escapeHtml(addr.state || '')} ${escapeHtml(addr.postal_code || '')}` : 'No address'}</p>
