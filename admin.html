@@ -141,11 +141,14 @@
   .pub-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
   /* ---------- Category chips ---------- */
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
-  .chip { background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px; font-family: 'Parkinsans'; font-size: 12.5px; font-weight: 600; color: var(--muted); cursor: pointer; transition: background 0.13s, color 0.13s, border-color 0.13s; }
+  /* One tidy row that scrolls horizontally on narrow screens instead of wrapping to a chunky
+     multi-row band. Scrollbar hidden; chips keep their size and never shrink/wrap. */
+  .chips { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; margin-bottom: 16px; padding-bottom: 1px; scrollbar-width: none; -ms-overflow-style: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: 0 0 auto; white-space: nowrap; background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-family: 'Parkinsans'; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; transition: background 0.13s, color 0.13s, border-color 0.13s; }
   .chip:hover { border-color: var(--teal); color: var(--teal); }
   .chip.active { background: var(--teal); border-color: var(--teal); color: #fff; }
-  .chip .n { opacity: 0.65; font-weight: 500; margin-left: 3px; }
+  .chip .n { opacity: 0.55; font-weight: 500; margin-left: 3px; }
 
   /* ---------- Products list ---------- */
   .prod-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
@@ -1059,16 +1062,16 @@
   const CATEGORIES = [
     { id: 'writing', label: 'Writing', match: p => /pencil|pen|sharpie|dry erase marker|marker/i.test(p.name) && !/colored|crayola|color/i.test(p.name) },
     { id: 'paper', label: 'Paper', match: p => /notebook|paper|cardstock|index cards|sticky notes/i.test(p.name) },
-    { id: 'binders', label: 'Binders & Folders', match: p => /binder|folder|divider|sheet protector|pouch|pencil box/i.test(p.name) },
+    { id: 'binders', label: 'Binders', match: p => /binder|folder|divider|sheet protector|pouch|pencil box/i.test(p.name) },
     { id: 'adhesives', label: 'Glue & Tape', match: p => /glue|tape/i.test(p.name) },
-    { id: 'art', label: 'Art Supplies', match: p => /crayon|colored pencil|crayola/i.test(p.name) || /markers/i.test(p.name) },
+    { id: 'art', label: 'Art', match: p => /crayon|colored pencil|crayola/i.test(p.name) || /markers/i.test(p.name) },
     { id: 'tools', label: 'Tools', match: p => /scissors|ruler|calculator|sharpener/i.test(p.name) },
     { id: 'erasers', label: 'Erasers', match: p => /eraser/i.test(p.name) },
     { id: 'classroom', label: 'Classroom', match: p => /tissue|paper towel|disinfectant|wipes/i.test(p.name) },
-    { id: 'bags', label: 'Ziploc Bags', match: p => /bags|ziploc/i.test(p.name) },
+    { id: 'bags', label: 'Bags', match: p => /bags|ziploc/i.test(p.name) },
     { id: 'personal', label: 'Personal', match: p => /backpack|water bottle/i.test(p.name) }
   ];
-  const OTHER_CAT = { id: 'other', label: 'Everything else' };
+  const OTHER_CAT = { id: 'other', label: 'Other' };
   function categoryOf(p) { return CATEGORIES.find(c => c.match(p)) || OTHER_CAT; }
 
   let cachedProducts = [];
