@@ -366,10 +366,28 @@
   .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: transform 0.18s; }
   .switch.on::after { transform: translateX(20px); }
   .sf-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  /* Card-header icon chip — a little life for the storefront cards */
+  .sf-ico { display: inline-flex; width: 28px; height: 28px; border-radius: 8px; background: rgba(34,58,63,0.08); color: var(--teal); align-items: center; justify-content: center; margin-right: 10px; vertical-align: middle; }
+  .sf-ico svg { width: 16px; height: 16px; }
+  .sf-card .card-head h3 { display: inline-flex; align-items: center; }
+
+  /* Featured picker: "featured now" summary + search + compact scroll list */
+  .feat-selected { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 12px; min-height: 26px; }
+  .feat-selected .lbl { font-family: 'Parkinsans'; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .feat-selected .none { font-size: 13px; color: var(--muted-2); }
+  .feat-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--teal); color: #fff; border-radius: 999px; padding: 4px 5px 4px 11px; font-family: 'Parkinsans'; font-size: 12px; font-weight: 600; }
+  .feat-tag button { background: rgba(255,255,255,0.22); border: none; color: #fff; width: 17px; height: 17px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; font-size: 12px; line-height: 1; padding: 0; }
+  .feat-tag button:hover { background: rgba(255,255,255,0.4); }
+  .feat-search { display: flex; align-items: center; gap: 8px; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 8px 12px; margin-bottom: 10px; }
+  .feat-search svg { width: 16px; height: 16px; color: var(--muted); flex: none; }
+  .feat-search input { border: none; background: none; outline: none; font-family: 'Barlow'; font-size: 14px; color: var(--teal); width: 100%; }
+  .feat-scroll { max-height: 264px; overflow-y: auto; border: 1px solid var(--line-soft); border-radius: var(--r-md); padding: 12px; background: var(--cream); }
   .feat-picker { display: flex; flex-wrap: wrap; gap: 8px; }
-  .feat-chip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px 5px 6px; font-family: 'Parkinsans'; font-size: 12.5px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.13s; }
-  .feat-chip img { width: 24px; height: 24px; border-radius: 50%; object-fit: contain; background: var(--cream); }
+  .feat-chip { display: inline-flex; align-items: center; gap: 7px; background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px 5px 6px; font-family: 'Parkinsans'; font-size: 12.5px; font-weight: 600; color: var(--teal); cursor: pointer; transition: background 0.13s, color 0.13s, border-color 0.13s; }
+  .feat-chip img { width: 24px; height: 24px; border-radius: 50%; object-fit: contain; background: var(--cream); flex: none; }
+  .feat-chip:hover { border-color: var(--teal); }
   .feat-chip.on { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .feat-empty { font-size: 13px; color: var(--muted); padding: 18px; text-align: center; width: 100%; }
   .ann-preview { border: 1px dashed var(--line); border-radius: var(--r-md); overflow: hidden; }
   .ann-preview .bar { background: var(--teal); color: #FAF6EF; text-align: center; padding: 10px; font-family: 'Parkinsans'; font-weight: 600; font-size: 13.5px; }
   .ann-preview .bar a { color: #FDCA06; text-decoration: underline; }
@@ -577,7 +595,7 @@
       <!-- STOREFRONT CUSTOMIZER -->
       <section class="panel" id="panel-storefront">
         <div class="card sf-card" style="margin-bottom:18px;">
-          <div class="card-head"><h3>Announcement bar</h3><div class="switch" id="ann-switch" role="switch" tabindex="0" aria-label="Show announcement bar"></div></div>
+          <div class="card-head"><h3><span class="sf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l14-6v14L3 13v-2Z"/><path d="M7 12v5a2 2 0 0 0 4 0v-3"/></svg></span>Announcement bar</h3><div class="switch" id="ann-switch" role="switch" tabindex="0" aria-label="Show announcement bar"></div></div>
           <div class="card-body">
             <div class="field-hint" style="margin-bottom:14px;">A ribbon across the very top of your store. Great for "Free shipping this week!" or a back-to-school sale.</div>
             <label class="field" style="margin-bottom:14px;">Message <input type="text" id="ann-text" maxlength="160" placeholder="Free shipping on orders over $50 this week!" /></label>
@@ -587,7 +605,7 @@
         </div>
 
         <div class="card sf-card" style="margin-bottom:18px;">
-          <div class="card-head"><h3>Store headline</h3></div>
+          <div class="card-head"><h3><span class="sf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 5v14M7 19h4"/><path d="M15 13h6M18 13v6"/></svg></span>Store headline</h3></div>
           <div class="card-body">
             <label class="field" style="margin-bottom:14px;">Big headline <input type="text" id="sf-hero-title" maxlength="80" placeholder="Shop the store" /></label>
             <label class="field">Subtitle <input type="text" id="sf-hero-sub" maxlength="240" placeholder="Build your own kit or pick up something for next semester." /></label>
@@ -595,10 +613,15 @@
         </div>
 
         <div class="card sf-card">
-          <div class="card-head"><h3>Featured products</h3><span class="pill gray plain" id="feat-count">0 of 8</span></div>
+          <div class="card-head"><h3><span class="sf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9 6.7 19.2l1-5.8L3.5 9.2l5.9-.9L12 3Z"/></svg></span>Featured products</h3><span class="pill gray plain" id="feat-count">0 of 8</span></div>
           <div class="card-body">
-            <div class="field-hint" style="margin-bottom:14px;">Pick up to 8 products to spotlight with a "Featured" badge and float to the front of your store.</div>
-            <div class="feat-picker" id="feat-picker"></div>
+            <div class="field-hint" style="margin-bottom:12px;">Pick up to 8 products to spotlight with a "Featured" badge and float to the front of your store.</div>
+            <div class="feat-selected" id="feat-selected"></div>
+            <div class="feat-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+              <input type="text" id="feat-search" placeholder="Search products to feature…" />
+            </div>
+            <div class="feat-scroll"><div class="feat-picker" id="feat-picker"></div></div>
           </div>
         </div>
 
@@ -1481,23 +1504,60 @@
     if (on && text) el.innerHTML = `<div class="bar">${link ? `<a href="#" onclick="return false;">${escapeHtml(text)}</a>` : escapeHtml(text)}</div>`;
     else el.innerHTML = `<div class="off">${on ? 'Type a message to show your announcement bar.' : 'Announcement bar is off — flip the switch to turn it on.'}</div>`;
   }
-  function updateFeatCount() {
-    document.getElementById('feat-count').textContent = `${document.querySelectorAll('#feat-picker .feat-chip.on').length} of 8`;
+  // Featured picker: selection held in a Set (survives search filtering), rendered as a
+  // "featured now" summary + a searchable, scrollable product list.
+  let sfProducts = [];
+  const sfFeatured = new Set();
+  let sfFeatSearch = '';
+  async function ensureSfProducts() {
+    if (!sfProducts.length) {
+      sfProducts = cachedProducts.length ? cachedProducts : ((await (await fetch('/api/admin/products')).json()).products || []);
+    }
+    return sfProducts;
   }
-  async function renderFeaturedPicker(selected) {
-    let prods = cachedProducts;
-    if (!prods.length) { try { prods = (await (await fetch('/api/admin/products')).json()).products || []; } catch { prods = []; } }
+  async function initFeatured(selectedIds) {
+    await ensureSfProducts();
+    sfFeatured.clear();
+    selectedIds.forEach(id => sfFeatured.add(id));
+    sfFeatSearch = '';
+    document.getElementById('feat-search').value = '';
+    renderFeatSelected();
+    renderFeatChips();
+  }
+  function renderFeatSelected() {
+    document.getElementById('feat-count').textContent = `${sfFeatured.size} of 8`;
+    const el = document.getElementById('feat-selected');
+    if (!sfFeatured.size) { el.innerHTML = '<span class="lbl">Featured now</span><span class="none">None yet — pick some below.</span>'; return; }
+    const byId = Object.fromEntries(sfProducts.map(p => [p.id, p]));
+    el.innerHTML = '<span class="lbl">Featured now</span>' + [...sfFeatured].map(id => {
+      const p = byId[id]; if (!p) return '';
+      return `<span class="feat-tag">${escapeHtml(p.name)}<button data-unfeat="${escapeHtml(id)}" aria-label="Remove ${escapeHtml(p.name)}">×</button></span>`;
+    }).join('');
+    el.querySelectorAll('[data-unfeat]').forEach(b => b.addEventListener('click', () => {
+      sfFeatured.delete(b.dataset.unfeat); renderFeatSelected(); syncFeatChipStates();
+    }));
+  }
+  function syncFeatChipStates() {
+    document.querySelectorAll('#feat-picker .feat-chip').forEach(ch => ch.classList.toggle('on', sfFeatured.has(ch.dataset.fid)));
+  }
+  function renderFeatChips() {
+    const q = sfFeatSearch.toLowerCase().trim();
+    const list = sfProducts.filter(p => !q || p.name.toLowerCase().includes(q) || (p.keywords || []).join(' ').toLowerCase().includes(q));
     const picker = document.getElementById('feat-picker');
-    picker.innerHTML = prods.map(p => `
-      <button class="feat-chip ${selected.has(p.id) ? 'on' : ''}" data-fid="${escapeHtml(p.id)}">
+    if (!list.length) { picker.innerHTML = '<div class="feat-empty">No products match.</div>'; return; }
+    picker.innerHTML = list.map(p => `
+      <button class="feat-chip ${sfFeatured.has(p.id) ? 'on' : ''}" data-fid="${escapeHtml(p.id)}">
         <img src="${escapeHtml(p.image || PLACEHOLDER_IMG)}" onerror="this.src='${PLACEHOLDER_IMG}'" alt=""/>${escapeHtml(p.name)}
       </button>`).join('');
     picker.querySelectorAll('.feat-chip').forEach(ch => ch.addEventListener('click', () => {
-      if (!ch.classList.contains('on') && document.querySelectorAll('#feat-picker .feat-chip.on').length >= 8) { toast('You can feature up to 8 products'); return; }
-      ch.classList.toggle('on'); updateFeatCount();
+      const id = ch.dataset.fid;
+      if (sfFeatured.has(id)) sfFeatured.delete(id);
+      else { if (sfFeatured.size >= 8) { toast('You can feature up to 8 products'); return; } sfFeatured.add(id); }
+      ch.classList.toggle('on', sfFeatured.has(id));
+      renderFeatSelected();
     }));
-    updateFeatCount();
   }
+  document.getElementById('feat-search').addEventListener('input', e => { sfFeatSearch = e.target.value; renderFeatChips(); });
   async function loadStorefront() {
     const c = await (await fetch('/api/admin/content')).json();
     document.getElementById('ann-switch').classList.toggle('on', !!c.announcement.enabled);
@@ -1506,7 +1566,7 @@
     document.getElementById('sf-hero-title').value = c.hero_title || '';
     document.getElementById('sf-hero-sub').value = c.hero_subtitle || '';
     renderAnnPreview();
-    await renderFeaturedPicker(new Set(c.featured_ids || []));
+    await initFeatured(new Set(c.featured_ids || []));
   }
   document.getElementById('ann-switch').addEventListener('click', () => { document.getElementById('ann-switch').classList.toggle('on'); renderAnnPreview(); });
   document.getElementById('ann-switch').addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); document.getElementById('ann-switch').click(); } });
@@ -1522,7 +1582,7 @@
       },
       hero_title: document.getElementById('sf-hero-title').value.trim(),
       hero_subtitle: document.getElementById('sf-hero-sub').value.trim(),
-      featured_ids: [...document.querySelectorAll('#feat-picker .feat-chip.on')].map(c => c.dataset.fid)
+      featured_ids: [...sfFeatured]
     };
     const r = await fetch('/api/admin/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (r.ok) { toast('Saved — preview & publish when ready'); refreshPublishBar(); }
