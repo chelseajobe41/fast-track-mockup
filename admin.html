@@ -195,6 +195,12 @@
   .adj-btn:hover { background: var(--cream); }
   .stock-input { border: none; width: 46px; padding: 6px 0; font-family: 'Parkinsans'; font-weight: 700; font-size: 14px; color: var(--teal); text-align: center; background: none; }
   .stock-input:focus { outline: none; }
+  /* The stepper has its own +/- buttons and the drawer fields are compact — the browser's native
+     number spinners just clip the digits. Hide them on all editor number inputs. */
+  .stock-input::-webkit-outer-spin-button, .stock-input::-webkit-inner-spin-button,
+  .ed-inv input[type=number]::-webkit-outer-spin-button, .ed-inv input[type=number]::-webkit-inner-spin-button,
+  .dollar-wrap input::-webkit-outer-spin-button, .dollar-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .stock-input, .ed-inv input[type=number], .dollar-wrap input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 
   /* Editor inventory section */
   .ed-inv { border-top: 1px solid var(--line-soft); padding-top: 18px; }
@@ -202,7 +208,7 @@
   .ed-inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
   .stepper.big { width: fit-content; }
   .stepper.big .adj-btn { width: 38px; height: 42px; font-size: 17px; }
-  .stepper.big .stock-input { width: 58px; font-size: 16px; }
+  .stepper.big .stock-input { width: 72px; font-size: 16px; }
   .ed-inv-grid .field input[type=number]:not(.stock-input) { text-align: center; font-family: 'Parkinsans'; font-weight: 600; }
 
   /* ---------- Order details ---------- */
