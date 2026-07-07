@@ -1585,8 +1585,12 @@
       featured_ids: [...sfFeatured]
     };
     const r = await fetch('/api/admin/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    if (r.ok) { toast('Saved — preview & publish when ready'); refreshPublishBar(); }
-    else toast('Could not save');
+    if (r.ok) {
+      await refreshPublishBar();
+      // Point the owner at the publish bar — saving here only makes a draft; it's not live yet.
+      window.scrollTo(0, 0);
+      toast('Saved as a draft — hit Preview or Publish in the bar up top to make it show', 4500);
+    } else toast('Could not save');
   });
 
   // ---------- Command palette (⌘K) ----------
