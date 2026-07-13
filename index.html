@@ -102,6 +102,8 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.pexels.com" crossorigin>
+<link rel="preload" as="image" href="https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&cs=tinysrgb&w=1280" imagesrcset="https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&cs=tinysrgb&w=768 768w, https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&cs=tinysrgb&w=1280 1280w, https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&cs=tinysrgb&w=1920 1920w" imagesizes="100vw" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&family=Caveat:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -626,7 +628,9 @@
 <section class="hero">
   <!-- HERO IMAGE: kids in a classroom. Swap the src to your own photo when ready. -->
   <div class="hero-video-bg">
-    <img src="https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&w=1920" alt="Elementary students raising hands in a classroom" />
+    <img src="https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&cs=tinysrgb&w=1280"
+         srcset="https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&cs=tinysrgb&w=768 768w, https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&cs=tinysrgb&w=1280 1280w, https://images.pexels.com/photos/8500287/pexels-photo-8500287.jpeg?auto=compress&cs=tinysrgb&w=1920 1920w"
+         sizes="100vw" fetchpriority="high" width="1920" height="1080" alt="Elementary students raising hands in a classroom" />
   </div>
   <div class="hero-overlay"></div>
 
@@ -773,7 +777,7 @@
       </div>
       <div style="position: relative; max-width: 420px; aspect-ratio: 4/5; margin-left: auto;">
         <div style="width: 100%; height: 100%; border-radius: 28px; overflow: hidden; box-shadow: 0 28px 60px rgba(34,58,63,0.22);">
-          <img src="https://images.pexels.com/photos/13198519/pexels-photo-13198519.jpeg?auto=compress&w=1200" alt="Happy kid with a backpack" style="width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block;" />
+          <img loading="lazy" src="https://images.pexels.com/photos/13198519/pexels-photo-13198519.jpeg?auto=compress&cs=tinysrgb&w=1000" alt="Happy kid with a backpack" style="width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block;" />
         </div>
         <div style="position: absolute; bottom: -22px; right: -22px; background: #fff; padding: 12px 18px 12px 26px; border-radius: 6px 12px 12px 6px; font-family: 'Caveat', cursive; font-size: 20px; color: var(--teal); transform: rotate(-5deg); box-shadow: 0 10px 24px rgba(34,58,63,0.18); z-index: 2;">To: Noah, 3rd Grade</div>
       </div>
@@ -795,7 +799,7 @@
     </div>
     <div class="product-grid">
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencils.jpg" alt="Pencils" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pencils.jpg" alt="Pencils" /></div>
         <div class="product-body">
           <div class="product-name">Ticonderoga Pencils</div>
           <div class="product-meta">Pack of 12, pre-sharpened</div>
@@ -806,7 +810,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Composition_Notebook.png" alt="Composition Notebook" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Composition_Notebook.png" alt="Composition Notebook" /></div>
         <div class="product-body">
           <div class="product-name">Composition Notebook</div>
           <div class="product-meta">Wide-ruled, 100 pages</div>
@@ -817,7 +821,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Crayons.jpg" alt="Crayola Crayons" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Crayons.jpg" alt="Crayola Crayons" /></div>
         <div class="product-body">
           <div class="product-name">Crayola Crayons</div>
           <div class="product-meta">24-count, classic colors</div>
@@ -828,7 +832,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Backpack.png" alt="17 Inch Basic Backpack" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Backpack.png" alt="17 Inch Basic Backpack" /></div>
         <div class="product-body">
           <div class="product-name">17 Inch Basic Backpack</div>
           <div class="product-meta">Durable, reinforced straps</div>
@@ -839,7 +843,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Elmers_Glue_Stick.jpg" alt="Elmer's Glue Stick" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Elmers_Glue_Stick.jpg" alt="Elmer's Glue Stick" /></div>
         <div class="product-body">
           <div class="product-name">Elmer's Glue Stick</div>
           <div class="product-meta">Washable, acid-free</div>
@@ -850,7 +854,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pocket_Folder.png" alt="Pocket Folder" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Pocket_Folder.png" alt="Pocket Folder" /></div>
         <div class="product-body">
           <div class="product-name">Pocket Folder</div>
           <div class="product-meta">Assorted colors</div>
@@ -861,7 +865,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Markers.jpg" alt="Crayola Markers" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Crayola_Markers.jpg" alt="Crayola Markers" /></div>
         <div class="product-body">
           <div class="product-name">Crayola Markers</div>
           <div class="product-meta">Broad tip, 10-count</div>
@@ -872,7 +876,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Highlighters_3_color.jpg" alt="Highlighters" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Highlighters_3_color.jpg" alt="Highlighters" /></div>
         <div class="product-body">
           <div class="product-name">Highlighters, 3 Colors</div>
           <div class="product-meta">Chisel tip, fluorescent</div>
@@ -883,7 +887,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Scissor_1.png" alt="Scissor" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Scissor_1.png" alt="Scissor" /></div>
         <div class="product-body">
           <div class="product-name">Scissor</div>
           <div class="product-meta">Blunt tip, kid-safe</div>
@@ -894,7 +898,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Binder_1.png" alt="Binder 1 Inch" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Binder_1.png" alt="Binder 1 Inch" /></div>
         <div class="product-body">
           <div class="product-name">Binder, 1 Inch</div>
           <div class="product-meta">3-ring, view-front</div>
@@ -905,7 +909,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Tissues.png" alt="Tissues" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Tissues.png" alt="Tissues" /></div>
         <div class="product-body">
           <div class="product-name">Tissues</div>
           <div class="product-meta">160-count, 2-ply</div>
@@ -916,7 +920,7 @@
         </div>
       </div>
       <div class="product">
-        <div class="product-img"><img src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Mechanical_Pencil.png" alt="Mechanical Pencil" /></div>
+        <div class="product-img"><img loading="lazy" src="https://irp.cdn-website.com/3b7b2d8d/dms3rep/multi/Mechanical_Pencil.png" alt="Mechanical Pencil" /></div>
         <div class="product-body">
           <div class="product-name">Mechanical Pencil</div>
           <div class="product-meta">0.7mm, refillable</div>
@@ -947,7 +951,7 @@
         </a>
       </div>
       <div class="upload-visual">
-        <img src="https://images.pexels.com/photos/8500288/pexels-photo-8500288.jpeg?auto=compress&w=900" alt="Child doing schoolwork at a desk" />
+        <img loading="lazy" src="https://images.pexels.com/photos/8500288/pexels-photo-8500288.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Child doing schoolwork at a desk" />
       </div>
     </div>
   </div>

@@ -542,7 +542,19 @@ app.get('/uploads/:file', (req, res) => {
   res.sendFile(full);
 });
 
-app.use(express.static(__dirname));
+// Cache static assets so repeat visits and Lighthouse's "efficient cache policy" are happy.
+// Images/fonts get 30 days (they're stable; owner uploads use unique filenames elsewhere).
+// CSS/JS get 1 day (they change on deploys and there is no filename hashing, so keep it short).
+// HTML and anything else falls through with no long cache, so pages stay fresh.
+app.use(express.static(__dirname, {
+  setHeaders(res, filePath) {
+    if (/\.(png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|otf)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=2592000');
+    } else if (/\.(css|js)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    }
+  },
+}));
 
 // Page routes
 app.get('/upload', (_req, res) => res.sendFile(join(__dirname, 'upload.html')));
