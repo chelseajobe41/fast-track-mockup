@@ -17,7 +17,7 @@ Customers can subscribe to any product or whole kit for automatic refills every 
 ## Shipping and returns
 
 - Shipping is calculated at checkout based on the size of the order
-- Standard transit: 3 to 7 business days within the continental US
+- Tracking email sent when the order ships
 - 30-day return window on unopened items, prepaid return label provided
 
 ## Gift a kit (grandparent feature)
