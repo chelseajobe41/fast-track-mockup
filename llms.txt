@@ -16,8 +16,7 @@ Customers can subscribe to any product or whole kit for automatic refills every 
 
 ## Shipping and returns
 
-- Flat $9.95 shipping on every order
-- Ships within 1 business day of payment
+- Shipping is calculated at checkout based on the size of the order
 - Standard transit: 3 to 7 business days within the continental US
 - 30-day return window on unopened items, prepaid return label provided
 
