@@ -410,7 +410,7 @@
       <img id="preview-img" class="preview-image hidden" alt="Uploaded list" />
       <div class="spinner"></div>
       <h2>Reading your list...</h2>
-      <p>Matching items to our catalog.</p>
+      <p id="loading-note">Matching items to our catalog.</p>
       <div class="loading-steps">
         <span class="loading-step active">Reading list</span>
         <span class="loading-step">Matching items</span>
@@ -512,15 +512,23 @@
     formData.append('list', file);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 100000);  // 100s safety net so the page never hangs
+    const noteEl = document.getElementById('loading-note');
+    if (noteEl) noteEl.textContent = 'Matching items to our catalog.';  // reset in case of a repeat upload
+    // Reassurance nudges so a slow read never feels like a dead spinner.
+    const timers = [
+      setTimeout(() => { if (noteEl) noteEl.textContent = "Still working, hang tight. Reading a full list can take up to a minute."; }, 10000),
+      setTimeout(() => { if (noteEl) noteEl.textContent = "Almost there. Matching everything to our catalog now..."; }, 25000),
+      setTimeout(() => controller.abort(), 100000)  // safety net so the page never hangs
+    ];
+    const clearTimers = () => timers.forEach(clearTimeout);
     try {
       const res = await fetch('/api/parse-list', { method: 'POST', body: formData, signal: controller.signal });
-      clearTimeout(timeoutId);
+      clearTimers();
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Unable to parse the list.');
       renderResults(data);
     } catch (err) {
-      clearTimeout(timeoutId);
+      clearTimers();
       loading.classList.add('hidden');
       intro.classList.remove('hidden');
       showError(err.name === 'AbortError'
