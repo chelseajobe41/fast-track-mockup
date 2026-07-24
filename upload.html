@@ -402,7 +402,7 @@
         <p>Or click to browse your files</p>
         <p class="types">JPG, PNG, or WebP &middot; Up to 10MB</p>
       </label>
-      <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/gif" />
+      <input type="file" id="file-input" accept="image/*" />
       <div id="error-box" class="error hidden"></div>
     </div>
 
@@ -490,15 +490,48 @@
     if (e.target.files.length) handleFile(e.target.files[0]);
   });
 
+  // Re-encode any selected image to a right-sized, correctly-oriented JPEG before upload.
+  // This frees the reader from format and size quirks (HEIC, AVIF, huge phone photos) that
+  // can otherwise make an upload fail before the list is ever read. If the browser can't
+  // decode the file at all, the caller falls back to the original.
+  async function normalizeImage(file) {
+    const MAX_EDGE = 2200;
+    let bitmap;
+    try {
+      bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    } catch (_) {
+      bitmap = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('decode-failed'));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+    const w = bitmap.width, h = bitmap.height;
+    if (!w || !h) throw new Error('decode-failed');
+    const scale = Math.min(1, MAX_EDGE / Math.max(w, h));
+    const cw = Math.round(w * scale), ch = Math.round(h * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = cw; canvas.height = ch;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';                  // flatten transparency onto white so the JPEG reads clean
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.drawImage(bitmap, 0, 0, cw, ch);
+    if (bitmap.close) bitmap.close();
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+    if (!blob) throw new Error('encode-failed');
+    return blob;
+  }
+
   async function handleFile(file) {
     errorBox.classList.add('hidden');
 
-    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
-      showError('Please upload a JPG, PNG, GIF, or WebP image.');
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+      showError('Please upload a photo of your supply list. A screenshot or a picture from your phone both work.');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      showError('File is too large. Please upload under 10MB.');
+    if (file.size > 25 * 1024 * 1024) {
+      showError('That image is very large. Please upload one under 25MB.');
       return;
     }
 
@@ -508,8 +541,27 @@
     loading.classList.remove('hidden');
     cycleLoadingSteps();
 
+    // Normalize to a clean JPEG. If the browser can't open the file, fall back to the
+    // original only when it is already a format the reader accepts and within its size limit.
+    let uploadBlob = file;
+    let uploadName = file.name || 'list.jpg';
+    try {
+      const jpeg = await normalizeImage(file);
+      uploadBlob = jpeg;
+      uploadName = (file.name ? file.name.replace(/\.[^.]+$/, '') : 'list') + '.jpg';
+      previewImg.src = URL.createObjectURL(jpeg);   // ensures a preview even for formats the img tag can't show
+    } catch (_) {
+      const okType = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type);
+      if (!okType || file.size > 10 * 1024 * 1024) {
+        loading.classList.add('hidden');
+        intro.classList.remove('hidden');
+        showError('We could not open that image on this device. Please try a screenshot of the list, or a JPG or PNG photo.');
+        return;
+      }
+    }
+
     const formData = new FormData();
-    formData.append('list', file);
+    formData.append('list', uploadBlob, uploadName);
 
     const controller = new AbortController();
     const noteEl = document.getElementById('loading-note');
