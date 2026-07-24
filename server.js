@@ -667,7 +667,7 @@ app.post('/api/parse-list', rateLimitParse, upload.single('list'), async (req, r
       model: 'claude-opus-4-7',
       max_tokens: 8192,
       thinking: { type: 'adaptive' },
-      output_config: { effort: 'high', format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
+      output_config: { effort: 'medium', format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
       system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
       messages: [{
         role: 'user',
@@ -676,7 +676,7 @@ app.post('/api/parse-list', rateLimitParse, upload.single('list'), async (req, r
           { type: 'text', text: 'Extract every supply list item from this image and match each to a SKU from the catalog. Return only the JSON object matching the schema.' }
         ]
       }]
-    });
+    }, { maxRetries: 1, timeout: 60000 });  // fail cleanly (~2 min worst case) instead of hanging the customer's upload
 
     const textBlock = response.content.find(b => b.type === 'text');
     const parsed = JSON.parse(textBlock.text);

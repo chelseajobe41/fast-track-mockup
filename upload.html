@@ -472,6 +472,11 @@
 
   let cartState = [];
 
+  // Belt-and-suspenders: stop the browser from navigating to / opening a dropped
+  // image if the drop lands anywhere outside the drop zone (the reported "it opens
+  // the picture in a new window" bug). The drop zone's own handlers still fire.
+  ['dragover', 'drop'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
+
   ['dragover', 'dragenter'].forEach(ev => {
     dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('dragover'); });
   });
@@ -506,15 +511,21 @@
     const formData = new FormData();
     formData.append('list', file);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 100000);  // 100s safety net so the page never hangs
     try {
-      const res = await fetch('/api/parse-list', { method: 'POST', body: formData });
+      const res = await fetch('/api/parse-list', { method: 'POST', body: formData, signal: controller.signal });
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Unable to parse the list.');
       renderResults(data);
     } catch (err) {
+      clearTimeout(timeoutId);
       loading.classList.add('hidden');
       intro.classList.remove('hidden');
-      showError(err.message);
+      showError(err.name === 'AbortError'
+        ? 'That took longer than expected. Please try a clear, well-lit photo of the whole list, or browse the store and add items yourself.'
+        : (err.message || 'Something went wrong reading your list. Please try again.'));
     }
   }
 
