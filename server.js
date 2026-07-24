@@ -664,10 +664,12 @@ app.post('/api/parse-list', rateLimitParse, upload.single('list'), async (req, r
     const base64 = req.file.buffer.toString('base64');
 
     const response = await anthropic.messages.create({
-      model: 'claude-opus-4-7',
+      // Haiku 4.5 is fast, vision-capable, and inexpensive: right-sized for reading a
+      // supply list and matching it to the catalog. No thinking/effort step, so the reader
+      // answers in a few seconds instead of the 25-60s the Opus + adaptive-thinking setup took.
+      model: 'claude-haiku-4-5',
       max_tokens: 8192,
-      thinking: { type: 'adaptive' },
-      output_config: { effort: 'medium', format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
+      output_config: { format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
       system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
       messages: [{
         role: 'user',
