@@ -251,6 +251,12 @@
     font-family: 'Parkinsans', sans-serif;
     font-weight: 700; min-width: 24px; text-align: center;
   }
+  .remove-btn {
+    background: none; border: none; cursor: pointer;
+    color: #9a8f80; font-size: 12px; font-weight: 600;
+    text-decoration: underline; padding: 4px 2px;
+  }
+  .remove-btn:hover { color: var(--orange); }
   .item-price {
     font-family: 'Parkinsans', sans-serif;
     font-weight: 700; font-size: 17px;
@@ -608,25 +614,7 @@
 
     resultsSummary.textContent = `${data.matched_items.length} items matched${data.unmatched.length ? `, ${data.unmatched.length} need your input` : ''}.`;
 
-    itemsList.innerHTML = cartState.map((item, idx) => `
-      <div class="item">
-        <div class="item-img"><img src="${item.image}" alt="${escapeHtml(item.name)}" /></div>
-        <div class="item-info">
-          <div class="item-name">
-            ${escapeHtml(item.name)}
-            <span class="item-confidence conf-${item.confidence}">${item.confidence}</span>
-          </div>
-          <div class="item-meta">${escapeHtml(item.unit)} &middot; $${item.price.toFixed(2)} each</div>
-          <div class="item-original">From list: "${escapeHtml(item.original_text)}"${item.note ? ` &middot; ${escapeHtml(item.note)}` : ''}</div>
-        </div>
-        <div class="qty-control">
-          <button class="qty-btn" data-action="dec" data-idx="${idx}">−</button>
-          <span class="qty-value" id="qty-${idx}">${item.quantity}</span>
-          <button class="qty-btn" data-action="inc" data-idx="${idx}">+</button>
-        </div>
-        <div class="item-price" id="line-${idx}">$${item.line_total.toFixed(2)}</div>
-      </div>
-    `).join('');
+    renderCartItems();
 
     if (data.unmatched && data.unmatched.length) {
       unmatchedBox.classList.remove('hidden');
@@ -655,16 +643,48 @@
     usageNote.textContent = '';
     usageNote.style.display = 'none';
 
-    itemsList.querySelectorAll('.qty-btn').forEach(btn => {
+  }
+
+  // Builds the matched-items list and wires the quantity + remove controls.
+  // Every change re-renders from cartState so row indices stay in sync after a
+  // removal. Decrementing to zero, or pressing Remove, drops the item entirely,
+  // which is the behavior the client asked for.
+  function renderCartItems() {
+    itemsList.innerHTML = cartState.map((item, idx) => `
+      <div class="item">
+        <div class="item-img"><img src="${item.image}" alt="${escapeHtml(item.name)}" /></div>
+        <div class="item-info">
+          <div class="item-name">
+            ${escapeHtml(item.name)}
+            <span class="item-confidence conf-${item.confidence}">${item.confidence}</span>
+          </div>
+          <div class="item-meta">${escapeHtml(item.unit)} &middot; $${item.price.toFixed(2)} each</div>
+          <div class="item-original">From list: "${escapeHtml(item.original_text)}"${item.note ? ` &middot; ${escapeHtml(item.note)}` : ''}</div>
+        </div>
+        <div class="qty-control">
+          <button class="qty-btn" data-action="dec" data-idx="${idx}">−</button>
+          <span class="qty-value">${item.quantity}</span>
+          <button class="qty-btn" data-action="inc" data-idx="${idx}">+</button>
+        </div>
+        <div class="item-price">$${item.line_total.toFixed(2)}</div>
+        <button class="remove-btn" data-action="remove" data-idx="${idx}" aria-label="Remove ${escapeHtml(item.name)}">Remove</button>
+      </div>
+    `).join('');
+
+    itemsList.querySelectorAll('.qty-btn, .remove-btn').forEach(btn => {
       btn.addEventListener('click', e => {
         const idx = +e.currentTarget.dataset.idx;
         const action = e.currentTarget.dataset.action;
         const item = cartState[idx];
         if (action === 'inc') item.quantity++;
-        else if (action === 'dec' && item.quantity > 1) item.quantity--;
-        item.line_total = +(item.price * item.quantity).toFixed(2);
-        document.getElementById(`qty-${idx}`).textContent = item.quantity;
-        document.getElementById(`line-${idx}`).textContent = `$${item.line_total.toFixed(2)}`;
+        else if (action === 'dec') item.quantity--;
+        else if (action === 'remove') item.quantity = 0;
+        if (item.quantity < 1) {
+          cartState.splice(idx, 1);            // zero quantity removes the item
+        } else {
+          item.line_total = +(item.price * item.quantity).toFixed(2);
+        }
+        renderCartItems();
         updateSubtotal();
       });
     });
@@ -673,6 +693,7 @@
   function updateSubtotal() {
     const subtotal = cartState.reduce((s, i) => s + i.line_total, 0);
     subtotalAmount.textContent = `$${subtotal.toFixed(2)}`;
+    checkoutBtn.disabled = cartState.length === 0;  // nothing left to buy after removals
   }
 
   restartBtn.addEventListener('click', () => {
