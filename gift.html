@@ -82,7 +82,7 @@
   .how-step-emoji { width: 80px; height: 80px; background: var(--cream); border: 2px solid var(--line); border-radius: 24px; display: grid; place-items: center; margin: 0 auto 20px; transition: transform 0.3s; color: var(--orange); }
   .how-step-emoji svg { width: 36px; height: 36px; }
   .how-step:hover .how-step-emoji { transform: rotate(-4deg) scale(1.05); border-color: var(--orange); }
-  .how-step h4 { font-family: 'Parkinsans', sans-serif; font-size: 20px; font-weight: 700; color: var(--teal); margin-bottom: 8px; letter-spacing: -0.01em; }
+  .how-step h3 { font-family: 'Parkinsans', sans-serif; font-size: 20px; font-weight: 700; color: var(--teal); margin-bottom: 8px; letter-spacing: -0.01em; }
   .how-step p { font-size: 15px; color: var(--teal-soft); line-height: 1.55; }
 
   /* Pick a kit */
@@ -95,7 +95,7 @@
   .pick-card:hover { border-color: var(--teal); transform: translateY(-3px); box-shadow: 0 18px 40px rgba(34,58,63,0.08); }
   .pick-card.selected { border-color: var(--orange); border-width: 2px; padding: 23px; box-shadow: 0 16px 36px rgba(220,61,45,0.18); }
   .pick-card-grade { font-family: 'Parkinsans', sans-serif; font-size: 12px; font-weight: 700; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
-  .pick-card h4 { font-family: 'Parkinsans', sans-serif; font-size: 18px; font-weight: 700; color: var(--teal); margin-bottom: 6px; }
+  .pick-card h3 { font-family: 'Parkinsans', sans-serif; font-size: 18px; font-weight: 700; color: var(--teal); margin-bottom: 6px; }
   .pick-card .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); }
   .pick-card .price { font-family: 'Parkinsans', sans-serif; font-size: 22px; font-weight: 700; color: var(--teal); }
   .pick-card .item-count { font-size: 12px; color: var(--muted); font-family: 'Parkinsans', sans-serif; }
@@ -182,7 +182,7 @@
     </div>
     <div class="hero-photo">
       <div class="hero-photo-frame">
-        <img src="https://images.pexels.com/photos/13198519/pexels-photo-13198519.jpeg?auto=compress&w=1200" alt="Happy elementary-age child with a backpack" />
+        <img src="/assets/gift/child-backpack.jpg" width="1200" height="840" alt="Happy elementary-age child with a backpack" />
       </div>
       <div class="hero-tag">From: Grandma</div>
     </div>
@@ -200,21 +200,21 @@
         <div class="how-step-emoji">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <h4>Pick a kit</h4>
+        <h3>Pick a kit</h3>
         <p>Eight grade levels, K through high school. Every kit curated for what kids actually need.</p>
       </div>
       <div class="how-step">
         <div class="how-step-emoji">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
-        <h4>Ship to them</h4>
+        <h3>Ship to them</h3>
         <p>You pay, we ship to your grandchild's address. They don't see the bill, they just see the box.</p>
       </div>
       <div class="how-step">
         <div class="how-step-emoji">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
         </div>
-        <h4>Add a note</h4>
+        <h3>Add a note</h3>
         <p>We tuck a handwritten-style card in the box. "Have a great first day, love Grandma." It hits.</p>
       </div>
     </div>
@@ -339,7 +339,7 @@
     document.getElementById('pick-grid').innerHTML = allKits.map(k => `
       <div class="pick-card ${selectedKit === k.kit_id ? 'selected' : ''}" data-kit="${k.kit_id}">
         <div class="pick-card-grade">${escapeHtml(k.grade_label)}</div>
-        <h4>${escapeHtml(k.name)}</h4>
+        <h3>${escapeHtml(k.name)}</h3>
         <div class="ages">${escapeHtml(k.age_range)}</div>
         <div class="price-row">
           <span class="price">$${k.price.toFixed(2)}</span>
