@@ -46,7 +46,10 @@
       el.setAttribute('aria-label', 'Fast Track School Supplies');
       // Tag context so we can style header vs footer differently
       const isFooter = el.closest('footer') !== null;
-      el.innerHTML = `<img src="/assets/logo.png" alt="" class="brand-logo${isFooter ? ' brand-logo-footer' : ''}" /><span class="brand-name${isFooter ? ' brand-name-footer' : ''}">Fast Track<span class="brand-name-sub">School Supplies</span></span>`;
+      // The link's aria-label carries the accessible name; the text is a visual echo of the logo,
+      // so hide it from the a11y tree to avoid a "label in name" mismatch (the styled dot/spacing
+      // makes the visible text not match the clean aria-label).
+      el.innerHTML = `<img src="/assets/logo.png" alt="" width="127" height="190" class="brand-logo${isFooter ? ' brand-logo-footer' : ''}" /><span class="brand-name${isFooter ? ' brand-name-footer' : ''}" aria-hidden="true">Fast Track<span class="brand-name-sub">School Supplies</span></span>`;
     });
   });
 
@@ -72,12 +75,11 @@
       cartDrawer.setAttribute('aria-label', 'Shopping cart');
     }
 
-    // Cart count badge — give it a live region so screen readers announce updates
-    const cartCount = document.getElementById('cart-count');
-    if (cartCount) {
-      cartCount.setAttribute('aria-label', 'Items in cart');
-      cartCount.setAttribute('aria-live', 'polite');
-    }
+    // Cart count badge — hide from the a11y tree so the cart button's visible text ("Cart")
+    // matches its "Open shopping cart" accessible name (the dynamic count number would otherwise
+    // be part of the visible text but not the name = a "label in name" mismatch).
+    // NB: the badge is styled by CLASS (.cart-count), not an id — target every match.
+    document.querySelectorAll('.cart-count').forEach(c => c.setAttribute('aria-hidden', 'true'));
 
     // Hamburger / close buttons — ensure aria-label is set (motion.js may have already added these, but cover dynamic cases)
     document.querySelectorAll('.cart-btn:not([aria-label])').forEach(b => b.setAttribute('aria-label', 'Open shopping cart'));

@@ -44,7 +44,7 @@ h2 .dot, h2 .period,
   font-size: 14px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--orange, #DC3D2D);
+  color: var(--orange, #C4372B);
   line-height: 1;
 }
 .brand-logo-footer {
@@ -163,7 +163,7 @@ textarea:focus-visible,
 select:focus-visible,
 [role="button"]:focus-visible,
 [tabindex="0"]:focus-visible {
-  outline: 3px solid var(--orange, #DC3D2D);
+  outline: 3px solid var(--orange, #C4372B);
   outline-offset: 2px;
   border-radius: 4px;
 }

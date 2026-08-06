@@ -30,13 +30,16 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/parkinsans/v3/-W_7XJXvQyPb1QfpBpRrfkQLfr8nfiI.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/barlow/v13/7cHpv4kjgoGqM7E_DMs5ynghnQ.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E30-8s51ostz0rdg.woff2">
 <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&family=Caveat:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 <link rel="stylesheet" href="/motion.css" />
 <script defer src="/motion.js"></script>
 <style>
   :root {
-    --teal:#223A3F; --teal-soft:rgba(34,58,63,0.75); --orange:#DC3D2D; --yellow:#FDCA06;
+    --teal:#223A3F; --teal-soft:rgba(34,58,63,0.75); --orange:#C4372B; --yellow:#FDCA06;
     --white:#ffffff; --cream:#FAF6EF; --line:#E8E4DC; --muted:#6A6F71; --green:#2d8659;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -131,10 +134,10 @@
   .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
   .footer-brand .wordmark { color: var(--white); }
   .footer-brand p { font-size: 14px; opacity: 0.7; margin-top: 18px; max-width: 300px; line-height: 1.6; }
-  .footer-col h5 { font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 20px; color: var(--yellow); letter-spacing: 0.05em; text-transform: uppercase; }
+  .footer-col h2 { font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 20px; color: var(--yellow); letter-spacing: 0.05em; text-transform: uppercase; }
   .footer-col a { display: block; font-family: 'Parkinsans', sans-serif; font-size: 14px; opacity: 0.85; margin-bottom: 12px; }
   .footer-col a:hover { color: var(--orange); opacity: 1; }
-  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 24px; display: flex; justify-content: space-between; font-size: 13px; opacity: 0.6; flex-wrap: wrap; gap: 16px; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 24px; display: flex; justify-content: space-between; font-size: 13px; opacity: 1; color: rgba(255,255,255,0.65); flex-wrap: wrap; gap: 16px; }
 
   @media (max-width: 900px) {
     .hero-grid, .gift-form-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -283,9 +286,9 @@
         <a href="/" class="wordmark">Fast Track</a>
         <p>Back-to-school supplies, ordered, packed, and delivered.</p>
       </div>
-      <div class="footer-col"><h5>Shop</h5><a href="/kits">Grade Kits</a><a href="/store">All Products</a><a href="/upload">Upload a List</a><a href="/gift">Gift a Kit</a></div>
-      <div class="footer-col"><h5>About</h5><a href="/#how">How It Works</a></div>
-      <div class="footer-col"><h5>Help</h5><a href="/faq">FAQ</a><a href="/manage">Manage subscription</a><a href="/shipping">Shipping</a><a href="/returns">Returns</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
+      <div class="footer-col"><h2>Shop</h2><a href="/kits">Grade Kits</a><a href="/store">All Products</a><a href="/upload">Upload a List</a><a href="/gift">Gift a Kit</a></div>
+      <div class="footer-col"><h2>About</h2><a href="/#how">How It Works</a></div>
+      <div class="footer-col"><h2>Help</h2><a href="/faq">FAQ</a><a href="/manage">Manage subscription</a><a href="/shipping">Shipping</a><a href="/returns">Returns</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
     </div>
     <div class="footer-bottom">
       <span>© 2026 Fast Track School Supplies.</span>

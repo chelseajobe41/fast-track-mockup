@@ -29,11 +29,14 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/parkinsans/v3/-W_7XJXvQyPb1QfpBpRrfkQLfr8nfiI.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/barlow/v13/7cHpv4kjgoGqM7E_DMs5ynghnQ.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E30-8s51ostz0rdg.woff2">
 <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --teal:#223A3F; --teal-soft:rgba(34,58,63,0.75); --teal-faint:rgba(34,58,63,0.06);
-    --orange:#DC3D2D; --yellow:#FDCA06; --white:#ffffff; --cream:#FAF6EF;
+    --orange:#C4372B; --yellow:#FDCA06; --white:#ffffff; --cream:#FAF6EF;
     --line:#E8E4DC; --muted:#6A6F71; --green:#2d8659; --red:#c03434;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -71,7 +74,7 @@
   .announce-bar { background: var(--teal); color: #FAF6EF; text-align: center; padding: 11px 20px; font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.01em; }
   .announce-bar a { color: #FDCA06; text-decoration: underline; }
   .featured-badge { position: absolute; top: 12px; left: 12px; z-index: 3; background: #FDCA06; color: #223A3F; padding: 4px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
-  .sale-badge { position: absolute; top: 12px; left: 12px; z-index: 3; background: #DC3D2D; color: #fff; padding: 4px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .sale-badge { position: absolute; top: 12px; left: 12px; z-index: 3; background: #C4372B; color: #fff; padding: 4px 10px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
   .product-price.sale { color: var(--orange); }
   .product-price .price-was { text-decoration: line-through; color: var(--muted); font-weight: 500; font-size: 15px; margin-right: 6px; }
 
@@ -215,10 +218,10 @@
   .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
   .footer-brand .wordmark { color: var(--white); }
   .footer-brand p { font-size: 14px; opacity: 0.7; margin-top: 18px; max-width: 300px; line-height: 1.6; }
-  .footer-col h5 { font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 20px; color: var(--yellow); letter-spacing: 0.05em; text-transform: uppercase; }
+  .footer-col h2 { font-family: 'Parkinsans', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 20px; color: var(--yellow); letter-spacing: 0.05em; text-transform: uppercase; }
   .footer-col a { display: block; font-family: 'Parkinsans', sans-serif; font-size: 14px; opacity: 0.85; margin-bottom: 12px; text-decoration: none; color: rgba(255,255,255,0.85); }
   .footer-col a:hover { color: var(--orange); opacity: 1; }
-  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 24px; display: flex; justify-content: space-between; font-size: 13px; opacity: 0.6; flex-wrap: wrap; gap: 16px; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 24px; display: flex; justify-content: space-between; font-size: 13px; opacity: 1; color: rgba(255,255,255,0.65); flex-wrap: wrap; gap: 16px; }
   @media (max-width: 700px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; } }
 </style>
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
@@ -289,7 +292,7 @@
 
 <!-- Cart drawer -->
 <div class="cart-overlay" id="cart-overlay"></div>
-<aside class="cart-drawer" id="cart-drawer">
+<div class="cart-drawer" id="cart-drawer">
   <div class="cart-head">
     <h2>Your cart</h2>
     <div class="cart-head-actions">
@@ -325,7 +328,7 @@
       Secure checkout via Stripe
     </div>
   </div>
-</aside>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -425,7 +428,7 @@
     const chips = document.getElementById('filter-chips');
     chips.innerHTML = CATEGORIES.map(c => {
       const count = c.id === 'all' ? PRODUCTS.length : PRODUCTS.filter(c.match).length;
-      return `<button class="chip ${activeCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.label} <span style="opacity:0.6;font-weight:400;">${count}</span></button>`;
+      return `<button class="chip ${activeCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.label} <span style="font-weight:400;">${count}</span></button>`;
     }).join('');
     chips.querySelectorAll('.chip').forEach(btn => btn.addEventListener('click', () => {
       activeCategory = btn.dataset.cat;
@@ -768,18 +771,18 @@
         <p>Back-to-school supplies, ordered, packed, and delivered. Built for families who want it done right.</p>
       </div>
       <div class="footer-col">
-        <h5>Shop</h5>
+        <h2>Shop</h2>
         <a href="/kits">Grade Kits</a>
         <a href="/store">All Products</a>
         <a href="/upload">Upload a List</a>
         <a href="/gift">Gift a Kit</a>
       </div>
       <div class="footer-col">
-        <h5>About</h5>
+        <h2>About</h2>
         <a href="/#how">How It Works</a>
       </div>
       <div class="footer-col">
-        <h5>Help</h5>
+        <h2>Help</h2>
         <a href="/faq">FAQ</a>
         <a href="/manage">Manage subscription</a>
         <a href="/shipping">Shipping</a>

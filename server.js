@@ -635,7 +635,7 @@ app.get('/manage', (_req, res) => {
   .card { background: #fff; border-radius: 22px; padding: 48px 40px; max-width: 520px; box-shadow: 0 20px 60px rgba(34,58,63,0.08); text-align: center; }
   h1 { font-family: 'Parkinsans', sans-serif; font-size: 28px; margin: 0 0 12px; }
   p { color: #6A6F71; margin: 0 0 18px; font-size: 16px; }
-  a { color: #DC3D2D; font-weight: 600; }
+  a { color: #C4372B; font-weight: 600; }
   .btn { display: inline-block; margin-top: 12px; background: #223A3F; color: #fff; padding: 14px 26px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 600; text-decoration: none; }
 </style></head>
 <body><div class="card">
@@ -1251,7 +1251,7 @@ app.get('/api/admin/orders/:id/packing-slip', requireAdmin, (req, res) => {
     body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: #1a2b2e; margin: 0; padding: 40px; }
     .head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #223A3F; padding-bottom: 16px; margin-bottom: 24px; }
     .brand { font-size: 22px; font-weight: 800; color: #223A3F; }
-    .brand span { color: #DC3D2D; }
+    .brand span { color: #C4372B; }
     .brand small { display:block; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6A6F71; font-weight: 700; margin-top: 2px; }
     .doc { text-align: right; }
     .doc h1 { font-size: 16px; margin: 0 0 4px; letter-spacing: 0.04em; text-transform: uppercase; color: #6A6F71; }
