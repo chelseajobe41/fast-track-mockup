@@ -257,6 +257,8 @@
     text-decoration: underline; padding: 4px 2px;
   }
   .remove-btn:hover { color: var(--orange); }
+  .merge-note { font-size: 13.5px; color: var(--teal); background: var(--cream); border-radius: 10px; padding: 11px 15px; margin-bottom: 14px; line-height: 1.35; }
+  .merge-note.hidden { display: none; }
   .item-price {
     font-family: 'Parkinsans', sans-serif;
     font-weight: 700; font-size: 17px;
@@ -441,6 +443,8 @@
         <h3>We couldn't match these items</h3>
         <div id="unmatched-list"></div>
       </div>
+
+      <div class="merge-note hidden" id="merge-note"></div>
 
       <div class="totals">
         <div class="totals-info">
@@ -694,6 +698,39 @@
     const subtotal = cartState.reduce((s, i) => s + i.line_total, 0);
     subtotalAmount.textContent = `$${subtotal.toFixed(2)}`;
     checkoutBtn.disabled = cartState.length === 0;  // nothing left to buy after removals
+    updateMergeNote();
+  }
+
+  // The store keeps its cart in localStorage under fastTrackCart as { sku_id: quantity }.
+  // Reading it here lets an uploaded list check out together with whatever the customer
+  // already added in the shop, so it is one order instead of two.
+  function readStoreCart() {
+    let raw = {};
+    try { raw = JSON.parse(localStorage.getItem('fastTrackCart') || '{}'); } catch {}
+    const items = {};
+    let count = 0;
+    for (const [id, qty] of Object.entries(raw)) {
+      const q = parseInt(qty, 10);
+      if (id && q > 0) { items[id] = q; count += q; }
+    }
+    const mode = localStorage.getItem('fastTrackCartMode') || 'one-time';
+    return { items, count, mode };
+  }
+
+  // Let the customer know the shop items will ride along, so the extra lines on the Stripe
+  // page are never a surprise.
+  function updateMergeNote() {
+    const note = document.getElementById('merge-note');
+    if (!note) return;
+    const { count } = readStoreCart();
+    if (count > 0) {
+      note.textContent = count === 1
+        ? 'Heads up: 1 item already in your cart will be added to this order, so you check out once.'
+        : `Heads up: ${count} items already in your cart will be added to this order, so you check out once.`;
+      note.classList.remove('hidden');
+    } else {
+      note.classList.add('hidden');
+    }
   }
 
   restartBtn.addEventListener('click', () => {
@@ -706,16 +743,31 @@
 
   checkoutBtn.addEventListener('click', async () => {
     if (!cartState.length) return;
+
+    const store = readStoreCart();
+
+    // A supply list is a one-time seasonal purchase and cannot ride inside a subscription
+    // order. If the shop cart is set to a subscription, confirm before combining everything
+    // into a single one-time checkout.
+    if (store.count > 0 && store.mode === 'subscription') {
+      const ok = confirm('Your shop cart is set to a subscription. Checking out your uploaded list will combine everything into one single-time order. Continue?');
+      if (!ok) return;
+    }
+
+    // Merge: start from the shop cart, then add the list quantities on top (summed per item).
+    const combined = { ...store.items };
+    for (const item of cartState) {
+      combined[item.sku_id] = (combined[item.sku_id] || 0) + item.quantity;
+    }
+    const items = Object.entries(combined).map(([sku_id, quantity]) => ({ sku_id, quantity }));
+
     checkoutBtn.disabled = true;
     checkoutBtn.textContent = 'Redirecting...';
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          source: 'upload',
-          items: cartState.map(i => ({ sku_id: i.sku_id, quantity: i.quantity }))
-        })
+        body: JSON.stringify({ source: 'upload', items })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Checkout failed.');

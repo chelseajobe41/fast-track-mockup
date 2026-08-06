@@ -62,6 +62,13 @@
     const params = new URLSearchParams(window.location.search);
     const sid = params.get('session_id') || '';
     document.getElementById('order-id').textContent = sid ? sid.slice(-10).toUpperCase() : 'PENDING';
+    // Payment completed — clear the shop cart so purchased items can't be ordered again.
+    // (This page is Stripe's success_url, so it only loads after a completed payment.)
+    try {
+      localStorage.removeItem('fastTrackCart');
+      localStorage.removeItem('fastTrackCartMode');
+      localStorage.removeItem('fastTrackCartInterval');
+    } catch {}
   </script>
 </body>
 </html>
