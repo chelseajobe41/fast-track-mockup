@@ -863,6 +863,85 @@ function renderKitPage(detail) {
     .split('<!--KIT_JSONLD-->').join(jsonLd);
 }
 
+// Category rules — MUST stay in lockstep with the CATEGORIES array in store.html so the
+// server-rendered filter chips + per-card category label match what the client re-renders.
+const STORE_CATEGORIES = [
+  { id: 'all', label: 'All', match: () => true },
+  { id: 'writing', label: 'Writing', match: p => /pencil|pen|sharpie|dry erase marker|marker/i.test(p.name) && !/colored|crayola|color/i.test(p.name) },
+  { id: 'paper', label: 'Paper', match: p => /notebook|paper|cardstock|index cards|sticky notes/i.test(p.name) },
+  { id: 'binders', label: 'Binders & Folders', match: p => /binder|folder|divider|sheet protector|pouch|pencil box/i.test(p.name) },
+  { id: 'adhesives', label: 'Glue & Tape', match: p => /glue|tape/i.test(p.name) },
+  { id: 'art', label: 'Art Supplies', match: p => /crayon|colored pencil|crayola/i.test(p.name) || /markers/i.test(p.name) },
+  { id: 'tools', label: 'Tools', match: p => /scissors|ruler|calculator|sharpener/i.test(p.name) },
+  { id: 'erasers', label: 'Erasers', match: p => /eraser/i.test(p.name) },
+  { id: 'classroom', label: 'Classroom', match: p => /tissue|paper towel|disinfectant|wipes/i.test(p.name) },
+  { id: 'bags', label: 'Ziploc Bags', match: p => /bags|ziploc/i.test(p.name) },
+  { id: 'personal', label: 'Personal', match: p => /backpack|water bottle/i.test(p.name) }
+];
+
+// One product card — a byte-for-byte port of the client render() card template (store.html), in the
+// empty-cart state (the server can't read the visitor's localStorage cart). Badges are absolutely
+// positioned and controls are fixed-height, so cart state never changes a card's DIMENSIONS — which
+// is all that matters: the client re-renders on load with the real cart, and because every card keeps
+// the same footprint the page never shifts (CLS). htmlEscape here is identical to the client escapeHtml.
+function storeCardHtml(p, inventory, featuredSet) {
+  const inv = inventory[p.id];
+  const stock = inv && inv.stock != null ? inv.stock : null;
+  const isOut = stock === 0;
+  const isLow = stock !== null && stock > 0 && stock <= ((inv && inv.low_stock_threshold) || 10);
+  const cat = STORE_CATEGORIES.find(c => c.id !== 'all' && c.match(p));
+  const onSaleP = isOnSale(p);
+  const priceNow = effectivePrice(p);
+  const control = isOut
+    ? `<button class="add-btn" disabled>Out of stock</button>`
+    : `<button class="add-btn" data-add="${p.id}" aria-label="Add ${htmlEscape(p.name)} to cart">
+              <span class="plus">+</span> Add
+            </button>`;
+  const subPrice = (priceNow * (1 - 0.10)).toFixed(2);
+  const subscribeLink = isOut ? '' : `<button class="subscribe-link" data-subscribe="${p.id}">Subscribe &amp; save 10% · $${subPrice}</button>`;
+  const badge = onSaleP ? '<span class="sale-badge">Sale</span>' : (featuredSet.has(p.id) ? '<span class="featured-badge">Featured</span>' : '');
+  const stockBadge = isOut ? '<span class="stock-badge out">Out</span>' : (isLow ? `<span class="stock-badge low">Only ${stock} left</span>` : '');
+  const priceHtml = onSaleP
+    ? `<span class="product-price sale"><span class="price-was">$${p.price.toFixed(2)}</span>$${priceNow.toFixed(2)}</span>`
+    : `<span class="product-price">$${p.price.toFixed(2)}</span>`;
+  return `
+        <div class="product-card ">
+          <div class="product-img">
+            ${badge}
+            ${stockBadge}
+            <img src="${p.image}" alt="${htmlEscape(p.name)}" loading="lazy" />
+          </div>
+          <div class="product-body">
+            <div class="product-cat">${(cat && cat.label) || 'Supplies'}</div>
+            <div class="product-name">${htmlEscape(p.name)}</div>
+            <div class="product-meta">${htmlEscape(p.unit || '')}</div>
+            <div class="product-row">
+              ${priceHtml}
+              ${control}
+            </div>
+            ${subscribeLink}
+          </div>
+        </div>`;
+}
+
+// The default store view: all products, featured floated to the front (stable sort, matching the
+// client's default 'featured' sort), rendered into the grid so the page has full height at first paint.
+function storeProductGridHtml(products, inventory, featuredSet) {
+  let list = products.slice();
+  if (featuredSet.size) {
+    list.sort((a, b) => (featuredSet.has(b.id) ? 1 : 0) - (featuredSet.has(a.id) ? 1 : 0));
+  }
+  return list.map(p => storeCardHtml(p, inventory, featuredSet)).join('');
+}
+
+// The filter chips with per-category counts, 'all' active — matches the client renderFilters() default.
+function storeFilterChipsHtml(products) {
+  return STORE_CATEGORIES.map(c => {
+    const count = c.id === 'all' ? products.length : products.filter(c.match).length;
+    return `<button class="chip ${c.id === 'all' ? 'active' : ''}" data-cat="${c.id}">${c.label} <span style="font-weight:400;">${count}</span></button>`;
+  }).join('');
+}
+
 // Server-side render of /store: injects an ItemList of Products (with offers) so the
 // collection page exposes price/availability schema in the initial HTML.
 function renderStorePage(products = PRODUCTS, content = readContent()) {
@@ -904,11 +983,20 @@ function renderStorePage(products = PRODUCTS, content = readContent()) {
   const announceHtml = (announce && announce.enabled && announce.text)
     ? `<div class="announce-bar">${announce.link ? `<a href="${htmlEscape(announce.link)}">${htmlEscape(announce.text)}</a>` : htmlEscape(announce.text)}</div>`
     : '';
+  // Server-render the grid, chips, and count so the page paints at full height (no CLS). The client
+  // render() re-runs on load with the real cart; every card keeps the same footprint, so nothing shifts.
+  const featuredSet = new Set(featured);
+  const gridHtml = storeProductGridHtml(products, inventory, featuredSet);
+  const chipsHtml = storeFilterChipsHtml(products);
+  const countHtml = `${products.length} of ${products.length} products`;
   return STORE_TEMPLATE
     .replace('</head>', jsonLd)
     .replace('<!--ANNOUNCEMENT_BAR-->', announceHtml)
     .replace('{{HERO_TITLE}}', htmlEscape(content.hero_title || 'Shop the store'))
-    .replace('{{HERO_SUBTITLE}}', htmlEscape(content.hero_subtitle || ''));
+    .replace('{{HERO_SUBTITLE}}', htmlEscape(content.hero_subtitle || ''))
+    .replace('<div class="grid" id="product-grid"></div>', `<div class="grid" id="product-grid">${gridHtml}</div>`)
+    .replace('<div class="filter-chips" id="filter-chips"></div>', `<div class="filter-chips" id="filter-chips">${chipsHtml}</div>`)
+    .replace('<span class="result-count" id="result-count">Loading...</span>', `<span class="result-count" id="result-count">${countHtml}</span>`);
 }
 
 // ---------- Stripe checkout (handles one-time AND subscription) ----------
