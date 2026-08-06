@@ -281,6 +281,28 @@
   .kpi-trend.down { background: var(--red-soft); color: var(--red); }
   .kpi-trend.flat { background: var(--cream); color: var(--muted); }
   .kpi .value-row { display: flex; align-items: baseline; gap: 10px; }
+
+  /* Financials */
+  .fin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 22px; }
+  @media (max-width: 1040px) { .fin-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .fin-grid { grid-template-columns: 1fr; } }
+  .kpi-sub { font-family: 'Parkinsans'; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-top: 6px; }
+  .seg { display: inline-flex; background: var(--cream); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
+  .seg-btn { border: none; background: none; font-family: 'Parkinsans'; font-weight: 600; font-size: 12.5px; color: var(--muted); padding: 5px 15px; border-radius: 999px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+  .seg-btn:hover { color: var(--teal); }
+  .seg-btn.active { background: var(--white); color: var(--teal); box-shadow: var(--shadow-sm); }
+  .fin-chart svg { width: 100%; height: 168px; display: block; overflow: visible; }
+  .fin-bar { fill: rgba(45,134,89,0.72); transition: fill 0.15s; }
+  .fin-bar:hover { fill: var(--green); }
+  .fin-table-wrap { margin-top: 18px; overflow-x: auto; }
+  .fin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .fin-table th { text-align: left; font-family: 'Parkinsans'; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .fin-table td { padding: 11px 14px; border-bottom: 1px solid var(--line-soft); color: var(--teal); white-space: nowrap; }
+  .fin-table th.num, .fin-table td.num { text-align: right; }
+  .fin-table td.rev { font-family: 'Parkinsans'; font-weight: 700; }
+  .fin-table tbody tr:last-child td { border-bottom: none; }
+  .fin-table .fin-total td { font-weight: 700; border-top: 2px solid var(--line); background: var(--cream); }
+  .fin-foot { font-size: 12px; color: var(--muted); margin-top: 14px; }
   .spark-wrap { margin-top: 6px; }
   .spark-wrap svg { width: 100%; height: 44px; display: block; overflow: visible; }
   .readiness-card .rd-num { font-family: 'Parkinsans'; font-weight: 800; font-size: 34px; color: var(--teal); letter-spacing: -0.02em; }
@@ -421,6 +443,10 @@
         Orders
         <span class="nav-badge" id="nav-orders-badge" style="display:none;">0</span>
       </button>
+      <button class="nav-item" data-panel="financials">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3.5-4 3 2.5L21 6"/></svg>
+        Financials
+      </button>
       <div class="sb-sec">Catalog</div>
       <button class="nav-item" data-panel="products">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13V5a1 1 0 0 1 1-1h8l7 7-9 9-7-7Z"/><circle cx="8" cy="8" r="1.4"/></svg>
@@ -527,6 +553,64 @@
               <div class="card-head"><h3>Store readiness</h3><button class="btn secondary sm" data-goto="products">Fix up</button></div>
               <div class="card-body" id="readiness-body"></div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FINANCIALS -->
+      <section class="panel" id="panel-financials">
+        <div class="fin-grid">
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">Today</span>
+              <span class="kpi-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div>
+            <div class="value" id="fin-today">—</div>
+            <div class="kpi-sub" id="fin-today-sub">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">This week</span>
+              <span class="kpi-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div>
+            <div class="value" id="fin-week">—</div>
+            <div class="kpi-sub" id="fin-week-sub">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">This month</span>
+              <span class="kpi-ico orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div>
+            <div class="value" id="fin-month">—</div>
+            <div class="kpi-sub" id="fin-month-sub">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">This quarter</span>
+              <span class="kpi-ico yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div>
+            <div class="value" id="fin-quarter">—</div>
+            <div class="kpi-sub" id="fin-quarter-sub">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">This year</span>
+              <span class="kpi-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div>
+            <div class="value" id="fin-year">—</div>
+            <div class="kpi-sub" id="fin-year-sub">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-top"><span class="label">All time</span>
+              <span class="kpi-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div>
+            <div class="value" id="fin-life">—</div>
+            <div class="kpi-sub" id="fin-life-sub">—</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Revenue over time</h3>
+            <div class="seg" id="fin-seg">
+              <button class="seg-btn" data-gran="day">Daily</button>
+              <button class="seg-btn active" data-gran="month">Monthly</button>
+              <button class="seg-btn" data-gran="year">Yearly</button>
+            </div>
+          </div>
+          <div class="card-body pad">
+            <div class="fin-chart" id="fin-chart"></div>
+            <div class="fin-table-wrap" id="fin-table-wrap"></div>
+            <p class="fin-foot">Revenue is the total collected at checkout, including shipping and tax. Periods are in your local time.</p>
           </div>
         </div>
       </section>
@@ -767,6 +851,7 @@
   const PAGE_META = {
     overview:   { title: 'Home',       sub: 'A quick look at how your store is doing.' },
     orders:     { title: 'Orders',     sub: 'Pack, ship, and track every order.' },
+    financials: { title: 'Financials', sub: 'Revenue by day, week, month, quarter, year, and all time.' },
     products:   { title: 'Products',   sub: 'Everything you sell — prices, photos, and stock in one place.' },
     shipping:   { title: 'Shipping',   sub: 'Set how much you charge customers to ship.' },
     storefront: { title: 'Storefront', sub: 'Announcements, headline, and featured products.' },
@@ -787,6 +872,7 @@
       : '';
     if (name === 'products') document.getElementById('add-product-btn').addEventListener('click', () => openEditor(null));
     if (name === 'overview') loadOverview();
+    if (name === 'financials') loadFinancials();
     if (name === 'orders') loadOrders();
     if (name === 'products') loadProducts();
     if (name === 'shipping') loadShipping();
@@ -860,6 +946,113 @@
       <polygon points="0,${H} ${line} ${W},${H}" fill="rgba(45,134,89,0.07)"/>${bars}
       <polyline points="${line}" fill="none" stroke="#2d8659" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
   }
+
+  // ---------- Financials ----------
+  // Computed entirely client-side from the order list, so every period boundary (today, this month,
+  // this quarter…) lands in the viewer's own local time — the calendar the owner actually thinks in.
+  let FIN_ORDERS = [];
+  let finGran = 'month';
+
+  async function loadFinancials() {
+    try { FIN_ORDERS = (await (await fetch('/api/admin/orders')).json()).orders || []; }
+    catch { FIN_ORDERS = []; }
+    renderFinPeriods();
+    renderFinBreakdown();
+  }
+
+  function renderFinPeriods() {
+    const now = new Date();
+    const y = now.getFullYear(), m = now.getMonth(), d = now.getDate(), DAY = 86400000;
+    const startToday = new Date(y, m, d).getTime();
+    const startWeek = startToday - new Date(y, m, d).getDay() * DAY;   // Sunday, local
+    const startMonth = new Date(y, m, 1).getTime();
+    const startQuarter = new Date(y, Math.floor(m / 3) * 3, 1).getTime();
+    const startYear = new Date(y, 0, 1).getTime();
+    const P = { today: [0, 0], week: [0, 0], month: [0, 0], quarter: [0, 0], year: [0, 0], life: [0, 0] };
+    for (const o of FIN_ORDERS) {
+      const ts = new Date(o.created_at).getTime();
+      if (isNaN(ts)) continue;
+      const c = o.amount_total_cents || 0;
+      P.life[0] += c; P.life[1]++;
+      if (ts >= startYear)    { P.year[0]    += c; P.year[1]++; }
+      if (ts >= startQuarter) { P.quarter[0] += c; P.quarter[1]++; }
+      if (ts >= startMonth)   { P.month[0]   += c; P.month[1]++; }
+      if (ts >= startWeek)    { P.week[0]    += c; P.week[1]++; }
+      if (ts >= startToday)   { P.today[0]   += c; P.today[1]++; }
+    }
+    const set = (id, [cents, n]) => {
+      document.getElementById('fin-' + id).textContent = dollars(cents);
+      document.getElementById('fin-' + id + '-sub').textContent =
+        n ? `${n} order${n === 1 ? '' : 's'} · avg ${dollars(Math.round(cents / n))}` : 'No orders yet';
+    };
+    set('today', P.today); set('week', P.week); set('month', P.month);
+    set('quarter', P.quarter); set('year', P.year); set('life', P.life);
+  }
+
+  // Continuous, gap-filled buckets (oldest -> newest) for the selected granularity.
+  function finBuckets(gran) {
+    const now = new Date();
+    const keyOf = dt => gran === 'day' ? dt.toLocaleDateString('en-CA')
+      : gran === 'month' ? `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`
+      : String(dt.getFullYear());
+    const buckets = [];
+    if (gran === 'day') {
+      for (let i = 29; i >= 0; i--) {
+        const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        buckets.push({ key: keyOf(dt), label: dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), cents: 0, orders: 0 });
+      }
+    } else if (gran === 'month') {
+      for (let i = 11; i >= 0; i--) {
+        const dt = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        buckets.push({ key: keyOf(dt), label: dt.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), cents: 0, orders: 0 });
+      }
+    } else {
+      let minY = now.getFullYear();
+      for (const o of FIN_ORDERS) { const yy = new Date(o.created_at).getFullYear(); if (!isNaN(yy) && yy < minY) minY = yy; }
+      for (let yy = minY; yy <= now.getFullYear(); yy++) buckets.push({ key: String(yy), label: String(yy), cents: 0, orders: 0 });
+    }
+    const idx = {}; buckets.forEach((b, i) => { idx[b.key] = i; });
+    for (const o of FIN_ORDERS) {
+      const dt = new Date(o.created_at); if (isNaN(dt.getTime())) continue;
+      const k = keyOf(dt);
+      if (k in idx) { buckets[idx[k]].cents += o.amount_total_cents || 0; buckets[idx[k]].orders++; }
+    }
+    return buckets;
+  }
+
+  function renderFinBreakdown() {
+    const buckets = finBuckets(finGran);
+    // Chart — bars scaled to the max in the window; stretches horizontally, so no text inside the SVG.
+    const W = 100, H = 40, n = buckets.length || 1, max = Math.max(1, ...buckets.map(b => b.cents));
+    const gap = n > 20 ? 0.22 : 0.36, bw = (W / n) * (1 - gap);
+    const bars = buckets.map((b, i) => {
+      const h = (b.cents / max) * (H - 1), x = (i / n) * W + ((W / n) - bw) / 2;
+      return `<rect class="fin-bar" x="${x.toFixed(2)}" y="${(H - h).toFixed(2)}" width="${bw.toFixed(2)}" height="${Math.max(0, h).toFixed(2)}" rx="0.4"><title>${escapeHtml(b.label)}: ${dollars(b.cents)} · ${b.orders} order${b.orders === 1 ? '' : 's'}</title></rect>`;
+    }).join('');
+    document.getElementById('fin-chart').innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${bars}</svg>`;
+    // Table — only periods with sales, newest first, plus a window total.
+    const rows = buckets.filter(b => b.orders > 0).reverse();
+    const totalC = buckets.reduce((s, b) => s + b.cents, 0), totalO = buckets.reduce((s, b) => s + b.orders, 0);
+    const windowLabel = finGran === 'day' ? 'Last 30 days' : finGran === 'month' ? 'Last 12 months' : 'All years';
+    const wrap = document.getElementById('fin-table-wrap');
+    if (!totalO) { wrap.innerHTML = `<div class="empty"><h3>No sales in this range</h3>Revenue shows up here as orders come in.</div>`; return; }
+    const body = rows.map(b => `<tr>
+        <td>${escapeHtml(b.label)}</td>
+        <td class="num rev">${dollars(b.cents)}</td>
+        <td class="num">${b.orders}</td>
+        <td class="num">${dollars(Math.round(b.cents / b.orders))}</td></tr>`).join('');
+    wrap.innerHTML = `<table class="fin-table">
+      <thead><tr><th>Period</th><th class="num">Revenue</th><th class="num">Orders</th><th class="num">Avg order</th></tr></thead>
+      <tbody>${body}
+        <tr class="fin-total"><td>${windowLabel}</td><td class="num rev">${dollars(totalC)}</td><td class="num">${totalO}</td><td class="num">${dollars(Math.round(totalC / totalO))}</td></tr>
+      </tbody></table>`;
+  }
+
+  document.querySelectorAll('#fin-seg .seg-btn').forEach(b => b.addEventListener('click', () => {
+    finGran = b.dataset.gran;
+    document.querySelectorAll('#fin-seg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
+    renderFinBreakdown();
+  }));
 
   async function loadOverview() {
     let data;
