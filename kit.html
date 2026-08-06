@@ -94,6 +94,7 @@
   .qty-btn.remove { color: var(--muted); }
   .qty-btn.remove:hover { background: var(--orange); color: var(--white); }
   .qty-value { font-family: 'Parkinsans', sans-serif; font-weight: 700; min-width: 22px; text-align: center; font-size: 14px; }
+  .item-qty { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 14px; color: var(--teal); background: var(--cream); border-radius: 999px; padding: 5px 13px; }
   .item-row-price { font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 15px; color: var(--teal); min-width: 64px; text-align: right; }
   .restore-btn { background: none; border: none; color: var(--orange); font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
   .removed-msg { font-size: 12px; color: var(--orange); font-family: 'Parkinsans', sans-serif; font-weight: 600; }
@@ -255,7 +256,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Kit not found.');
       kitData = data;
-      cartState = data.items.map(i => ({ ...i, removed: false }));
+      cartState = data.items;  // a kit is a fixed bundle; items are not individually removable
       render();
     } catch (err) {
       document.getElementById('loading').textContent = err.message;
@@ -282,44 +283,26 @@
   }
 
   function renderItems() {
-    const active = cartState.filter(i => !i.removed);
-    document.getElementById('item-count').textContent = `${active.length} items`;
-    document.getElementById('items-list').innerHTML = cartState.map((item, idx) => `
-      <div class="item-row ${item.removed ? 'removed' : ''}">
+    // Read-only: a kit is a fixed bundle. Items cannot be removed or re-quantified here, so
+    // the 10% bundle price can't be gamed by dropping items. To buy items individually, a
+    // customer uses the store or the list upload (at regular prices).
+    document.getElementById('item-count').textContent = `${cartState.length} items`;
+    document.getElementById('items-list').innerHTML = cartState.map((item) => `
+      <div class="item-row">
         <div class="item-row-img"><img src="${item.image}" alt="${escapeHtml(item.name)}" /></div>
         <div>
           <div class="item-row-name">${escapeHtml(item.name)}</div>
           <div class="item-row-meta">${escapeHtml(item.unit || '')} · $${item.price.toFixed(2)} each</div>
         </div>
-        ${item.removed
-          ? `<span class="removed-msg">Removed</span><button class="restore-btn" data-action="restore" data-idx="${idx}">Restore</button>`
-          : `<div class="qty-control">
-              <button class="qty-btn" data-action="dec" data-idx="${idx}">−</button>
-              <span class="qty-value">${item.quantity}</span>
-              <button class="qty-btn" data-action="inc" data-idx="${idx}">+</button>
-              <button class="qty-btn remove" data-action="remove" data-idx="${idx}" title="Remove">×</button>
-            </div>
-            <div class="item-row-price">$${(item.price * item.quantity).toFixed(2)}</div>`
-        }
+        <div class="item-qty">×${item.quantity}</div>
+        <div class="item-row-price">$${(item.price * item.quantity).toFixed(2)}</div>
       </div>
     `).join('');
-    document.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', () => {
-      const idx = +btn.dataset.idx;
-      const action = btn.dataset.action;
-      const item = cartState[idx];
-      if (action === 'inc') item.quantity++;
-      else if (action === 'dec' && item.quantity > 1) item.quantity--;
-      else if (action === 'remove') item.removed = true;
-      else if (action === 'restore') item.removed = false;
-      renderItems();
-      updateTotals();
-    }));
   }
 
   function updateTotals() {
-    const active = cartState.filter(i => !i.removed);
-    const subtotal = active.reduce((s, i) => s + i.price * i.quantity, 0);
-    const rawSubtotal = active.reduce((s, i) => s + i.original_price * i.quantity, 0);
+    const subtotal = cartState.reduce((s, i) => s + i.price * i.quantity, 0);
+    const rawSubtotal = cartState.reduce((s, i) => s + i.original_price * i.quantity, 0);
     const savings = rawSubtotal - subtotal;
     const shipping = computeShipping(subtotal);
     const total = subtotal + shipping;
@@ -335,7 +318,7 @@
       document.getElementById('savings-row').style.display = 'none';
       document.getElementById('strike-total').textContent = '';
     }
-    document.getElementById('checkout-btn').disabled = active.length === 0;
+    document.getElementById('checkout-btn').disabled = cartState.length === 0;
   }
 
   document.getElementById('checkout-btn').addEventListener('click', () => doCheckout(false));
@@ -347,7 +330,7 @@
     const btn = document.getElementById('checkout-btn');
     btn.disabled = true; const original = btn.innerHTML; btn.textContent = 'Redirecting...';
     try {
-      const items = cartState.filter(i => !i.removed).map(i => ({ sku_id: i.sku_id, quantity: i.quantity }));
+      const items = cartState.map(i => ({ sku_id: i.sku_id, quantity: i.quantity }));
       const res = await fetch('/api/checkout', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source: 'kit-page', kit_id: getKitId(), items })

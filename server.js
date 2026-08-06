@@ -1037,10 +1037,28 @@ const MAX_QTY_PER_ITEM = 50;
 const MAX_ITEMS_IN_CART = 100;
 
 function normalizeCart(body) {
+  // Kit checkouts always charge the kit's full, canonical contents at the bundle price.
+  // We deliberately ignore the client-sent item list for a kit, so a customer cannot remove
+  // items from a kit (through the page or a hand-crafted request) and still keep the 10%
+  // bundle discount on a smaller set. A kit is all-or-nothing.
+  const kit = body.kit_id ? KITS[body.kit_id] : null;
+  if (kit && Array.isArray(kit.items)) {
+    return kit.items
+      .map(({ id, quantity }) => {
+        const p = PRODUCT_BY_ID[id];
+        if (!p) return null;
+        let qty = parseInt(quantity, 10);
+        if (!Number.isFinite(qty) || qty < 1) qty = 1;
+        if (qty > MAX_QTY_PER_ITEM) qty = MAX_QTY_PER_ITEM;
+        const price = +(p.price * (1 - KIT_DISCOUNT)).toFixed(2);  // 10% bundle discount
+        return { name: p.name, unit: p.unit, price, image: p.image, quantity: qty };
+      })
+      .filter(Boolean);
+  }
+
   if (!Array.isArray(body.items) || body.items.length === 0) return [];
   if (body.items.length > MAX_ITEMS_IN_CART) return [];  // reject absurdly long carts
 
-  const isKit = !!body.kit_id && !!KITS[body.kit_id];
   return body.items
     .map(item => {
       // Look up the product server-side — never trust prices/names from the client
@@ -1050,9 +1068,7 @@ function normalizeCart(body) {
       let qty = parseInt(item.quantity, 10);
       if (!Number.isFinite(qty) || qty < 1) qty = 1;
       if (qty > MAX_QTY_PER_ITEM) qty = MAX_QTY_PER_ITEM;
-      // Kits are their own bundle deal (10% off base) and do NOT stack an item sale on top;
-      // individual store purchases honor the sale price.
-      const price = isKit ? +(p.price * (1 - KIT_DISCOUNT)).toFixed(2) : effectivePrice(p);
+      const price = effectivePrice(p);  // individual store purchases honor the sale price
       return { name: p.name, unit: p.unit, price, image: p.image, quantity: qty };
     })
     .filter(Boolean);
