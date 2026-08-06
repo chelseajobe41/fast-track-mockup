@@ -165,8 +165,25 @@ function injectPreviewBanner(html) {
 </div>`;
   return html.includes('</body>') ? html.replace('</body>', banner + '\n</body>') : html + banner;
 }
+// The live catalog on disk still references ~40 product photos on the old Duda CDN
+// (irp.cdn-website.com). We now self-host copies at /assets/products/<id>.<ext>; this rewrites any
+// Duda URL to its local copy at load time when the file exists, so the store, kit pages,
+// /products.json, and the Stripe payload all serve the self-hosted image with no dependency on the
+// external CDN. If a local copy is ever missing, the original URL is kept so nothing breaks. (Done
+// in code because the live products.json lives on the persistent disk and isn't updated by a push.)
+const LOCAL_PRODUCT_IMG_DIR = join(__dirname, 'assets', 'products');
+function localizeProductImage(p) {
+  if (!/cdn-website\.com/i.test(p.image || '')) return p;
+  for (const ext of ['png', 'jpg', 'jpeg', 'webp', 'gif']) {
+    if (existsSync(join(LOCAL_PRODUCT_IMG_DIR, `${p.id}.${ext}`))) {
+      return { ...p, image: `/assets/products/${p.id}.${ext}` };
+    }
+  }
+  return p;
+}
+
 function reloadCatalog() {
-  PRODUCTS = readProducts();
+  PRODUCTS = readProducts().map(localizeProductImage);
   PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
   SYSTEM_PROMPT = buildSystemPrompt();
 }
