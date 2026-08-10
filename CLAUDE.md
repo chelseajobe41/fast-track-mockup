@@ -118,7 +118,9 @@ gitignored). The public repo exposes none of them.
 - `STRIPE_PORTAL_URL` — Stripe-hosted customer portal login URL (may or may not be set)
 - `ANTHROPIC_API_KEY` — Houa's Claude API key (powers /upload list parsing)
 - `BASE_URL` — https://fasttrackschoolsupplies.com
-- `ADMIN_USERNAME` / `ADMIN_PASSWORD` — protects /admin
+- `ADMIN_USERNAME` / `ADMIN_PASSWORD` — protects /admin. The server now FAILS CLOSED: it refuses to
+  boot in production (BASE_URL = the live domain) if `ADMIN_PASSWORD` is unset or the default
+  `change-me`. So this env var must stay set on Houa's Render, or a deploy will not come up.
 - (Stripe Tax is enabled in code via `automatic_tax: { enabled: true }`; the MN registration
   lives in Houa's Stripe dashboard, not in code.)
 
@@ -171,7 +173,13 @@ canonical/title/schema in the initial HTML (client JS runs too late for crawlers
   `buildKitDetail()`. The client JS hydrates the interactive cart and reads the kit id from the
   URL path (`getKitId()` parses the path, not a query string).
 - **`/store` is rendered by `renderStorePage()`** which injects an `ItemList` of Products (with
-  offers) before `</head>` in `store.html`.
+  offers) before `</head>` AND server-renders the product grid, filter chips, result count, and a
+  `window.__STORE_INVENTORY__` stock snapshot into `store.html` (so the page paints at full height —
+  no layout shift — and out-of-stock state survives a failed inventory fetch). The client `render()`
+  still re-runs on load for the interactive cart; the SSR card markup in server.js
+  (`storeCardHtml`/`storeProductGridHtml`/`storeFilterChipsHtml` + `STORE_CATEGORIES`) is a hand-port
+  of the client template in store.html — **change one, change both.** Token substitution uses function
+  replacers (`.replace(x, () => v)`), not string replacers, to avoid `$`-sequence corruption.
 - `kit.html` and `store.html` are in the deny-list so the raw templates (with unfilled tokens)
   cannot be fetched directly.
 - When editing these two files, KEEP the placeholder tokens / `</head>` structure intact, and
@@ -200,9 +208,24 @@ the placeholder.
 - Do not leave payment-mode-only Stripe params (`shipping_options`, `customer_creation`) at the
   top level of the checkout session — they must be inside the `if (!isSubscription)` branch.
   In subscription mode Stripe rejects them.
-- The deny-list middleware in server.js (before express.static) blocks public access to
-  orders.json, inventory.json, kits.json, server.js, package.json, node_modules, .git, .claude.
-  Keep it. It prevents customer PII (orders.json) from being downloadable.
+- The deny-list middleware in server.js (before express.static) blocks public access to orders.json,
+  inventory.json, kits.json, settings.json, products-draft.json, server.js, package.json, admin.html,
+  .env, node_modules, .git, .claude. It CANONICALIZES the request path first (`canonicalPath()`:
+  decode %-encoding, collapse slashes/backslashes, resolve `.`/`..`, case-insensitive) BEFORE matching,
+  so encoding/traversal variants (`/orders%2ejson`, `//orders.json`, `//.git/config`) can't slip a
+  protected file past it. Keep both the canonicalization and the list; add any new sensitive file to
+  DENY_PATHS. It prevents customer PII (orders.json) exposure.
+- Checkout is server-authoritative on price: `normalizeCart` looks up every price by `sku_id` from the
+  in-memory catalog and aggregates duplicate SKUs. NEVER trust a price/name from the client, and don't
+  reintroduce the kit + subscription discount stacking (a kit on a subscription must get ONE 10%).
+- The Stripe webhook is idempotent: `logOrder()` dedupes by order id and returns whether it appended;
+  inventory is decremented ONLY when a new order was logged, and the handler returns 500 on error so
+  Stripe safely retries. Don't "simplify" that back to an unconditional write.
+- Flat-file reads (`readProducts/readInventory/readOrders`) default ONLY on a missing file and THROW
+  on a corrupt one — so a read-modify-write never overwrites real data with an empty result. Do NOT
+  change them back to returning `[]`/`{}` on any read error (that silently wipes orders/inventory).
+- The `/api/parse-list` rate limit relies on `app.set('trust proxy', 1)` + `req.ip` (plus a global
+  ceiling + a concurrency guard). Don't revert to keying off a raw `x-forwarded-for` header.
 - Batch pushes when possible. Every push triggers a Render rebuild.
 
 ---
@@ -222,24 +245,37 @@ the placeholder.
 
 ## 11. Quick status (update this as things change)
 
-- Catalog: 55 products, alphabetized, real photos.
-- Shipping: configurable in admin (flat or order-total tiers) — see section 12.
+- Catalog: 55 products, alphabetized, real photos — compressed + self-hosted at `/assets/products/`
+  (~2.5 MB total, no external CDN dependency).
+- Shipping: configurable in admin (flat or order-total tiers) — see section 12. Subscriptions now
+  charge shipping too (a recurring line item), not just one-time orders.
 - Tax: Stripe Tax enabled in code; Houa registered Minnesota (collecting tax confirmed).
 - Business entity: Fast Track School Supplies Inc (MN corp), mailing 3225 McLeod Dr, Suite 100,
   Las Vegas, NV 89121, contact Main@fasttrackschoolsupplies.com.
 - Repo visibility: public (so Render auto-deploys). Not yet transferred to Houa.
-- **Product Manager build ($1,400: products $750 + shipping $150 + org codes $500)**: built and
-  fully tested on branch `product-manager`. NOT merged to main / not live yet — pending final
-  payment. Requires the Render persistent-disk setup below before/at go-live.
+- **Product Manager / self-service admin: LIVE on `main`.** Deployed and in production; the Render
+  persistent disk is active (`DATA_DIR=/var/data`), and a real Stripe order + organization code were
+  verified end-to-end in prod. (The old "$1,400, branch `product-manager`, pending payment" status is
+  historical — it shipped.)
+- **Admin now includes a Financials tab** — revenue by day / week / month / quarter / year / all-time,
+  with a Daily/Monthly/Yearly chart + table, computed client-side from the order list in local time.
+- **Custom-code updates shipped this cycle (all live):** organization code is a Stripe Checkout
+  custom field (shows on the payment page for every flow); the `/upload` page's matched list has an
+  "Add to cart" action that puts items in the shared persistent cart (survives navigation); the
+  `/store` product grid is server-rendered (SSR); product images compressed/self-hosted; a full
+  security + correctness hardening pass (see section 9, commit `8143e84`).
+- Accessibility/CWV: storefront pages score Accessibility 100 (WCAG 2.2 AA); homepage/store CLS in
+  Google's "good" band. `/kits/:id` and `/gift` still client-render their lists (higher CLS) — deferred
+  until Houa drives traffic.
 
 ---
 
-## 12. Product Manager / self-service admin (branch `product-manager` until live)
+## 12. Product Manager / self-service admin (LIVE on `main`)
 
 Adds owner self-service to `/admin` (same Basic-Auth login). Redesigned as a Shopify-style app:
-left sidebar (Home / Orders / Products / Shipping / Storefront), KPI dashboard, slide-over editors.
-Inventory is merged INTO Products (stock pill on each row; stock stepper + low-stock threshold
-inside the editor — one Save writes product + stock). No separate Inventory tab.
+left sidebar (Home / Orders / Financials / Products / Shipping / Storefront), KPI dashboard,
+slide-over editors. Inventory is merged INTO Products (stock pill on each row; stock stepper +
+low-stock threshold inside the editor — one Save writes product + stock). No separate Inventory tab.
 
 ### Premium features (dashboard, fulfillment, storefront, power tools)
 
@@ -248,6 +284,11 @@ inside the editor — one Save writes product + stock). No separate Inventory ta
   images + revenue, a "needs your attention" feed (out-of-stock / low / no-photo, kit-critical items
   ranked first via `kitItemIds()`), and a "store readiness" score (share of catalog that's in stock +
   has a photo + has a description, plus kits-ready count).
+- **Financials tab** — revenue by Today / This week / This month / This quarter / This year / All time
+  (six KPI cards), plus a "Revenue over time" card with a Daily/Monthly/Yearly toggle driving a bar
+  chart + itemized table. Computed entirely client-side (admin.html) from `GET /api/admin/orders`, so
+  every period boundary lands in the owner's LOCAL time. Revenue = total collected at checkout
+  (`amount_total_cents`, incl. shipping + tax). No server route added.
 - **Fulfillment cockpit (Orders)** — order list with search + status chips (pending/packed/shipped);
   clicking an order opens a slide-over drawer with a status stepper (`POST /api/admin/orders/:id/
   fulfillment`, states validated, sets `packed_at`/`shipped_at`), pick list, ship-to, org code, and a
@@ -295,9 +336,12 @@ A no-op edit (draft identical to published) auto-discards the draft — no phant
 - **Shipping tab** — flat rate OR order-total tiers ("up to $30 → $9.95", … , "all larger → $19.95").
   Checkout computes shipping via `shippingCentsFor(subtotalCents)` from `settings.json`; cart pages
   fetch `/api/shipping-config` to show a matching amount.
-- **Organization codes** — an optional Stripe Checkout `custom_field` captured onto each order
-  (`organization_code`); the Orders tab shows the code per order + a summary card (orders + total per
-  code) for rebates. Tracking only, no customer discount.
+- **Organization codes** — an optional Stripe Checkout `custom_field` (`custom_fields[].key = 'orgcode'`
+  in `/api/checkout`) so the "Organization or fundraiser code" box appears on the Stripe payment page
+  for EVERY flow (store cart, uploaded list, kit, gift). The webhook reads it from
+  `session.custom_fields` (with a metadata fallback for pre-change orders). The Orders tab shows the
+  code per order + a summary card (orders + total per code) for rebates. Tracking only, no discount.
+  (This replaced the earlier cart-drawer input, which only worked from the store page.)
 
 ### Data now lives on a persistent disk, NOT the repo (critical)
 
@@ -311,12 +355,15 @@ served from memory; uploaded images serve via `GET /uploads/:file` (path-travers
 **Why:** without this, a git deploy would revert the client's admin edits AND wipe order history
 (the repo files overwrite on checkout). The disk keeps live data durable across deploys.
 
-### Required Render setup at go-live (one-time, on Houa's Render — he owns it)
+### Render setup — DONE (one-time, on Houa's Render — he owns it)
 
-1. Render → the service → add a **Persistent Disk** (1 GB, mounted at `/var/data`).
-2. Add env var `DATA_DIR=/var/data`.
-3. Deploy the merged `main`. First boot seeds `/var/data` from the repo copies.
+This is already in place on prod (kept here for reference / disaster recovery):
+1. **Persistent Disk** (1 GB, mounted at `/var/data`) — added.
+2. Env var `DATA_DIR=/var/data` — set.
+3. `main` deployed; first boot seeded `/var/data` from the repo copies.
 If `DATA_DIR`/disk is ever missing, the app safely falls back to repo files (pre-build behavior).
+Also required in prod: a strong `ADMIN_PASSWORD` env var — the server now REFUSES to boot in
+production if it's unset or the default (see section 6).
 
 ### Local review / testing
 
