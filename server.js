@@ -7,7 +7,7 @@ import Stripe from 'stripe';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, copyFileSync, unlinkSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
-import { randomBytes } from 'crypto';
+import { randomBytes, timingSafeEqual } from 'crypto';
 
 // ---------- Boot ----------
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -82,8 +82,12 @@ const KITS = JSON.parse(readFileSync(join(__dirname, 'kits.json'), 'utf8'));
 // ---------- Mutable catalog (editable via admin; refreshed in-memory on every write) ----------
 // PRODUCTS/PRODUCT_BY_ID/SYSTEM_PROMPT are `let` so admin edits take effect immediately without a
 // restart. Every product write calls reloadCatalog(), so checkout/kits/store/AI all read fresh data.
-let PRODUCTS, PRODUCT_BY_ID, SYSTEM_PROMPT;
-function readProducts() { return JSON.parse(readFileSync(PRODUCTS_PATH, 'utf8')); }
+let PRODUCTS = [], PRODUCT_BY_ID = {}, SYSTEM_PROMPT = '';
+// A read returns a default ONLY when the file is legitimately missing (not created yet). A corrupt or
+// half-written file THROWS on purpose: read-modify-write callers (logOrder, decrementInventory, admin
+// edits) must abort rather than overwrite real data with an empty result. Boot is guarded in
+// reloadCatalog(), and the webhook/admin routes turn a throw into a 500 (safe retry) instead of a wipe.
+function readProducts() { if (!existsSync(PRODUCTS_PATH)) return []; return JSON.parse(readFileSync(PRODUCTS_PATH, 'utf8')); }
 function writeProducts(list) { writeJsonAtomic(PRODUCTS_PATH, list); }
 
 // ---------- Draft catalog (edit -> preview -> publish) ----------
@@ -92,7 +96,7 @@ function writeProducts(list) { writeJsonAtomic(PRODUCTS_PATH, list); }
 // the live catalog in one step). The draft file existing == "you have unpublished changes".
 // Stock and shipping stay instant — they're operational, not presentational.
 const DRAFT_PATH = join(DATA_DIR, 'products-draft.json');
-function readDraft() { return existsSync(DRAFT_PATH) ? JSON.parse(readFileSync(DRAFT_PATH, 'utf8')) : null; }
+function readDraft() { if (!existsSync(DRAFT_PATH)) return null; try { return JSON.parse(readFileSync(DRAFT_PATH, 'utf8')); } catch (e) { console.error('readDraft failed, ignoring draft:', e.message); return null; } }
 function discardDraftFile() { if (existsSync(DRAFT_PATH)) unlinkSync(DRAFT_PATH); }
 // What the admin edits: the draft if one exists, else a working copy of the published catalog.
 function workingProducts() { return readDraft() ?? readProducts(); }
@@ -183,9 +187,16 @@ function localizeProductImage(p) {
 }
 
 function reloadCatalog() {
-  PRODUCTS = readProducts().map(localizeProductImage);
-  PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
-  SYSTEM_PROMPT = buildSystemPrompt();
+  // If products.json is corrupt, keep the current in-memory catalog (empty at boot) instead of
+  // throwing — a bad file must not crash-loop the always-on server, and must not wipe live data.
+  try {
+    const next = readProducts().map(localizeProductImage);
+    PRODUCTS = next;
+    PRODUCT_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
+    SYSTEM_PROMPT = buildSystemPrompt();
+  } catch (e) {
+    console.error('reloadCatalog failed, keeping existing catalog:', e.message);
+  }
 }
 reloadCatalog();  // initialize PRODUCTS / PRODUCT_BY_ID / SYSTEM_PROMPT
 
@@ -208,12 +219,17 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'change-me';
+// Fail closed: never serve the admin (order PII + price control) with the public default password in
+// production. Local dev (BASE_URL still localhost) keeps working with the default.
+if (/fasttrackschoolsupplies\.com/i.test(BASE_URL) && (!process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD === 'change-me')) {
+  throw new Error('Refusing to start: set a strong ADMIN_PASSWORD in the environment (the default is public in the repo).');
+}
 
 // ---------- Persistence helpers (JSON file based) ----------
 // NOTE: For higher volume, swap to SQLite or Postgres. JSON files are fine for v1.
-function readInventory() { return JSON.parse(readFileSync(INVENTORY_PATH, 'utf8')); }
+function readInventory() { if (!existsSync(INVENTORY_PATH)) return {}; return JSON.parse(readFileSync(INVENTORY_PATH, 'utf8')); }
 function writeInventory(inv) { writeJsonAtomic(INVENTORY_PATH, inv); }
-function readOrders() { return JSON.parse(readFileSync(ORDERS_PATH, 'utf8')); }
+function readOrders() { if (!existsSync(ORDERS_PATH)) return []; return JSON.parse(readFileSync(ORDERS_PATH, 'utf8')); }
 function writeOrders(orders) { writeJsonAtomic(ORDERS_PATH, orders); }
 
 // Store settings (shipping config). Defaults to the prior flat $9.95 if no settings file exists yet.
@@ -302,10 +318,15 @@ function decrementInventory(items) {
   writeInventory(inv);
 }
 
+// Idempotent: Stripe delivers webhooks at-least-once and redelivers on any timeout, so guard against
+// logging the same session/invoice twice. Returns true only when a NEW order was appended (so the
+// caller knows whether to also decrement inventory).
 function logOrder(order) {
   const orders = readOrders();
+  if (orders.some(o => o.id === order.id)) return false;
   orders.unshift(order);
   writeOrders(orders);
+  return true;
 }
 
 // ---------- AI prompt ----------
@@ -366,13 +387,25 @@ const OUTPUT_SCHEMA = {
 };
 
 // ---------- Admin auth (HTTP Basic) ----------
+// Length-guarded constant-time string compare (timingSafeEqual throws on unequal-length buffers).
+function safeEqual(a, b) {
+  const ab = Buffer.from(String(a));
+  const bb = Buffer.from(String(b));
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
 function requireAdmin(req, res, next) {
   const auth = req.headers.authorization || '';
   const [scheme, encoded] = auth.split(' ');
   if (scheme === 'Basic' && encoded) {
     const decoded = Buffer.from(encoded, 'base64').toString();
-    const [user, pass] = decoded.split(':');
-    if (user === ADMIN_USERNAME && pass === ADMIN_PASSWORD) return next();
+    // Split on the FIRST ':' only — a password may legitimately contain colons.
+    const i = decoded.indexOf(':');
+    const user = i === -1 ? decoded : decoded.slice(0, i);
+    const pass = i === -1 ? '' : decoded.slice(i + 1);
+    // Evaluate both compares (no short-circuit) so timing doesn't reveal which half matched.
+    const ok = safeEqual(user, ADMIN_USERNAME);
+    if (safeEqual(pass, ADMIN_PASSWORD) && ok) return next();
   }
   res.setHeader('WWW-Authenticate', 'Basic realm="Fast Track Admin", charset="UTF-8"');
   res.status(401).send('Authentication required.');
@@ -380,6 +413,9 @@ function requireAdmin(req, res, next) {
 
 // ---------- App ----------
 const app = express();
+// Render puts the app behind a single proxy. Trust exactly one hop so req.ip is the real client IP
+// (derived from the end of the X-Forwarded-For chain) instead of an attacker-spoofable header value.
+app.set('trust proxy', 1);
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 // Security headers (Helmet) — sane defaults with CSP relaxed for our specific needs
@@ -418,13 +454,18 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
       const items = lineItems.data.map(li => {
         // Strip the "(Every month)" suffix we add on subscriptions
         const productName = (li.description || '').replace(/\s*\([^)]+\)$/, '');
-        const match = PRODUCTS.find(p => p.name === productName);
+        // Prefer the SKU carried through Stripe product metadata; fall back to a name match only for
+        // orders created before that metadata existed. Never rely on the display name alone.
+        const skuFromMeta = li.price?.product?.metadata?.sku_id;
+        const match = (skuFromMeta && PRODUCT_BY_ID[skuFromMeta]) || PRODUCTS.find(p => p.name === productName);
         return {
-          sku_id: match?.id || null,
+          sku_id: match?.id || skuFromMeta || null,
           name: productName,
           quantity: li.quantity,
-          unit_price_cents: li.price.unit_amount,
-          line_total_cents: li.amount_total
+          // Guard against a price-less line item (mirrors the invoice branch) so a malformed event
+          // can't throw on every delivery and become a poison-pill under the new 500-retry behavior.
+          unit_price_cents: li.price?.unit_amount ?? 0,
+          line_total_cents: li.amount_total ?? 0
         };
       });
       const isSub = session.mode === 'subscription';
@@ -452,8 +493,8 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
         fulfillment: 'pending',
         items
       };
-      logOrder(order);
-      decrementInventory(items.filter(i => i.sku_id));
+      // Only touch inventory if this is a genuinely new order (idempotent against redelivery).
+      if (logOrder(order)) decrementInventory(items.filter(i => i.sku_id));
       // Stripe sends the customer receipt automatically. Owner is notified via Stripe Dashboard + mobile app.
     } else if (event.type === 'invoice.paid') {
       // Recurring subscription charge succeeded. Log a new order so fulfillment can ship the refill.
@@ -492,8 +533,7 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
         };
         // Don't double-log the first invoice (already covered by checkout.session.completed)
         if (invoice.billing_reason !== 'subscription_create') {
-          logOrder(order);
-          decrementInventory(items.filter(i => i.sku_id));
+          if (logOrder(order)) decrementInventory(items.filter(i => i.sku_id));
           // Stripe sends the renewal receipt to the customer automatically.
         }
       }
@@ -508,6 +548,10 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
     }
   } catch (e) {
     console.error('Webhook handler failed:', e);
+    // Return non-2xx so Stripe re-delivers. logOrder() is idempotent, so a retry can't duplicate the
+    // order — it just gives a transient write failure another chance instead of silently losing a
+    // paid order (which a 200-on-error would do).
+    return res.status(500).send('handler error');
   }
   res.json({ received: true });
 });
@@ -533,13 +577,33 @@ const DENY_PATHS = new Set([
   '/kit.html',            // SSR template — served only via /kits/:id with tokens filled
   '/store.html',          // SSR template — served only via /store with schema injected
   '/settings.json',       // store settings (shipping config) — admin-only
-  '/products-draft.json'  // unpublished draft catalog — visible only via preview sessions
+  '/products-draft.json', // unpublished draft catalog — visible only via preview sessions
+  '/admin.html'           // the admin shell — reachable only via /admin (behind requireAdmin)
 ]);
 const DENY_PREFIXES = ['/node_modules', '/.git', '/.claude'];
+// Canonicalize the request path the SAME way the filesystem will resolve it BEFORE matching the
+// deny-list — otherwise express.static (which decodes %-encoding and collapses slashes) would serve
+// a denied file that the raw-path check missed (e.g. /orders%2ejson, //orders.json, //.git/config).
+function canonicalPath(reqPath) {
+  let decoded;
+  try { decoded = decodeURIComponent(reqPath); } catch { return null; }  // malformed %-encoding
+  const segs = [];
+  for (const seg of decoded.replace(/\\/g, '/').split('/')) {
+    if (seg === '' || seg === '.') continue;
+    if (seg === '..') segs.pop();
+    else segs.push(seg);
+  }
+  return '/' + segs.join('/');
+}
 app.use((req, res, next) => {
-  if (DENY_PATHS.has(req.path)) return res.status(404).end();
+  const p = canonicalPath(req.path);
+  if (p === null) return res.status(400).end();
+  // Compare case-insensitively (deny entries are all lowercase) so a case variant like /ORDERS.JSON
+  // can't slip past on a case-insensitive filesystem.
+  const lp = p.toLowerCase();
+  if (DENY_PATHS.has(lp)) return res.status(404).end();
   for (const prefix of DENY_PREFIXES) {
-    if (req.path === prefix || req.path.startsWith(prefix + '/')) {
+    if (lp === prefix || lp.startsWith(prefix + '/')) {
       return res.status(404).end();
     }
   }
@@ -650,18 +714,40 @@ app.get('/manage', (_req, res) => {
 });
 
 // ---------- Rate limiter for the AI endpoint ----------
-// Each IP can call /api/parse-list up to 8 times per rolling hour.
-const PARSE_RATE_LIMIT = 8;
+// /api/parse-list is unauthenticated and runs a PAID Anthropic vision call on every hit, so it needs
+// three independent guards: per-IP budget, a global hourly ceiling (cost backstop against distributed
+// abuse), and a concurrency cap (each in-flight call pins a big in-memory buffer for up to ~60s).
+const PARSE_RATE_LIMIT = 8;            // per IP per rolling hour
 const PARSE_WINDOW_MS = 60 * 60 * 1000;
-const parseHits = new Map();  // ip -> [timestamp, timestamp, ...]
+const PARSE_GLOBAL_LIMIT = 200;       // total across all IPs per rolling hour
+const PARSE_MAX_CONCURRENT = 4;       // simultaneous in-flight AI calls
+const parseHits = new Map();          // ip -> [timestamp, ...]
+let parseGlobalHits = [];             // timestamps across all IPs
+let parseInFlight = 0;
+
+// Sweep so one-shot IPs don't leak the Map forever (entries were only pruned when the same IP recurred).
+setInterval(() => {
+  const cutoff = Date.now() - PARSE_WINDOW_MS;
+  for (const [ip, arr] of parseHits) {
+    const kept = arr.filter(t => t > cutoff);
+    if (kept.length) parseHits.set(ip, kept); else parseHits.delete(ip);
+  }
+  parseGlobalHits = parseGlobalHits.filter(t => t > cutoff);
+}, 10 * 60 * 1000).unref();
 
 function rateLimitParse(req, res, next) {
-  const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
+  parseGlobalHits = parseGlobalHits.filter(t => now - t < PARSE_WINDOW_MS);
+  if (parseGlobalHits.length >= PARSE_GLOBAL_LIMIT) {
+    res.setHeader('Retry-After', 600);
+    return res.status(429).json({ error: 'The list reader is busy right now. Please try again later.' });
+  }
+  // req.ip is trustworthy here because we set `trust proxy` = 1 (Render's single proxy), so it is the
+  // real client IP, not the attacker-controlled first element of a raw X-Forwarded-For header.
+  const ip = req.ip || 'unknown';
   const recent = (parseHits.get(ip) || []).filter(t => now - t < PARSE_WINDOW_MS);
   if (recent.length >= PARSE_RATE_LIMIT) {
-    const oldest = recent[0];
-    const retryAfterSec = Math.ceil((PARSE_WINDOW_MS - (now - oldest)) / 1000);
+    const retryAfterSec = Math.ceil((PARSE_WINDOW_MS - (now - recent[0])) / 1000);
     res.setHeader('Retry-After', retryAfterSec);
     return res.status(429).json({
       error: `Too many uploads. Try again in ${Math.ceil(retryAfterSec / 60)} minutes.`,
@@ -670,11 +756,28 @@ function rateLimitParse(req, res, next) {
   }
   recent.push(now);
   parseHits.set(ip, recent);
+  parseGlobalHits.push(now);
+  next();
+}
+
+// Reserve a concurrency slot BEFORE multer buffers the (up to 10MB) upload, and release it when the
+// response finishes/closes (covers success, thrown error, and client abort) so the count never drifts.
+function parseConcurrencyGuard(req, res, next) {
+  if (parseInFlight >= PARSE_MAX_CONCURRENT) {
+    res.setHeader('Retry-After', 5);
+    return res.status(503).json({ error: 'The list reader is busy. Please try again in a moment.' });
+  }
+  parseInFlight++;
+  let released = false;
+  const release = () => { if (!released) { released = true; parseInFlight--; } };
+  res.on('finish', release);
+  res.on('close', release);
   next();
 }
 
 // ---------- AI list parsing ----------
-app.post('/api/parse-list', rateLimitParse, upload.single('list'), async (req, res) => {
+// Concurrency guard first so a 503'd request doesn't consume the caller's per-IP / global rate budget.
+app.post('/api/parse-list', parseConcurrencyGuard, rateLimitParse, upload.single('list'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
     const mediaType = req.file.mimetype;
@@ -733,7 +836,9 @@ app.post('/api/parse-list', rateLimitParse, upload.single('list'), async (req, r
     });
   } catch (err) {
     console.error('Parse error:', err);
-    res.status(err.status || 500).json({ error: err.message || 'Unknown error.' });
+    // Don't leak internal (Anthropic/parse) error text to the caller. The concurrency slot is released
+    // by the res 'finish'/'close' handler in parseConcurrencyGuard, so no manual decrement here.
+    res.status(err.status && err.status < 500 ? err.status : 500).json({ error: 'Could not read your list. Please try again.' });
   }
 });
 
@@ -980,7 +1085,11 @@ function renderStorePage(products = PRODUCTS, content = readContent()) {
   };
   // Storefront content injection: featured ids for the client, hero copy, and the announcement bar.
   const featured = (content.featured_ids || []).filter(id => products.some(p => p.id === id));
-  const contentScript = `<script>window.__STORE_CONTENT__=${JSON.stringify({ featured_ids: featured })};</script>`;
+  // Seed the client with a stock snapshot so that if /api/inventory-public later fails, the client
+  // keeps the correct out-of-stock state instead of re-rendering everything as available.
+  const invSnapshot = {};
+  for (const p of products) { const v = inventory[p.id]; if (v) invSnapshot[p.id] = { stock: v.stock, low_stock_threshold: v.low_stock_threshold }; }
+  const contentScript = `<script>window.__STORE_CONTENT__=${JSON.stringify({ featured_ids: featured })};window.__STORE_INVENTORY__=${JSON.stringify(invSnapshot)};</script>`;
   const jsonLd = `<script type="application/ld+json">\n${JSON.stringify(itemList, null, 2)}\n</script>\n${contentScript}\n</head>`;
   const announce = content.announcement;
   const announceHtml = (announce && announce.enabled && announce.text)
@@ -992,14 +1101,18 @@ function renderStorePage(products = PRODUCTS, content = readContent()) {
   const gridHtml = storeProductGridHtml(products, inventory, featuredSet);
   const chipsHtml = storeFilterChipsHtml(products);
   const countHtml = `${products.length} of ${products.length} products`;
+  // Function replacers (not string replacers): a string replacement value has JS special sequences
+  // ($$, $&, $`, $') interpreted even for a plain-string search, which would corrupt any product/hero
+  // text containing them. A function replacement returns its value verbatim. renderKitPage uses
+  // split().join() for the same reason.
   return STORE_TEMPLATE
-    .replace('</head>', jsonLd)
-    .replace('<!--ANNOUNCEMENT_BAR-->', announceHtml)
-    .replace('{{HERO_TITLE}}', htmlEscape(content.hero_title || 'Shop the store'))
-    .replace('{{HERO_SUBTITLE}}', htmlEscape(content.hero_subtitle || ''))
-    .replace('<div class="grid" id="product-grid"></div>', `<div class="grid" id="product-grid">${gridHtml}</div>`)
-    .replace('<div class="filter-chips" id="filter-chips"></div>', `<div class="filter-chips" id="filter-chips">${chipsHtml}</div>`)
-    .replace('<span class="result-count" id="result-count">Loading...</span>', `<span class="result-count" id="result-count">${countHtml}</span>`);
+    .replace('</head>', () => jsonLd)
+    .replace('<!--ANNOUNCEMENT_BAR-->', () => announceHtml)
+    .replace('{{HERO_TITLE}}', () => htmlEscape(content.hero_title || 'Shop the store'))
+    .replace('{{HERO_SUBTITLE}}', () => htmlEscape(content.hero_subtitle || ''))
+    .replace('<div class="grid" id="product-grid"></div>', () => `<div class="grid" id="product-grid">${gridHtml}</div>`)
+    .replace('<div class="filter-chips" id="filter-chips"></div>', () => `<div class="filter-chips" id="filter-chips">${chipsHtml}</div>`)
+    .replace('<span class="result-count" id="result-count">Loading...</span>', () => `<span class="result-count" id="result-count">${countHtml}</span>`);
 }
 
 // ---------- Stripe checkout (handles one-time AND subscription) ----------
@@ -1012,7 +1125,7 @@ app.post('/api/checkout', async (req, res) => {
   }
   if (!stripe) return res.status(500).json({ error: 'Stripe is not configured. Set STRIPE_SECRET_KEY.' });
   try {
-    const cart = normalizeCart(req.body);
+    const cart = normalizeCart(req.body, req.body.mode === 'subscription');
     if (!cart.length) return res.status(400).json({ error: 'Cart is empty.' });
 
     const isSubscription = req.body.mode === 'subscription';
@@ -1025,7 +1138,7 @@ app.post('/api/checkout', async (req, res) => {
     // Stock check (subscriptions still need stock for the first shipment)
     const inventory = readInventory();
     const oos = cart.filter(item => {
-      const product = PRODUCTS.find(p => p.name === item.name);
+      const product = PRODUCT_BY_ID[item.sku_id];
       if (!product) return false;
       return (inventory[product.id]?.stock || 0) < item.quantity;
     });
@@ -1049,7 +1162,10 @@ app.post('/api/checkout', async (req, res) => {
         product_data: {
           name: item.name + (isSubscription ? ` (${recurring.label})` : ''),
           description: item.unit || undefined,
-          images: isAbsoluteHttps ? [absImage] : []
+          images: isAbsoluteHttps ? [absImage] : [],
+          // Carry the SKU through Stripe so the webhook decrements the right product by id, instead of
+          // reverse-matching the human-readable name (which breaks on names ending in "(...)").
+          ...(item.sku_id ? { metadata: { sku_id: item.sku_id } } : {})
         },
         unit_amount: Math.round(effectivePrice * 100)
       };
@@ -1076,6 +1192,24 @@ app.post('/api/checkout', async (req, res) => {
         }
       }
     }];
+
+    // Stripe's shipping_options are payment-mode only. For subscriptions, add shipping as a recurring
+    // line item so every shipment (the initial order AND each renewal) is charged the same rate the
+    // cart shows — subscriptions were previously shipping for free while the cart displayed a charge.
+    if (isSubscription) {
+      const shipCents = shippingCentsFor(subtotalCents);
+      if (shipCents > 0) {
+        line_items.push({
+          price_data: {
+            currency: 'usd',
+            product_data: { name: `Standard shipping (${recurring.label})` },
+            unit_amount: shipCents,
+            recurring: { interval: recurring.interval, interval_count: recurring.interval_count }
+          },
+          quantity: 1
+        });
+      }
+    }
 
     const sessionParams = {
       mode: isSubscription ? 'subscription' : 'payment',
@@ -1131,31 +1265,19 @@ app.post('/api/checkout', async (req, res) => {
     res.json({ url: session.url });
   } catch (err) {
     console.error('Checkout error:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Sorry, we could not start checkout. Please try again.' });
   }
 });
 
 // ---------- Customer portal (manage / cancel subscriptions) ----------
-app.post('/api/customer-portal', async (req, res) => {
-  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured.' });
-  try {
-    const { customer_id } = req.body;
-    if (!customer_id) return res.status(400).json({ error: 'customer_id required' });
-    const portalSession = await stripe.billingPortal.sessions.create({
-      customer: customer_id,
-      return_url: `${BASE_URL}/`
-    });
-    res.json({ url: portalSession.url });
-  } catch (err) {
-    console.error('Portal error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
+// (Removed) /api/customer-portal accepted a raw customer_id from any unauthenticated caller and minted
+// that customer's Stripe billing-portal session (invoices, payment method, address, cancel) — an IDOR.
+// It was unused: the live /manage flow points customers to the portal link in their Stripe receipt.
 
 const MAX_QTY_PER_ITEM = 50;
 const MAX_ITEMS_IN_CART = 100;
 
-function normalizeCart(body) {
+function normalizeCart(body, isSubscription = false) {
   // Kit checkouts always charge the kit's full, canonical contents at the bundle price.
   // We deliberately ignore the client-sent item list for a kit, so a customer cannot remove
   // items from a kit (through the page or a hand-crafted request) and still keep the 10%
@@ -1169,8 +1291,11 @@ function normalizeCart(body) {
         let qty = parseInt(quantity, 10);
         if (!Number.isFinite(qty) || qty < 1) qty = 1;
         if (qty > MAX_QTY_PER_ITEM) qty = MAX_QTY_PER_ITEM;
-        const price = +(p.price * (1 - KIT_DISCOUNT)).toFixed(2);  // 10% bundle discount
-        return { name: p.name, unit: p.unit, price, image: p.image, quantity: qty };
+        // A kit = one 10% discount. On a subscription the subscription's own 10% is applied later
+        // (checkout multiplies by 1 - SUBSCRIPTION_DISCOUNT), so we must NOT also bake in the bundle
+        // discount here or it stacks to 19% off.
+        const price = isSubscription ? p.price : +(p.price * (1 - KIT_DISCOUNT)).toFixed(2);
+        return { sku_id: p.id, name: p.name, unit: p.unit, price, image: p.image, quantity: qty };
       })
       .filter(Boolean);
   }
@@ -1178,19 +1303,21 @@ function normalizeCart(body) {
   if (!Array.isArray(body.items) || body.items.length === 0) return [];
   if (body.items.length > MAX_ITEMS_IN_CART) return [];  // reject absurdly long carts
 
-  return body.items
-    .map(item => {
-      // Look up the product server-side — never trust prices/names from the client
-      const p = item.sku_id ? PRODUCT_BY_ID[item.sku_id] : null;
-      if (!p) return null;
-      // Clamp quantity to a sane range
-      let qty = parseInt(item.quantity, 10);
-      if (!Number.isFinite(qty) || qty < 1) qty = 1;
-      if (qty > MAX_QTY_PER_ITEM) qty = MAX_QTY_PER_ITEM;
-      const price = effectivePrice(p);  // individual store purchases honor the sale price
-      return { name: p.name, unit: p.unit, price, image: p.image, quantity: qty };
-    })
-    .filter(Boolean);
+  // Aggregate quantities per SKU (server-side lookup — never trust client prices/names), so the same
+  // item split across two lines is charged and stock-checked once rather than each line vs full stock.
+  const byId = new Map();
+  for (const item of body.items) {
+    const p = item && item.sku_id ? PRODUCT_BY_ID[item.sku_id] : null;
+    if (!p) continue;
+    let qty = parseInt(item.quantity, 10);
+    if (!Number.isFinite(qty) || qty < 1) qty = 1;
+    byId.set(p.id, (byId.get(p.id) || 0) + qty);
+  }
+  return [...byId.entries()].map(([id, sumQty]) => {
+    const p = PRODUCT_BY_ID[id];
+    const qty = Math.min(sumQty, MAX_QTY_PER_ITEM);
+    return { sku_id: id, name: p.name, unit: p.unit, price: effectivePrice(p), image: p.image, quantity: qty };
+  });
 }
 
 // Sanitize free-text input: strip control characters, cap length
@@ -1412,13 +1539,19 @@ app.get('/api/admin/inventory', requireAdmin, (_req, res) => {
 });
 
 app.post('/api/admin/inventory/:skuId', requireAdmin, (req, res) => {
+  const sku = req.params.skuId;
   const inv = readInventory();
-  if (!inv[req.params.skuId]) inv[req.params.skuId] = { stock: 0, low_stock_threshold: 10 };
-  if (typeof req.body.stock === 'number') inv[req.params.skuId].stock = req.body.stock;
-  if (typeof req.body.adjust === 'number') inv[req.params.skuId].stock = Math.max(0, (inv[req.params.skuId].stock || 0) + req.body.adjust);
-  if (typeof req.body.low_stock_threshold === 'number') inv[req.params.skuId].low_stock_threshold = req.body.low_stock_threshold;
+  // Don't silently create an inventory row for a non-existent product (orphan rows).
+  if (!inv[sku] && !PRODUCT_BY_ID[sku]) return res.status(404).json({ error: 'Unknown product.' });
+  if (!inv[sku]) inv[sku] = { stock: 0, low_stock_threshold: 10 };
+  // Stock is a whole, non-negative, FINITE count — clamp/round so "-5", "3.5", or 1e999 (Infinity)
+  // can't be stored.
+  const toCount = (v) => Number.isFinite(v) ? Math.max(0, Math.round(v)) : null;
+  if (Number.isFinite(req.body.stock)) inv[sku].stock = toCount(req.body.stock);
+  if (Number.isFinite(req.body.adjust)) inv[sku].stock = toCount((inv[sku].stock || 0) + req.body.adjust);
+  if (Number.isFinite(req.body.low_stock_threshold)) inv[sku].low_stock_threshold = toCount(req.body.low_stock_threshold);
   writeInventory(inv);
-  res.json({ sku_id: req.params.skuId, ...inv[req.params.skuId] });
+  res.json({ sku_id: sku, ...inv[sku] });
 });
 
 // ---------- Admin: Products CRUD (the "Product Manager") ----------
@@ -1574,15 +1707,19 @@ app.post('/api/admin/bulk/price', requireAdmin, (req, res) => {
   const idSet = new Set(ids);
   const products = workingProducts();
   let changed = 0;
+  let skipped = 0;
   for (const p of products) {
     if (!idSet.has(p.id)) continue;
     let np = mode === 'pct' ? p.price * (1 + num / 100) : mode === 'add' ? p.price + num : num;
-    np = Math.max(0, Math.round(np * 100) / 100);
+    np = Math.round(np * 100) / 100;
+    // Never silently clamp a product to $0 (a `unit_amount: 0` line item = free goods at checkout)
+    // or to an absurd value. Skip those instead — same bounds the single-product editor enforces.
+    if (np <= 0 || np > 100000) { skipped++; continue; }
     if (np !== p.price) { p.price = np; changed++; }
   }
   saveWorking(products);
   // Note: `updated` (not `changed`) — draftSummary() also has a `changed` key; spread order matters.
-  res.json({ ...draftSummary(), updated: changed });
+  res.json({ ...draftSummary(), updated: changed, skipped });
 });
 
 // Bulk stock update (instant — inventory is operational, not draft). Each item: {id, stock} or {id, adjust}.

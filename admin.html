@@ -962,9 +962,11 @@
 
   function renderFinPeriods() {
     const now = new Date();
-    const y = now.getFullYear(), m = now.getMonth(), d = now.getDate(), DAY = 86400000;
+    const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
     const startToday = new Date(y, m, d).getTime();
-    const startWeek = startToday - new Date(y, m, d).getDay() * DAY;   // Sunday, local
+    // Build the week start via the Date constructor (not fixed-ms subtraction) so it stays correct
+    // across a DST transition inside the current week.
+    const startWeek = new Date(y, m, d - new Date(y, m, d).getDay()).getTime();   // Sunday, local
     const startMonth = new Date(y, m, 1).getTime();
     const startQuarter = new Date(y, Math.floor(m / 3) * 3, 1).getTime();
     const startYear = new Date(y, 0, 1).getTime();

@@ -362,7 +362,8 @@
   const priceOf = p => onSale(p) ? Number(p.sale_price) : p.price;
 
   let PRODUCTS = [];
-  let INVENTORY = {};
+  // Seeded from the server-rendered snapshot so out-of-stock state survives an inventory fetch failure.
+  let INVENTORY = window.__STORE_INVENTORY__ || {};
   const FEATURED = new Set((window.__STORE_CONTENT__ && window.__STORE_CONTENT__.featured_ids) || []);
   let activeCategory = 'all';
   let searchQuery = '';
