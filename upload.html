@@ -319,6 +319,25 @@
     transition: transform 0.15s;
   }
   .checkout-btn:hover { transform: translateY(-2px); }
+  .added-panel {
+    background: var(--cream); border: 1px solid var(--line, #E8E4DC);
+    border-radius: 16px; padding: 28px 32px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+  }
+  .added-check {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(45,134,89,0.12); color: var(--green, #2d8659);
+    display: grid; place-items: center;
+  }
+  .added-text { font-size: 15px; color: var(--teal); line-height: 1.45; max-width: 480px; }
+  .added-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .added-secondary {
+    background: #fff; color: var(--teal); border: 1.5px solid var(--teal);
+    padding: 15px 26px; border-radius: 999px;
+    font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 15px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .added-secondary:hover { background: var(--cream); }
 
   .restart {
     margin-top: 24px; text-align: center;
@@ -449,15 +468,29 @@
 
       <div class="merge-note hidden" id="merge-note"></div>
 
-      <div class="totals">
+      <div class="totals" id="totals-row">
         <div class="totals-info">
           <div class="totals-label">Subtotal</div>
           <div class="totals-amount" id="subtotal-amount">$0.00</div>
         </div>
-        <button class="checkout-btn" id="checkout-btn">
-          Continue to checkout
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <button class="checkout-btn" id="addcart-btn">
+          Add to cart
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         </button>
+      </div>
+
+      <div class="added-panel hidden" id="added-panel">
+        <div class="added-check">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="added-text" id="added-text">Added to your cart.</div>
+        <div class="added-actions">
+          <button class="added-secondary" id="keep-shopping-btn">Add more from the shop</button>
+          <button class="checkout-btn" id="go-checkout-btn">
+            Check out
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
       </div>
 
       <div class="usage-note" id="usage-note"></div>
@@ -481,7 +514,8 @@
   const resultsSummary = document.getElementById('results-summary');
   const usageNote = document.getElementById('usage-note');
   const restartBtn = document.getElementById('restart-btn');
-  const checkoutBtn = document.getElementById('checkout-btn');
+  const addCartBtn = document.getElementById('addcart-btn');
+  const addedPanel = document.getElementById('added-panel');
 
   let cartState = [];
 
@@ -618,6 +652,9 @@
     cartState = data.matched_items;
     loading.classList.add('hidden');
     results.classList.remove('hidden');
+    // Reset to the review state (in case a previous list was already added to the cart).
+    document.getElementById('totals-row').classList.remove('hidden');
+    addedPanel.classList.add('hidden');
 
     resultsSummary.textContent = `${data.matched_items.length} items matched${data.unmatched.length ? `, ${data.unmatched.length} need your input` : ''}.`;
 
@@ -700,7 +737,7 @@
   function updateSubtotal() {
     const subtotal = cartState.reduce((s, i) => s + i.line_total, 0);
     subtotalAmount.textContent = `$${subtotal.toFixed(2)}`;
-    checkoutBtn.disabled = cartState.length === 0;  // nothing left to buy after removals
+    addCartBtn.disabled = cartState.length === 0;  // nothing left to add after removals
     updateMergeNote();
   }
 
@@ -728,8 +765,8 @@
     const { count } = readStoreCart();
     if (count > 0) {
       note.textContent = count === 1
-        ? 'Heads up: 1 item already in your cart will be added to this order, so you check out once.'
-        : `Heads up: ${count} items already in your cart will be added to this order, so you check out once.`;
+        ? 'You already have 1 item in your cart. Adding your list keeps them together in one cart.'
+        : `You already have ${count} items in your cart. Adding your list keeps them together in one cart.`;
       note.classList.remove('hidden');
     } else {
       note.classList.add('hidden');
@@ -744,28 +781,52 @@
     errorBox.classList.add('hidden');
   });
 
-  checkoutBtn.addEventListener('click', async () => {
+  // Add the matched list to the PERSISTENT cart (localStorage fastTrackCart) — the same cart the
+  // store uses — so the list stays put if the customer keeps shopping or navigates away, and rides
+  // along with anything they add in the shop. This is what "put my list in the cart" means.
+  addCartBtn.addEventListener('click', () => {
     if (!cartState.length) return;
 
     const store = readStoreCart();
-
-    // A supply list is a one-time seasonal purchase and cannot ride inside a subscription
-    // order. If the shop cart is set to a subscription, confirm before combining everything
-    // into a single one-time checkout.
+    // A supply list is a one-time purchase. If the cart is currently a subscription, adding the list
+    // switches the whole cart to a single one-time order — confirm first.
     if (store.count > 0 && store.mode === 'subscription') {
-      const ok = confirm('Your shop cart is set to a subscription. Checking out your uploaded list will combine everything into one single-time order. Continue?');
+      const ok = confirm('Your cart is set to a subscription. Adding your supply list switches the cart to a single one-time order. Continue?');
       if (!ok) return;
     }
 
-    // Merge: start from the shop cart, then add the list quantities on top (summed per item).
+    // Merge: start from whatever is already in the cart, then add the list quantities on top.
     const combined = { ...store.items };
     for (const item of cartState) {
       combined[item.sku_id] = (combined[item.sku_id] || 0) + item.quantity;
     }
-    const items = Object.entries(combined).map(([sku_id, quantity]) => ({ sku_id, quantity }));
+    localStorage.setItem('fastTrackCart', JSON.stringify(combined));
+    localStorage.setItem('fastTrackCartMode', 'one-time');
+    syncHeaderCount();
 
-    checkoutBtn.disabled = true;
-    checkoutBtn.textContent = 'Redirecting...';
+    const added = cartState.reduce((s, i) => s + i.quantity, 0);
+    const total = Object.values(combined).reduce((s, q) => s + q, 0);
+    document.getElementById('added-text').textContent =
+      `${added} item${added === 1 ? '' : 's'} added to your cart${total !== added ? ` (${total} total)` : ''}. Your list is saved in your cart, so you can keep shopping and it will still be there.`;
+    document.getElementById('totals-row').classList.add('hidden');
+    document.getElementById('merge-note').classList.add('hidden');
+    addedPanel.classList.remove('hidden');
+    addedPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  document.getElementById('keep-shopping-btn').addEventListener('click', () => {
+    window.location.href = '/store';
+  });
+
+  // Check out the unified cart (list + anything added in the shop) in one order.
+  document.getElementById('go-checkout-btn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const cart = readStoreCart();
+    const items = Object.entries(cart.items).map(([sku_id, quantity]) => ({ sku_id, quantity }));
+    if (!items.length) { window.location.href = '/store'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Redirecting...';
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
@@ -777,8 +838,8 @@
       window.location.href = data.url;
     } catch (err) {
       alert(err.message);
-      checkoutBtn.disabled = false;
-      checkoutBtn.innerHTML = 'Continue to checkout <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+      btn.disabled = false;
+      btn.innerHTML = 'Check out <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
     }
   });
 
@@ -790,15 +851,16 @@
     return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  // Sync the header cart count with the localStorage cart from /store
-  (function syncCartCount() {
+  // Sync the header cart count with the localStorage cart (shared with /store).
+  function syncHeaderCount() {
     try {
       const stored = JSON.parse(localStorage.getItem('fastTrackCart') || '{}');
-      const count = Object.values(stored).reduce((s, q) => s + q, 0);
+      const count = Object.values(stored).reduce((s, q) => s + (parseInt(q, 10) || 0), 0);
       const el = document.getElementById('cart-count');
       if (el) el.textContent = count;
     } catch {}
-  })();
+  }
+  syncHeaderCount();
 </script>
 
 <footer>
