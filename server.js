@@ -428,7 +428,10 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
         };
       });
       const isSub = session.mode === 'subscription';
-      const orgCode = session.metadata?.organization_code || null;
+      // Org code now comes from the Stripe checkout custom field; fall back to the old cart-metadata
+      // path so any order created just before this change still captures it.
+      const orgField = (session.custom_fields || []).find(f => f.key === 'orgcode');
+      const orgCode = (orgField?.text?.value || '').trim() || session.metadata?.organization_code || null;
       const order = {
         id: session.id,
         short_id: session.id.slice(-10).toUpperCase(),
@@ -1083,6 +1086,17 @@ app.post('/api/checkout', async (req, res) => {
       // Lets customers enter promo codes at checkout. Codes are created in
       // Stripe Dashboard -> Products -> Coupons -> Create promotion code.
       allow_promotion_codes: true,
+      // Organization / fundraiser code, collected right on the Stripe checkout page so it's there
+      // no matter how the customer reached checkout (store cart, uploaded list, kit, or gift). It's
+      // optional and tracking-only (does not change the price) and is read back in the webhook.
+      // Stripe custom-field keys must be alphanumeric only, hence "orgcode".
+      custom_fields: [{
+        key: 'orgcode',
+        label: { type: 'custom', custom: 'Organization or fundraiser code' },
+        type: 'text',
+        optional: true,
+        text: { maximum_length: 50 }
+      }],
       success_url: `${BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${BASE_URL}/cancel`,
       metadata: {

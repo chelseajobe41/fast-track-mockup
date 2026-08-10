@@ -178,12 +178,6 @@
   .free-tag { color: var(--green); font-weight: 700; }
   .shipping-note { font-size: 12px; color: var(--muted); margin-top: 6px; padding: 8px 12px; background: var(--cream); border-radius: 8px; }
   .shipping-note.close { color: var(--orange); }
-  .cart-code { margin-top: 2px; }
-  .cart-code-toggle { background: none; border: none; padding: 4px 0; display: inline-flex; align-items: center; gap: 7px; font-family: 'Parkinsans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; }
-  .cart-code-toggle:hover { color: var(--teal); }
-  .cart-code-field { margin-top: 8px; }
-  .cart-code-field input { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; padding: 11px 14px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--teal); background: #fff; transition: border-color 0.15s, box-shadow 0.15s; }
-  .cart-code-field input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(34,58,63,0.08); }
   .checkout-btn { width: 100%; background: var(--orange); color: #fff; padding: 12px 22px; border-radius: 999px; font-family: 'Parkinsans', sans-serif; font-weight: 700; font-size: 14.5px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.15s, transform 0.15s; }
   .checkout-btn:hover:not(:disabled) { background: #b22e21; transform: translateY(-1px); }
   .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -310,15 +304,6 @@
       <div class="summary-fine" id="cart-fine"></div>
     </div>
     <div class="shipping-note" id="shipping-note"></div>
-    <div class="cart-code">
-      <button type="button" class="cart-code-toggle" id="cart-code-toggle" aria-expanded="false">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        Have a fundraiser or organization code?
-      </button>
-      <div class="cart-code-field" id="cart-code-field" hidden>
-        <input type="text" id="cart-org-code" maxlength="50" placeholder="e.g. LINCOLN-PTA" autocomplete="off" />
-      </div>
-    </div>
     <button class="checkout-btn" id="checkout-btn" style="margin-top: 10px;">
       Continue to checkout
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -693,11 +678,6 @@
   document.getElementById('cart-close').addEventListener('click', () => closeCart());
   document.getElementById('cart-overlay').addEventListener('click', () => closeCart());
   document.getElementById('checkout-btn').addEventListener('click', goCheckout);
-  document.getElementById('cart-code-toggle').addEventListener('click', () => {
-    document.getElementById('cart-code-field').hidden = false;
-    document.getElementById('cart-code-toggle').style.display = 'none';
-    document.getElementById('cart-org-code').focus();
-  });
   document.getElementById('clear-cart-btn').addEventListener('click', () => {
     cart = {};
     cartMode = 'one-time';
@@ -730,8 +710,7 @@
         source: cartMode === 'subscription' ? 'store-cart-subscription' : 'store-cart',
         items,
         mode: cartMode,
-        interval: cartInterval,
-        organization_code: (document.getElementById('cart-org-code')?.value || '').trim()
+        interval: cartInterval
       };
       const res = await fetch('/api/checkout', {
         method: 'POST',
