@@ -1248,6 +1248,8 @@
         <div style="margin-top:8px;font-size:13px;color:var(--muted);">${escapeHtml(o.customer_email || '')}${o.customer_phone ? ' · ' + escapeHtml(o.customer_phone) : ''}</div>
       </div>
       ${o.organization_code ? `<div class="od-sec"><h4>Organization / fundraiser code</h4><span class="pill teal">${escapeHtml(o.organization_code)}</span></div>` : ''}
+      ${o.gift_note ? `<div class="od-sec"><h4>Gift card message (print for the box)</h4><div style="font-size:14px;color:var(--teal);line-height:1.5;white-space:pre-wrap;">${escapeHtml(o.gift_note)}</div>${o.sender_name ? `<div style="margin-top:6px;font-size:13px;color:var(--muted);font-style:italic;">— ${escapeHtml(o.sender_name)}</div>` : ''}</div>` : ''}
+      ${o.internal_note ? `<div class="od-sec"><h4>Order note (internal — not for the box)</h4><div style="font-size:13px;color:var(--muted);">${escapeHtml(o.internal_note)}</div></div>` : ''}
       <div class="od-sec">
         <div class="od-row"><span>Order type</span><span>${o.order_type === 'subscription' ? 'Subscription refill' : 'One-time'}</span></div>
         <div class="od-row"><span>Placed</span><span>${fmt(o.created_at)}</span></div>

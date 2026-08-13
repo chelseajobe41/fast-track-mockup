@@ -407,7 +407,8 @@
           kit_id: selectedKit,
           items,
           gift_note: document.getElementById('gift-note').value || '',
-          sender_name: document.getElementById('sender-name').value || ''
+          sender_name: document.getElementById('sender-name').value || '',
+          internal_note: document.getElementById('internal-note').value || ''
         })
       });
       const data = await res.json();

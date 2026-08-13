@@ -489,6 +489,11 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
         subscription_id: session.subscription || null,
         subscription_interval: session.metadata?.subscription_interval || null,
         organization_code: orgCode,
+        // Gift orders carry a message to print on the in-box card + who it's from, and an optional
+        // internal fulfillment note (e.g. "don't ship before Aug 15"). Surfaced on the packing slip.
+        gift_note: session.metadata?.gift_note || null,
+        sender_name: session.metadata?.sender_name || null,
+        internal_note: session.metadata?.internal_note || null,
         status: 'paid',
         fulfillment: 'pending',
         items
@@ -1239,6 +1244,7 @@ app.post('/api/checkout', async (req, res) => {
         kit_id: sanitizeText(req.body.kit_id, 50) || '',
         gift_note: sanitizeText(req.body.gift_note, 500),
         sender_name: sanitizeText(req.body.sender_name, 100),
+        internal_note: sanitizeText(req.body.internal_note, 200),
         // Optional organization/fundraiser code, entered in the cart. Captured on the order so the
         // owner can rebate the group. Tracking only — does NOT affect the price. Read in the webhook.
         organization_code: sanitizeText(req.body.organization_code, 50)
@@ -1474,6 +1480,14 @@ app.get('/api/admin/orders/:id/packing-slip', requireAdmin, (req, res) => {
   const orderDate = order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
   const totalUnits = (order.items || []).reduce((s, i) => s + i.quantity, 0);
   const orgLine = order.organization_code ? `<div class="org">Organization / fundraiser code: <strong>${htmlEscape(order.organization_code)}</strong></div>` : '';
+  // Gift message to copy onto the card that goes IN the box, plus who it's from.
+  const giftLine = order.gift_note
+    ? `<div class="gift"><h2>Gift card message — write or print this on the card in the box</h2><div class="gift-msg">${htmlEscape(order.gift_note)}</div>${order.sender_name ? `<div class="gift-from">— ${htmlEscape(order.sender_name)}</div>` : ''}</div>`
+    : '';
+  // Internal fulfillment instruction from the buyer — for the packer only, NOT for the box.
+  const internalLine = order.internal_note
+    ? `<div class="internal"><strong>Order note (internal — do not put this in the box):</strong> ${htmlEscape(order.internal_note)}</div>`
+    : '';
   const html = `<!doctype html><html><head><meta charset="utf-8"><title>Packing slip ${htmlEscape(order.short_id || '')}</title>
   <style>
     * { box-sizing: border-box; }
@@ -1490,6 +1504,11 @@ app.get('/api/admin/orders/:id/packing-slip', requireAdmin, (req, res) => {
     .meta h2 { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #6A6F71; margin: 0 0 6px; }
     .meta div { font-size: 14px; line-height: 1.5; }
     .org { background: #FFF9E8; border: 1px solid #FDCA06; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 20px; }
+    .gift { background: #F1FAF5; border: 1px solid #2d8659; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; }
+    .gift h2 { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #2d8659; margin: 0 0 6px; }
+    .gift-msg { font-size: 15px; line-height: 1.5; white-space: pre-wrap; color: #1a2b2e; }
+    .gift-from { margin-top: 6px; font-size: 14px; font-style: italic; color: #6A6F71; }
+    .internal { background: #FFF1EE; border: 1px dashed #C4372B; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; color: #1a2b2e; }
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6A6F71; border-bottom: 2px solid #223A3F; padding: 8px 10px; }
     td { padding: 11px 10px; border-bottom: 1px solid #E8E4DC; font-size: 14px; vertical-align: top; }
@@ -1514,6 +1533,8 @@ app.get('/api/admin/orders/:id/packing-slip', requireAdmin, (req, res) => {
       <div><h2>Contact</h2><div>${htmlEscape(order.customer_email || '')}${order.customer_phone ? '<br>' + htmlEscape(order.customer_phone) : ''}</div></div>
       <div><h2>Type</h2><div>${order.order_type === 'subscription' ? 'Subscription refill' : 'One-time order'}</div></div>
     </div>
+    ${giftLine}
+    ${internalLine}
     ${orgLine}
     <table>
       <thead><tr><th>Qty</th><th>Item</th><th class="chk">Pack</th></tr></thead>
