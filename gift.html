@@ -45,6 +45,8 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Barlow', system-ui, sans-serif; background: var(--white); color: var(--teal); line-height: 1.55; -webkit-font-smoothing: antialiased; }
   .container { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   a { color: inherit; text-decoration: none; }
 
   header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.96); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
@@ -163,7 +165,7 @@
       <a href="/store">Store</a>
       <a href="/gift" class="active">Gift</a>
     </nav>
-    <button class="cart-btn" onclick="window.location.href='/store'">
+    <button class="cart-btn" type="button">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6z"/></svg>
       Cart <span class="cart-count" id="cart-count">0</span>
     </button>
@@ -175,10 +177,10 @@
     <div>
       <h1>Send a kit to your <span class="accent">grandkid</span>.</h1>
       <p class="lead">Pick the grade. Pick the address. Add a note. We pack it up and ship it straight to them, ready for the first bell.</p>
-      <button class="hero-cta" onclick="document.getElementById('pick').scrollIntoView({behavior:'smooth'})">
+      <a class="hero-cta" href="#pick">
         Pick a kit
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </button>
+      </a>
     </div>
     <div class="hero-photo">
       <div class="hero-photo-frame">

@@ -170,8 +170,13 @@ canonical/title/schema in the initial HTML (client JS runs too late for crawlers
   (`{{KIT_TITLE}}`, `{{KIT_CANONICAL}}`, `{{KIT_DESCRIPTION}}`, `{{KIT_OG_TITLE}}`, `{{KIT_H1}}`,
   and the `<!--KIT_JSONLD-->` comment). `renderKitPage()` in server.js fills these per kit with a
   self-referencing canonical and a VALID Product JSON-LD (real price/availability) built from
-  `buildKitDetail()`. The client JS hydrates the interactive cart and reads the kit id from the
+  `buildKitDetail()`. It also fills the visible kit (`{{KIT_GRADE}}`, `{{KIT_AGE}}`, totals tokens,
+  and `<!--KIT_ITEMS-->` via `kitItemRowHtml()`, a port of the client `renderItems()` row: change one,
+  change both). The client JS re-renders the same markup on load and reads the kit id from the
   URL path (`getKitId()` parses the path, not a query string).
+- **Inline event handlers do not run.** The CSP sets `script-src-attr 'none'`, so `onclick="..."`
+  is silently blocked. Wire clicks with `addEventListener` (the header Cart button is handled in
+  `motion.js`: every page sends it to `/store#cart`, which opens the drawer).
 - **`/store` is rendered by `renderStorePage()`** which injects an `ItemList` of Products (with
   offers) before `</head>` AND server-renders the product grid, filter chips, result count, and a
   `window.__STORE_INVENTORY__` stock snapshot into `store.html` (so the page paints at full height —
@@ -265,8 +270,8 @@ the placeholder.
   `/store` product grid is server-rendered (SSR); product images compressed/self-hosted; a full
   security + correctness hardening pass (see section 9, commit `8143e84`).
 - Accessibility/CWV: storefront pages score Accessibility 100 (WCAG 2.2 AA); homepage/store CLS in
-  Google's "good" band. `/kits/:id` and `/gift` still client-render their lists (higher CLS) — deferred
-  until Houa drives traffic.
+  Google's "good" band. `/kits/:id` now server-renders its items, totals, grade and tagline (CLS 0.68 -> under
+  0.1 locally, Nov 2026). `/gift` still client-renders its kit list.
 
 ---
 

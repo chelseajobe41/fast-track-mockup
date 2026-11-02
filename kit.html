@@ -133,7 +133,7 @@
       <a href="/store">Store</a>
       <a href="/gift">Gift</a>
     </nav>
-    <button class="cart-btn" onclick="window.location.href='/store'">
+    <button class="cart-btn" type="button">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6z"/></svg>
       Cart <span class="cart-count" id="cart-count">0</span>
     </button>
@@ -145,21 +145,21 @@
     <nav>
       <a href="/">Home</a><span class="sep">/</span>
       <a href="/kits">Kits</a><span class="sep">/</span>
-      <span class="current" id="crumb-current">Kit</span>
+      <span class="current" id="crumb-current">{{KIT_H1}}</span>
     </nav>
   </div>
 </div>
 
-<div class="loading" id="loading">Loading kit...</div>
+<div class="loading" id="loading" hidden></div>
 
-<div id="kit-content" style="display:none;">
-  <section class="kit-hero">
+<div id="kit-content">
+  <section class="kit-hero" style="{{KIT_HERO_STYLE}}">
     <div class="container kit-hero-grid">
       <div>
-        <span class="grade-chip" id="grade-chip">Grade</span>
+        <span class="grade-chip" id="grade-chip">{{KIT_GRADE}}</span>
         <h1 id="kit-title">{{KIT_H1}}</h1>
-        <div class="age" id="kit-age">Ages</div>
-        <p class="tagline" id="kit-tagline"></p>
+        <div class="age" id="kit-age">{{KIT_AGE}}</div>
+        <p class="tagline" id="kit-tagline">{{KIT_TAGLINE}}</p>
         <div class="badge-row">
           <span class="badge discount">10% bundle discount</span>
           <span class="badge green">
@@ -171,13 +171,13 @@
       </div>
       <aside class="checkout-card">
         <div class="label">Order total</div>
-        <div class="strike-total" id="strike-total"></div>
-        <div class="total" id="total-display">$0.00</div>
+        <div class="strike-total" id="strike-total">{{KIT_STRIKE_TOTAL}}</div>
+        <div class="total" id="total-display">{{KIT_TOTAL}}</div>
         <div class="breakdown">
-          <div class="row"><span>Bundle subtotal</span><span id="subtotal-display">$0.00</span></div>
-          <div class="row" id="savings-row" style="display:none;"><span>Bundle savings</span><span class="savings" id="savings-display">−$0.00</span></div>
-          <div class="row"><span>Shipping</span><span id="shipping-display">Calculated at checkout</span></div>
-          <div class="row bold"><span>Total</span><span id="total-bold">$0.00</span></div>
+          <div class="row"><span>Bundle subtotal</span><span id="subtotal-display">{{KIT_RAW_SUBTOTAL}}</span></div>
+          <div class="row" id="savings-row" style="{{KIT_SAVINGS_STYLE}}"><span>Bundle savings</span><span class="savings" id="savings-display">{{KIT_SAVINGS}}</span></div>
+          <div class="row"><span>Shipping</span><span id="shipping-display">{{KIT_SHIPPING}}</span></div>
+          <div class="row bold"><span>Total</span><span id="total-bold">{{KIT_TOTAL}}</span></div>
         </div>
         <button class="checkout-btn" id="checkout-btn">
           Buy this kit
@@ -201,9 +201,9 @@
         <div>
           <div class="items-section-head">
             <h2>What's in this kit</h2>
-            <span class="count" id="item-count">0 items</span>
+            <span class="count" id="item-count">{{KIT_ITEM_COUNT}}</span>
           </div>
-          <div class="items-list" id="items-list"></div>
+          <div class="items-list" id="items-list"><!--KIT_ITEMS--></div>
         </div>
       </div>
     </div>
@@ -289,10 +289,12 @@
     // Read-only: a kit is a fixed bundle. Items cannot be removed or re-quantified here, so
     // the 10% bundle price can't be gamed by dropping items. To buy items individually, a
     // customer uses the store or the list upload (at regular prices).
+    // The server renders this same row markup into the page (kitItemRowHtml in server.js) so
+    // crawlers see the full kit and the page doesn't shift on load. Change one, change both.
     document.getElementById('item-count').textContent = `${cartState.length} items`;
     document.getElementById('items-list').innerHTML = cartState.map((item) => `
       <div class="item-row">
-        <div class="item-row-img"><img src="${item.image}" alt="${escapeHtml(item.name)}" /></div>
+        <div class="item-row-img"><img src="${item.image}" alt="${escapeHtml(item.name)}" width="44" height="44" loading="lazy" decoding="async" /></div>
         <div>
           <div class="item-row-name">${escapeHtml(item.name)}</div>
           <div class="item-row-meta">${escapeHtml(item.unit || '')} · $${item.price.toFixed(2)} each</div>

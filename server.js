@@ -695,10 +695,13 @@ app.get('/manage', (_req, res) => {
   const portalUrl = process.env.STRIPE_PORTAL_URL;
   if (portalUrl) return res.redirect(302, portalUrl);
   // Fallback if not yet configured: a friendly page explaining where to find the portal link.
+  // A utility page, so keep it out of search results (it's also left out of sitemap.xml).
+  res.setHeader('X-Robots-Tag', 'noindex');
   res.status(200).type('html').send(`<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
 <title>Manage your subscription | Fast Track School Supplies</title>
 <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
@@ -941,17 +944,42 @@ app.get('/api/kits/:kitId', (req, res) => {
   res.json(payload);
 });
 
+// One kit item row — a port of the client renderItems() template in kit.html. Server-rendering the
+// rows means crawlers that don't run JavaScript see the whole kit (not "0 items / $0.00"), and the
+// client re-render on load swaps in identical markup, so the page doesn't shift. Change one, change both.
+function kitItemRowHtml(item) {
+  return `
+      <div class="item-row">
+        <div class="item-row-img"><img src="${htmlEscape(item.image)}" alt="${htmlEscape(item.name)}" width="44" height="44" loading="lazy" decoding="async" /></div>
+        <div>
+          <div class="item-row-name">${htmlEscape(item.name)}</div>
+          <div class="item-row-meta">${htmlEscape(item.unit || '')} · $${item.price.toFixed(2)} each</div>
+        </div>
+        <div class="item-qty">×${item.quantity}</div>
+        <div class="item-row-price">$${(item.price * item.quantity).toFixed(2)}</div>
+      </div>
+    `;
+}
+
 // Server-side render of a kit detail page: fills SEO placeholder tokens in KIT_TEMPLATE
 // with per-kit values and injects a VALID Product JSON-LD (real price/availability).
+// The visible kit (grade, tagline, items, totals) is rendered here too; the totals mirror
+// updateTotals() in kit.html, with shipping from the same settings the cart pages use.
 function renderKitPage(detail) {
   const url = `${SITE_URL}/kits/${detail.kit_id}`;
   const title = `${detail.name} | Fast Track School Supplies`;
-  const description = `${detail.tagline} Ages ${detail.age_range}. ${detail.items.length} items, bundled at ${Math.round(KIT_DISCOUNT * 100)}% off and shipped to your door.`;
+  // age_range already carries its own label ("Ages 5-6", "Grades 6-8").
+  const description = `${detail.tagline} ${detail.age_range}. ${detail.items.length} items, bundled at ${Math.round(KIT_DISCOUNT * 100)}% off and shipped to your door.`;
+  const images = detail.items
+    .map(i => absolutize(i.image))
+    .filter(src => src && /^https:\/\//i.test(src) && !src.endsWith(PLACEHOLDER_IMAGE))
+    .slice(0, 4);
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: detail.name,
     description: detail.tagline,
+    ...(images.length ? { image: images } : {}),
     category: 'School Supply Kit',
     brand: { '@type': 'Brand', name: 'Fast Track School Supplies' },
     audience: { '@type': 'EducationalAudience', audienceType: detail.age_range, educationalRole: 'Student' },
@@ -964,15 +992,31 @@ function renderKitPage(detail) {
       seller: { '@type': 'Organization', name: 'Fast Track School Supplies' }
     },
     url,
-    isRelatedTo: detail.items.slice(0, 8).map(i => ({ '@type': 'Product', name: i.name }))
+    isRelatedTo: detail.items.map(i => ({ '@type': 'Product', name: i.name }))
   };
   const jsonLd = `<script type="application/ld+json">\n${JSON.stringify(productSchema, null, 2)}\n</script>`;
+  const money = n => `$${n.toFixed(2)}`;
+  const shipping = detail.subtotal > 0 ? shippingCentsFor(Math.round(detail.subtotal * 100)) / 100 : 0;
+  const total = detail.subtotal + shipping;
+  const savings = detail.raw_subtotal - detail.subtotal;
   return KIT_TEMPLATE
     .split('{{KIT_TITLE}}').join(htmlEscape(title))
     .split('{{KIT_OG_TITLE}}').join(htmlEscape(title))
     .split('{{KIT_DESCRIPTION}}').join(htmlEscape(description))
     .split('{{KIT_CANONICAL}}').join(url)
     .split('{{KIT_H1}}').join(htmlEscape(detail.name))
+    .split('{{KIT_HERO_STYLE}}').join(htmlEscape(`background: linear-gradient(180deg, ${detail.hero_color}55, transparent 60%)`))
+    .split('{{KIT_GRADE}}').join(htmlEscape(detail.grade_label))
+    .split('{{KIT_AGE}}').join(htmlEscape(detail.age_range))
+    .split('{{KIT_TAGLINE}}').join(htmlEscape(detail.tagline))
+    .split('{{KIT_STRIKE_TOTAL}}').join(savings > 0 ? money(detail.raw_subtotal + shipping) : '')
+    .split('{{KIT_TOTAL}}').join(money(total))
+    .split('{{KIT_RAW_SUBTOTAL}}').join(money(detail.raw_subtotal))
+    .split('{{KIT_SAVINGS_STYLE}}').join(savings > 0 ? '' : 'display:none;')
+    .split('{{KIT_SAVINGS}}').join(`−${money(savings)}`)
+    .split('{{KIT_SHIPPING}}').join(money(shipping))
+    .split('{{KIT_ITEM_COUNT}}').join(`${detail.items.length} items`)
+    .split('<!--KIT_ITEMS-->').join(detail.items.map(kitItemRowHtml).join(''))
     .split('<!--KIT_JSONLD-->').join(jsonLd);
 }
 
@@ -1055,6 +1099,22 @@ function storeFilterChipsHtml(products) {
   }).join('');
 }
 
+// Manufacturer brands that appear in product names. Products carry no brand field and the owner
+// renames them in the admin, so the schema brand is read from the name at render time. Fast Track
+// resells these items, so a product with no recognizable brand in its name gets no brand at all
+// rather than being labeled as a Fast Track product.
+const PRODUCT_BRANDS = [
+  'Crayola', "Elmer's", 'Ticonderoga', 'Sharpie', 'Expo', 'Fiskars', 'Ziploc', 'Scotch', 'Post-it',
+  'Five Star', 'Mead', 'Clorox', 'Lysol', 'Kleenex', 'Puffs', 'Bic', 'Paper Mate', 'Pilot', 'Pentel',
+  'Westcott', 'Prang', 'Dixon', 'Avery', 'Texas Instruments', 'Purell'
+];
+// Whole-word match ("Bic" must not match "Bicycle"). No brand above contains a regex metacharacter.
+const BRAND_PATTERNS = PRODUCT_BRANDS.map(brand => ({ brand, re: new RegExp(`(^|[^a-z])${brand.toLowerCase()}([^a-z]|$)`) }));
+function productBrand(name) {
+  const n = String(name || '').replace(/\u2019/g, "'").toLowerCase();
+  return BRAND_PATTERNS.find(x => x.re.test(n))?.brand || null;
+}
+
 // Server-side render of /store: injects an ItemList of Products (with offers) so the
 // collection page exposes price/availability schema in the initial HTML.
 function renderStorePage(products = PRODUCTS, content = readContent()) {
@@ -1069,7 +1129,7 @@ function renderStorePage(products = PRODUCTS, content = readContent()) {
         name: p.name,
         category: 'School Supplies',
         ...(absolutize(p.image) && /^https:\/\//i.test(absolutize(p.image)) ? { image: absolutize(p.image) } : {}),
-        brand: { '@type': 'Brand', name: 'Fast Track School Supplies' },
+        ...(productBrand(p.name) ? { brand: { '@type': 'Brand', name: productBrand(p.name) } } : {}),
         offers: {
           '@type': 'Offer',
           price: effectivePrice(p).toFixed(2),

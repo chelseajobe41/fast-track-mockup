@@ -23,7 +23,7 @@
   "name": "How to Upload Your School Supply List",
   "description": "Use Fast Track's AI to turn a supply list photo into a ready-to-ship kit in seconds.",
   "step": [
-    { "@type": "HowToStep", "position": 1, "name": "Snap a photo", "text": "Take a picture of your teacher's supply list, or upload a PDF." },
+    { "@type": "HowToStep", "position": 1, "name": "Snap a photo", "text": "Take a picture of your teacher's supply list, or upload a screenshot of it." },
     { "@type": "HowToStep", "position": 2, "name": "AI matches items", "text": "Our system reads your list and matches items to products in our catalog." },
     { "@type": "HowToStep", "position": 3, "name": "Review and check out", "text": "Adjust quantities, then check out via Stripe." },
     { "@type": "HowToStep", "position": 4, "name": "Receive your kit", "text": "We pack your kit and ship it to your door with tracking." }
@@ -409,7 +409,7 @@
       <a href="/store">Store</a>
       <a href="/gift">Gift</a>
     </nav>
-    <button class="cart-btn" onclick="window.location.href='/store'">
+    <button class="cart-btn" type="button">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l3 6h6l3-6M3 6h18l-2 13H5L3 6zM9 22a1 1 0 100-2 1 1 0 000 2zM15 22a1 1 0 100-2 1 1 0 000 2z"/></svg>
       Cart
       <span class="cart-count" id="cart-count">0</span>
@@ -422,7 +422,7 @@
 
     <div id="intro">
       <h1>Upload your supply list<span class="dot">.</span></h1>
-      <p class="lead">Drop a photo or PDF of your child's list. Our system reads your list, matches items to our catalog, and builds your cart in seconds. Anything we can't match is flagged below so you can review.</p>
+      <p class="lead">Drop a photo or screenshot of your child's list. Our system reads your list, matches items to our catalog, and builds your cart in seconds. Anything we can't match is flagged below so you can review.</p>
 
       <label for="file-input" class="dropzone" id="dropzone">
         <div class="dropzone-icon">

@@ -699,6 +699,12 @@
     updateCartFab();
   }
   document.getElementById('cart-fab').addEventListener('click', openCart);
+  // Arriving from another page's Cart button (/store#cart): open the drawer, then drop the hash
+  // so a refresh or back-navigation doesn't reopen it.
+  if (location.hash === '#cart') {
+    openCart();
+    history.replaceState(null, '', location.pathname + location.search);
+  }
 
   async function goCheckout() {
     const btn = document.getElementById('checkout-btn');

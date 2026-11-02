@@ -6,7 +6,7 @@
 
 Fast Track School Supplies replaces the annual scramble of running from store to store for school supplies. We offer three ways to shop:
 
-1. **Upload a supply list** — Parents drop a photo or PDF of the teacher's supply list. An AI assistant reads every line, matches each item to a SKU in our catalog, and builds a cart in seconds.
+1. **Upload a supply list** — Parents drop a photo or screenshot of the teacher's supply list. An AI assistant reads every line, matches each item to a SKU in our catalog, and builds a cart in seconds.
 2. **Pre-built grade kits** — Eight curated kits, Kindergarten through High School, bundled at a 10% discount vs. buying items individually.
 3. **Browse the store** — 50+ trusted school supplies (Ticonderoga pencils, Crayola crayons, Elmer's glue, etc.) with search, filters, and a custom cart.
 

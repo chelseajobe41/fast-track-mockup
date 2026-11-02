@@ -40,6 +40,17 @@
     el.classList.add('bump');
   };
 
+  // ---------- Header Cart button: open the cart on /store ----------
+  // The cart drawer lives on /store. Every other page's Cart button sends the shopper there with
+  // #cart so the drawer opens on arrival. Wired here (not inline onclick) because the CSP sets
+  // script-src-attr 'none', which silently blocks inline handlers. /store's own button
+  // (#cart-toggle) opens the drawer in place and is skipped.
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.cart-btn');
+    if (!btn || btn.id === 'cart-toggle') return;
+    window.location.href = '/store#cart';
+  });
+
   // ---------- Swap text wordmarks for the real logo image ----------
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.wordmark').forEach(el => {
